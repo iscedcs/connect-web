@@ -39,9 +39,11 @@ export default function WalletCard() {
 
       {/* Bottom actions */}
       <div className="bg-neutral-900 border-2 border-t-0 border-[#868686] rounded-b-2xl max-w-80 mx-auto ">
-        <Button className="w-full py-4 text-sm hover:bg-neutral-800 transition">
-          Connect your BVN to get started
-        </Button>
+        <Link href="/bvn">
+          <Button className="w-full py-4 text-sm hover:bg-neutral-800 transition">
+            Connect your BVN to get started
+          </Button>
+        </Link>
         <div className="h-px bg-[#868686] mx-4" />
 
         <Link

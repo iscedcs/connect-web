@@ -26,7 +26,7 @@ const initialSlides: Slide[] = [
   },
 ];
 
-export default function PromoCarousel() {
+export default function PromoBanner() {
   const [slides, setSlides] = useState<Slide[]>(initialSlides);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [paused, setPaused] = useState(false);

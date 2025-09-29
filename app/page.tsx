@@ -34,6 +34,7 @@ export default function HomePage() {
         <ConnectManagement />
         <StoreManagement />
       </section>
+
       <section className="p-4">
         <AccountSettingsList />
       </section>

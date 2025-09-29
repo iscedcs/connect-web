@@ -47,8 +47,10 @@ const rows: Row[] = [
 export default function AccountSettingsList() {
   return (
     <div className="mt-4">
-      <h4 className="text-sm text-gray-300 mb-3">Account settings</h4>
-      <div className="divide-y divide-neutral-800 rounded-2xl overflow-hidden bg-neutral-900">
+      <h4 className="text-xl font-extrabold text-gray-300 mb-3">
+        Account settings
+      </h4>
+      <div className=" rounded-2xl overflow-hidden">
         {rows.map(({ href, label, Icon }) => (
           <Link
             key={href}

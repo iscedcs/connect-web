@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { scaleSlides } from "@/lib/utils";
+import Link from "next/link";
 
 const icons = [
   { src: "/assets/logos_youtube-icon.svg", alt: "YouTube" },
@@ -61,9 +62,11 @@ export default function ConnectManagement() {
       </div>
 
       <div className="mt-5">
-        <Button variant="secondary" className="rounded-full px-6">
-          Add links
-        </Button>
+        <Link href="/connect/links">
+          <Button variant="secondary" className="rounded-full px-6">
+            Add links
+          </Button>
+        </Link>
       </div>
 
       <style jsx>{`

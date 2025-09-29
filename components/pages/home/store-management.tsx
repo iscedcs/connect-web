@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function StoreManagement() {
   return (
     <div className="bg-neutral-900 rounded-2xl p-5">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <div>
           <h3 className="text-lg font-medium">Store management</h3>
           <p className="text-sm text-gray-400">
@@ -16,7 +16,7 @@ export default function StoreManagement() {
 
         <Link
           href="/store"
-          className="text-xl hover:translate-x-1 transition-transform">
+          className="text-xl group-hover:translate-x-1  transition-transform">
           <ArrowRight />
         </Link>
       </div>
@@ -25,7 +25,7 @@ export default function StoreManagement() {
         <img
           src="/assets/e9243be0b3ade6de587540fa09033d222fd0929e.png"
           alt="Store"
-          className="w-36 h-auto object-contain"
+          className="w-36 h-auto object-contain transition-transform motion-safe:group-hover:-translate-y-0.5"
         />
       </div>
     </div>
