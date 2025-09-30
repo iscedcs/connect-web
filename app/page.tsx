@@ -15,12 +15,16 @@ import EventCard from "@/components/pages/cardholder/home/event-card";
 import ProfileHeader from "@/components/pages/cardholder/home/profile-header";
 import PromoBanner from "@/components/pages/cardholder/home/promo-banner";
 import StoreManagement from "@/components/pages/cardholder/home/store-management";
+import NFCChecker from "@/components/shared/nfc-checker";
 
 export default function HomePage() {
   return (
-    <main className="bg-black text-white min-h-screen md:max-w-lg mx-auto">
+    <main className="bg-black text-white min-h-screen">
       <section className="">
         <ProfileHeader />
+      </section>
+      <section className="">
+        <NFCChecker />
       </section>
       <section className="p-4 space-y-5">
         <PromoBanner />
