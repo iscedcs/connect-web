@@ -7,18 +7,18 @@
 // import StoreManagement from "@/components/home/StoreManagement";
 // import AccountSettingsList from "@/components/home/AccountSettingsList";
 
-import AccountSettingsList from "@/components/pages/home/account-settings";
-import ConnectManagement from "@/components/pages/home/contact-management";
-import WalletCard from "@/components/pages/home/contact-wallet";
-import DevicesCard from "@/components/pages/home/device-section";
-import EventCard from "@/components/pages/home/event-card";
-import ProfileHeader from "@/components/pages/home/profile-header";
-import PromoBanner from "@/components/pages/home/promo-banner";
-import StoreManagement from "@/components/pages/home/store-management";
+import AccountSettingsList from "@/components/pages/cardholder/home/account-settings";
+import ConnectManagement from "@/components/pages/cardholder/home/contact-management";
+import WalletCard from "@/components/pages/cardholder/home/contact-wallet";
+import DevicesCard from "@/components/pages/cardholder/home/device-section";
+import EventCard from "@/components/pages/cardholder/home/event-card";
+import ProfileHeader from "@/components/pages/cardholder/home/profile-header";
+import PromoBanner from "@/components/pages/cardholder/home/promo-banner";
+import StoreManagement from "@/components/pages/cardholder/home/store-management";
 
 export default function HomePage() {
   return (
-    <main className="bg-black text-white min-h-screen">
+    <main className="bg-black text-white min-h-screen md:max-w-lg mx-auto">
       <section className="">
         <ProfileHeader />
       </section>

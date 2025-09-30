@@ -1,5 +1,5 @@
 "use client";
-import OtpScreen from "@/components/otp/otp-screen";
+import OtpScreen from "@/components/cardholder/otp/otp-screen";
 import React from "react";
 
 export default function OtpClientSection() {

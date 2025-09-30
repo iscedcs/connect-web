@@ -1,14 +1,14 @@
 "use client";
-import OtpScreen from "@/components/otp/otp-screen";
+import OtpScreen from "@/components/cardholder/otp/otp-screen";
 import React from "react";
 
-export default function OtpClientErrorSection() {
+export default function OtpSucesssSection() {
   return (
     <OtpScreen
-      state="error"
+      state="success"
       onVerify={async (code) => {
         console.log("Verifying OTP:", code);
-        return "error" as const;
+        return "success" as const;
       }}
     />
   );

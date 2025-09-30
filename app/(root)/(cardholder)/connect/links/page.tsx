@@ -1,9 +1,9 @@
 // app/connect/links/page.tsx
 "use client";
 
-import LinkAddedSuccess from "@/components/connect/link-added-success";
-import LinkForm from "@/components/connect/link-form";
-import LinkPickerGrid from "@/components/connect/link-picker-grid";
+import LinkAddedSuccess from "@/components/cardholder/connect/link-added-success";
+import LinkForm from "@/components/cardholder/connect/link-form";
+import LinkPickerGrid from "@/components/cardholder/connect/link-picker-grid";
 import { useState } from "react";
 
 type Step =
