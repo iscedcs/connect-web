@@ -22,15 +22,20 @@ export interface NFCWriteOptions {
 	signal?: AbortSignal;
 }
 
+export interface NFCScanOptions {
+	signal?: AbortSignal;
+}
+
 export class WebNFCUtils {
 	private reader: NDEFReader | null = null;
 	private writer: NDEFWriter | null = null;
+	private isScanning: boolean = false;
 
 	/**
 	 * Check if Web NFC is supported in the current browser
 	 */
 	static isNFCSupported(): boolean {
-		return 'NDEFReader' in window && 'NDEFWriter' in window;
+		return typeof window !== 'undefined' && 'NDEFReader' in window;
 	}
 
 	/**
@@ -42,7 +47,6 @@ export class WebNFCUtils {
 		}
 
 		try {
-			// Try to create an NDEFReader to test NFC availability
 			const reader = new NDEFReader();
 			return true;
 		} catch (error) {
@@ -52,35 +56,59 @@ export class WebNFCUtils {
 	}
 
 	/**
-	 * Request NFC permissions
+	 * Get scanning status
 	 */
-	async requestPermissions(): Promise<boolean> {
-		try {
-			if ('permissions' in navigator) {
-				const permission = await navigator.permissions.query({
-					name: 'nfc' as any,
-				});
-				return permission.state === 'granted';
-			}
-			return true;
-		} catch (error) {
-			console.warn('Permission request failed:', error);
-			return false;
-		}
+	get isScanningActive(): boolean {
+		return this.isScanning;
 	}
 
 	/**
-	 * Start scanning for NFC tags
+	 * Start scanning for NFC tags with event handlers
 	 */
-	async startReading(signal?: AbortSignal): Promise<void> {
+	async startScan(
+		onReading: (event: NFCReadingEvent) => void,
+		onError?: (error: Error) => void,
+		options?: NFCScanOptions
+	): Promise<void> {
 		if (!WebNFCUtils.isNFCSupported()) {
 			throw new Error('Web NFC is not supported in this browser');
 		}
 
+		if (this.isScanning) {
+			throw new Error('NFC scan is already in progress');
+		}
+
 		try {
 			this.reader = new NDEFReader();
-			await this.reader.scan({ signal });
+			this.isScanning = true;
+
+			// Set up event listeners
+			this.reader.addEventListener('reading', (event: any) => {
+				const nfcEvent: NFCReadingEvent = {
+					serialNumber: event.serialNumber || '',
+					records: event.message.records.map((record: any) => ({
+						recordType: record.recordType,
+						mediaType: record.mediaType,
+						id: record.id,
+						data: record.data,
+						encoding: record.encoding,
+						lang: record.lang,
+					})),
+				};
+				onReading(nfcEvent);
+			});
+
+			if (onError) {
+				this.reader.addEventListener('readingerror', (event: any) => {
+					onError(
+						new Error(event.error || 'Unknown NFC reading error')
+					);
+				});
+			}
+
+			await this.reader.scan(options);
 		} catch (error) {
+			this.isScanning = false;
 			throw new Error(`Failed to start NFC reading: ${error}`);
 		}
 	}
@@ -88,49 +116,69 @@ export class WebNFCUtils {
 	/**
 	 * Stop scanning for NFC tags
 	 */
-	stopReading(): void {
+	stopScan(): void {
 		this.reader = null;
+		this.isScanning = false;
 	}
 
 	/**
-	 * Listen for NFC reading events
+	 * Scan for a single NFC tag (Promise-based)
 	 */
-	onReading(callback: (event: NFCReadingEvent) => void): void {
-		if (!this.reader) {
-			throw new Error(
-				'NFC reader not initialized. Call startReading() first.'
-			);
-		}
+	async scanOnce(options?: NFCScanOptions): Promise<NFCReadingEvent> {
+		return new Promise((resolve, reject) => {
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => {
+				controller.abort();
+				reject(new Error('NFC scan timeout'));
+			}, 30000); // 30 second timeout
 
-		this.reader.addEventListener('reading', (event: any) => {
-			const nfcEvent: NFCReadingEvent = {
-				serialNumber: event.serialNumber,
-				records: event.message.records.map((record: any) => ({
-					recordType: record.recordType,
-					mediaType: record.mediaType,
-					id: record.id,
-					data: record.data,
-					encoding: record.encoding,
-					lang: record.lang,
-				})),
-			};
-			callback(nfcEvent);
+			this.startScan(
+				(event) => {
+					clearTimeout(timeoutId);
+					this.stopScan();
+					resolve(event);
+				},
+				(error) => {
+					clearTimeout(timeoutId);
+					this.stopScan();
+					reject(error);
+				},
+				{ ...options, signal: controller.signal }
+			).catch(reject);
 		});
 	}
 
 	/**
-	 * Listen for NFC reading errors
+	 * Extract card ID from URL record (like in your React component)
 	 */
-	onReadingError(callback: (error: Error) => void): void {
-		if (!this.reader) {
-			throw new Error(
-				'NFC reader not initialized. Call startReading() first.'
-			);
+	static extractCardIdFromURL(record: NFCRecord): string | null {
+		if (record.recordType === 'url' && record.data) {
+			const decoder = new TextDecoder();
+			const url = decoder.decode(record.data);
+			const idMatch = url.match(/id=([^&]+)/);
+			return idMatch?.[1] || null;
+		}
+		return null;
+	}
+
+	/**
+	 * Scan for card ID specifically (matching your React component logic)
+	 */
+	async scanForCardId(options?: NFCScanOptions): Promise<string> {
+		const event = await this.scanOnce(options);
+
+		if (event.records.length === 0) {
+			throw new Error('No NFC records found');
 		}
 
-		this.reader.addEventListener('readingerror', (event: any) => {
-			callback(new Error(event.error || 'Unknown NFC reading error'));
-		});
+		const record = event.records[0];
+		const cardId = WebNFCUtils.extractCardIdFromURL(record);
+
+		if (!cardId) {
+			throw new Error('Invalid card data - no ID found in URL');
+		}
+
+		return cardId;
 	}
 
 	/**
@@ -214,7 +262,7 @@ export class WebNFCUtils {
 	}
 }
 
-// Type declarations for Web NFC API (if not available globally)
+// Type declarations for Web NFC API
 declare global {
 	interface Window {
 		NDEFReader: any;
