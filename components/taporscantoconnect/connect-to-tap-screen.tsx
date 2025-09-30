@@ -69,6 +69,7 @@ export default function ConnectTapScreen({
 
 			const record = event.records[0];
 			const cardId = WebNFCUtils.extractCardIdFromURL(record);
+			const deviceType = WebNFCUtils.extractDeviceType(record);
 
 			if (!cardId) {
 				throw new Error('Invalid card - no ID found');
@@ -79,8 +80,14 @@ export default function ConnectTapScreen({
 			// Stop scanning before redirecting
 			nfcUtils.stopScan();
 
-			// Redirect to OTP page with card ID
-			router.push(`/otp/idle?cardid=${cardId}`);
+			// Build URL with card ID and device type (if available)
+			const params = new URLSearchParams({ cardid: cardId });
+			if (deviceType) {
+				params.append('type', deviceType);
+			}
+
+			// Redirect to OTP page with card ID and type
+			router.push(`/otp/idle?${params.toString()}`);
 		} catch (error) {
 			console.error('Error processing card data:', error);
 			setError(

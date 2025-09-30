@@ -162,6 +162,19 @@ export class WebNFCUtils {
 	}
 
 	/**
+	 * Extract device type from URL record
+	 */
+	static extractDeviceType(record: NFCRecord): string | null {
+		if (record.recordType === 'url' && record.data) {
+			const decoder = new TextDecoder();
+			const url = decoder.decode(record.data);
+			const typeMatch = url.match(/type=([^&]+)/);
+			return typeMatch?.[1] || null;
+		}
+		return null;
+	}
+
+	/**
 	 * Scan for card ID specifically (matching your React component logic)
 	 */
 	async scanForCardId(options?: NFCScanOptions): Promise<string> {
@@ -179,6 +192,29 @@ export class WebNFCUtils {
 		}
 
 		return cardId;
+	}
+
+	/**
+	 * Scan for card data (ID and type)
+	 */
+	async scanForCardData(
+		options?: NFCScanOptions
+	): Promise<{ id: string; type: string | null }> {
+		const event = await this.scanOnce(options);
+
+		if (event.records.length === 0) {
+			throw new Error('No NFC records found');
+		}
+
+		const record = event.records[0];
+		const cardId = WebNFCUtils.extractCardIdFromURL(record);
+		const deviceType = WebNFCUtils.extractDeviceType(record);
+
+		if (!cardId) {
+			throw new Error('Invalid card data - no ID found in URL');
+		}
+
+		return { id: cardId, type: deviceType };
 	}
 
 	/**
