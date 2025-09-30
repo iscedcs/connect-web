@@ -1,17 +1,18 @@
 import OtpClientSection from '@/components/pages/home/otpclientsection';
 
 interface PageProps {
-	searchParams: {
+	searchParams: Promise<{
 		cardid?: string;
 		type?: string;
-	};
+	}>;
 }
 
-export default function Page({ searchParams }: PageProps) {
+export default async function Page({ searchParams }: PageProps) {
+	const params = await searchParams;
 	return (
 		<OtpClientSection
-			cardId={searchParams.cardid}
-			deviceType={searchParams.type}
+			cardId={params.cardid}
+			deviceType={params.type}
 		/>
 	);
 }
