@@ -25,6 +25,7 @@ export default function OtpScreen({
 	onVerify,
 	cardId,
 	deviceType,
+	userId,
 }: {
 	state?: OtpState;
 	seconds?: number;
@@ -33,6 +34,7 @@ export default function OtpScreen({
 	onVerify?: (code: string) => Promise<'success' | 'error'> | void;
 	cardId?: string;
 	deviceType?: string;
+	userId?: string;
 }) {
 	const [timeLeft, setTimeLeft] = useState(seconds);
 
@@ -125,6 +127,12 @@ export default function OtpScreen({
 									Device Type:
 								</span>{' '}
 								{deviceType}
+							</p>
+						)}
+						{userId && (
+							<p className='text-xs text-white/80 mt-1'>
+								<span className='font-medium'>User ID:</span>{' '}
+								{userId} - 944517
 							</p>
 						)}
 					</div>

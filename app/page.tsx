@@ -1,12 +1,4 @@
-// app/page.tsx
-// import PromoBanner from "@/components/home/PromoBanner";
-// import EventCarousel from "@/components/home/EventCarousel";
-// import DevicesCard from "@/components/home/DevicesCard";
-// import WalletCard from "@/components/home/WalletCard";
-// import ConnectManagement from "@/components/home/ConnectManagement";
-// import StoreManagement from "@/components/home/StoreManagement";
-// import AccountSettingsList from "@/components/home/AccountSettingsList";
-
+import { getAuthInfo } from "@/app/actions/auth";
 import AccountSettingsList from "@/components/pages/cardholder/home/account-settings";
 import ConnectManagement from "@/components/pages/cardholder/home/contact-management";
 import WalletCard from "@/components/pages/cardholder/home/contact-wallet";
@@ -15,17 +7,17 @@ import EventCard from "@/components/pages/cardholder/home/event-card";
 import ProfileHeader from "@/components/pages/cardholder/home/profile-header";
 import PromoBanner from "@/components/pages/cardholder/home/promo-banner";
 import StoreManagement from "@/components/pages/cardholder/home/store-management";
-import NFCChecker from "@/components/shared/nfc-checker";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const authInfo = await getAuthInfo();
   return (
-    <main className="bg-black text-white min-h-screen">
+    <main className="bg-black text-white">
       <section className="">
-        <ProfileHeader />
+        <ProfileHeader user={authInfo.user} />
       </section>
-      <section className="">
-        <NFCChecker />
-      </section>
+      {/* <section className=''>
+				<NFCChecker />
+			</section> */}
       <section className="p-4 space-y-5">
         <PromoBanner />
         <EventCard />
@@ -41,6 +33,9 @@ export default function HomePage() {
 
       <section className="p-4">
         <AccountSettingsList />
+      </section>
+      <section className="p-4 my-20 border-t border-white/10 text-xs text-white/50">
+        <pre>{JSON.stringify(authInfo, null, 2)}</pre>
       </section>
     </main>
   );
