@@ -1,6 +1,6 @@
+export const CONNECT_API = process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL;
 export const AUTH_API = process.env.NEXT_PUBLIC_LIVE_ISCEAUTH_BACKEND_URL;
 export const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-
 export const URLS = {
   contact: {
     leave: "/api/contact/leave",
@@ -61,5 +61,11 @@ export const URLS = {
     recent: "/api/card-interactions/recent",
     stats: "/api/card-interactions/stats",
     date_range: "/api/card-interactions/date-range",
+  },
+  user: {
+    one: "/user/one/{id}",
+  },
+  device: {
+    create: "/device/create",
   },
 };
