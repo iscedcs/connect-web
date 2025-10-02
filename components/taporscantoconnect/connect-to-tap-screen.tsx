@@ -109,7 +109,7 @@ export default function ConnectTapScreen({
 			{/* gradient bg (replace with your asset if you prefer) */}
 			<video
 				className='absolute inset-0 w-full h-full object-cover'
-				src='/assets/GettyImages-1297962402.mp4'
+				src='/assets/loading.webm'
 				autoPlay
 				loop
 				muted

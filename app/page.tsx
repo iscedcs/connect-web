@@ -15,17 +15,23 @@ import EventCard from '@/components/pages/home/event-card';
 import ProfileHeader from '@/components/pages/home/profile-header';
 import PromoBanner from '@/components/pages/home/promo-banner';
 import StoreManagement from '@/components/pages/home/store-management';
-import NFCChecker from '@/components/shared/nfc-checker';
+import { getAuthInfo } from '@/lib/auth';
 
-export default function HomePage() {
+export default async function HomePage() {
+	const authInfo = await getAuthInfo();
+	if ('error' in authInfo) {
+		console.log('User not authenticated');
+	}
+	const user = authInfo.user;
+	const accessToken = authInfo.accessToken;
 	return (
 		<main className='bg-black text-white min-h-screen'>
 			<section className=''>
 				<ProfileHeader />
 			</section>
-			<section className=''>
+			{/* <section className=''>
 				<NFCChecker />
-			</section>
+			</section> */}
 			<section className='p-4 space-y-5'>
 				<PromoBanner />
 				<EventCard />
@@ -41,6 +47,9 @@ export default function HomePage() {
 
 			<section className='p-4'>
 				<AccountSettingsList />
+			</section>
+			<section className='p-4 my-20 border-t border-white/10 text-xs text-white/50'>
+				<pre>{JSON.stringify(authInfo, null, 2)}</pre>
 			</section>
 		</main>
 	);
