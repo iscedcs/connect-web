@@ -5,11 +5,13 @@ import React from 'react';
 interface OtpClientSectionProps {
 	cardId?: string;
 	deviceType?: string;
+	user?: UserInfo;
 }
 
 export default function OtpClientSection({
 	cardId,
 	deviceType,
+	user,
 }: OtpClientSectionProps) {
 	// Log the received parameters for debugging
 	React.useEffect(() => {
@@ -26,6 +28,7 @@ export default function OtpClientSection({
 			state='idle'
 			cardId={cardId}
 			deviceType={deviceType}
+			userId={user?.id}
 			onResend={() => console.log('resend…')}
 			onVerify={async (code) => (code === '944517' ? 'success' : 'error')}
 		/>

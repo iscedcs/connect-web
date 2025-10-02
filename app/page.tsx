@@ -15,19 +15,14 @@ import EventCard from '@/components/pages/home/event-card';
 import ProfileHeader from '@/components/pages/home/profile-header';
 import PromoBanner from '@/components/pages/home/promo-banner';
 import StoreManagement from '@/components/pages/home/store-management';
-import { getAuthInfo } from '@/lib/auth';
+import { getAuthInfo } from '@/app/actions/auth';
 
 export default async function HomePage() {
 	const authInfo = await getAuthInfo();
-	if ('error' in authInfo) {
-		console.log('User not authenticated');
-	}
-	const user = authInfo.user;
-	const accessToken = authInfo.accessToken;
 	return (
-		<main className='bg-black text-white min-h-screen'>
+		<main className='bg-black text-white'>
 			<section className=''>
-				<ProfileHeader />
+				<ProfileHeader user={authInfo.user} />
 			</section>
 			{/* <section className=''>
 				<NFCChecker />
