@@ -125,7 +125,7 @@ export default function HomeClientSection() {
         enabled
         onToggle={(v) => console.log("store toggle:", v)}
       />
-      <AccountSettingsList />
+      <AccountSettingsList isAuthenticated />
     </>
   );
 }

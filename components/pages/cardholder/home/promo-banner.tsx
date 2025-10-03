@@ -53,6 +53,10 @@ export default function PromoBanner() {
     const updatedSlides = slides.filter((s) => s.id !== id);
     setSlides(updatedSlides);
     setCurrentSlide(0); // reset to first slide if needed
+
+    setTimeout(() => {
+      instanceRef.current?.update();
+    }, 0);
   };
 
   if (slides.length === 0) return null;
