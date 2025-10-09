@@ -1,10 +1,10 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { EllipseIcon, InfoIcon } from "@/lib/icons";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { Button } from "../ui/button";
 
 export default function ConnectScanScreen({
   onTapInstead,

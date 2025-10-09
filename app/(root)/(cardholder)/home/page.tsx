@@ -1,5 +1,5 @@
 import MaxWidthWrapper from "@/components/maxwidth-wrapper";
-import HomeClientSection from "@/components/pages/home/homesectionclient";
+import HomeClientSection from "@/components/pages/cardholder/home/homesectionclient";
 
 export default function HomePageTestSection() {
   return (

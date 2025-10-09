@@ -39,7 +39,9 @@ export function middleware(req: NextRequest) {
     pathname.startsWith("/favicon") ||
     pathname.startsWith("/robots.txt") ||
     pathname.startsWith("/sitemap.xml") ||
-    pathname.startsWith("/auth/callback") || // allow the callback through
+    pathname.startsWith("/auth/callback") ||
+    pathname.startsWith("/auth/logout") ||
+    pathname.startsWith("/auth/login") ||
     pathname.startsWith("/api/auth")
   ) {
     return NextResponse.next();

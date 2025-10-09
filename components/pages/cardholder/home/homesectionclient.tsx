@@ -1,8 +1,8 @@
 "use client";
-import DevicesConnectedCard from "@/components/pages/home/filled-state/device-connected";
-import WalletBalanceCard from "@/components/pages/home/filled-state/wallet-connected-balance";
-import ConnectManagementList from "@/components/pages/home/filled-state/connect-management-list";
-import StoreManagementTable from "@/components/pages/home/filled-state/store-management";
+import DevicesConnectedCard from "@/components/pages/cardholder/home/filled-state/device-connected";
+import WalletBalanceCard from "@/components/pages/cardholder/home/filled-state/wallet-connected-balance";
+import ConnectManagementList from "@/components/pages/cardholder/home/filled-state/connect-management-list";
+import StoreManagementTable from "@/components/pages/cardholder/home/filled-state/store-management";
 import AccountSettingsList from "./account-settings";
 import ProfileHeader from "./profile-header";
 import PromoBanner from "./promo-banner";
@@ -125,7 +125,7 @@ export default function HomeClientSection() {
         enabled
         onToggle={(v) => console.log("store toggle:", v)}
       />
-      <AccountSettingsList />
+      <AccountSettingsList isAuthenticated />
     </>
   );
 }
