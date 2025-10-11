@@ -1,6 +1,6 @@
 "use client";
 
-import ConnectSuccessScreen from "@/components/taporscantoconnect/connected-to-device-screen";
+import ConnectSuccessScreen from "@/components/cardholder/taporscantoconnect/connected-to-device-screen";
 
 export default function Page() {
   return (

@@ -3,7 +3,7 @@
 
 import WalletHistoryList, {
   WalletTxn,
-} from "@/components/wallet/wallet-history-list";
+} from "@/components/cardholder/wallet/wallet-history-list";
 
 const items: WalletTxn[] = [
   {

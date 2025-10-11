@@ -1,7 +1,6 @@
 "use client";
 
-import EditProfileForm from "@/components/forms/editProfile-form";
-
+import EditProfileForm from "@/components/cardholder/forms/editProfile-form";
 
 export default function EditProfilePage() {
   return (

@@ -1,7 +1,7 @@
 // app/wallet/empty/page.tsx
 "use client";
 
-import WalletEmptyState from "@/components/wallet/empty-wallet-state";
+import WalletEmptyState from "@/components/cardholder/wallet/empty-wallet-state";
 
 export default function Page() {
   return (
