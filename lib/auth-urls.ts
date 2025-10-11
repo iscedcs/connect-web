@@ -1,4 +1,4 @@
-// src/lib/auth-urls.ts
+///lib/auth-urls.ts
 export function buildAuthLoginUrl(redirectTo: string) {
   const base = process.env.AUTH_BASE_URL!;
   const path = process.env.AUTH_LOGIN_PATH || "/sign-in";
@@ -11,5 +11,6 @@ export function buildAuthLoginUrl(redirectTo: string) {
 
   const url = new URL(path, base);
   url.searchParams.set("redirect_uri", safeRedirect);
+  url.searchParams.set("prompt", "login");
   return url.toString();
 }
