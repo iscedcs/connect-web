@@ -5,9 +5,17 @@ export async function GET(req: Request) {
   const appBase =
     process.env.NEXT_PUBLIC_URL || `${here.protocol}//${here.host}`;
 
-  const res = NextResponse.redirect(new URL("/", appBase));
+  const returnTo = new URL("/", appBase).toString();
+
+  const authBase = process.env.AUTH_BASE_URL;
+
+  const ssoLogout = new URL("/sso/logout", authBase);
+  ssoLogout.searchParams.set("redirect", returnTo);
+
+  const res = NextResponse.redirect(ssoLogout, { status: 302 });
+
   res.cookies.set("accessToken", "", {
-    httpOnly: true, // match how it was set
+    httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
