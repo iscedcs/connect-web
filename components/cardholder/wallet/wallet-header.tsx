@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowLeft, Eye, Plus, Send, List } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   CopyClipIcon,
   EyesOpenIcon,
@@ -10,7 +8,9 @@ import {
   ScanIcon,
   SendIcon,
 } from "@/lib/icons";
-import { Button } from "../ui/button";
+import { cn } from "@/lib/utils";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 export default function WalletHeader({
   backHref = "/",

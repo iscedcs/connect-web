@@ -13,10 +13,10 @@ import {
 } from "@/components/ui/form";
 import { ArrowLeft, IdCard, MapPin } from "lucide-react";
 import Link from "next/link";
-import { Textarea } from "../ui/textarea";
-import ImagePicker from "../shared/image-picker";
-import { Input } from "../ui/input";
 import { AttachmentIcon, LocationIcon } from "@/lib/icons";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import ImagePicker from "@/components/shared/image-picker";
 
 export default function EditProfileForm({
   defaultValues,

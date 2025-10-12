@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import WearablesCarousel from "./wearable-carousel";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 
 export default function WearablesScreen({
   onConnect,
