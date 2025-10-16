@@ -1,4 +1,4 @@
-export const CONNECT_API = process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL;
+export const CONNECT_API_ORIGIN = process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL;
 export const AUTH_API = process.env.NEXT_PUBLIC_LIVE_ISCEAUTH_BACKEND_URL;
 export const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 export const URLS = {

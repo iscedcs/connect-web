@@ -9,6 +9,7 @@ export const publicRoutes = ["/"];
  * @type {string[]}
  */
 export const protectedRoutes = [
+  "/",
   "/bvn",
   "/connect",
   "/connect/links",
@@ -20,6 +21,9 @@ export const protectedRoutes = [
   "/otp/success",
   "/profile",
   "/profile/edit",
+  "/device",
+  "/links",
+  "/settings",
   "/wallet",
   "/wallet/empty",
   "/wearables",

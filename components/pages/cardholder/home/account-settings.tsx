@@ -22,7 +22,7 @@ type Row = {
 };
 
 const baseRows: Row[] = [
-  { href: "/profile/edit", label: "Edit profile", Icon: EditIcon },
+  { href: "/profile", label: "Edit profile", Icon: EditIcon },
   { href: "/account", label: "Account settings", Icon: AccountSettingsIcon },
   {
     href: "/notifications",
