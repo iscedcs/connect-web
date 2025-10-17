@@ -14,7 +14,7 @@ export default function DevicesCard() {
         </p>
       </div>
 
-      <Link href="/connect">
+      <Link href="/wearables">
         <Button className="rounded-full px-4 py-2 w-fit" variant="secondary">
           Connect devices
         </Button>
