@@ -7,16 +7,50 @@ import EventCard from "@/components/pages/cardholder/home/event-card";
 import ProfileHeader from "@/components/pages/cardholder/home/profile-header";
 import PromoBanner from "@/components/pages/cardholder/home/promo-banner";
 import StoreManagement from "@/components/pages/cardholder/home/store-management";
+import { CONNECT_API_ORIGIN, URLS } from "@/lib/const";
+
+type ConnectProfile = {
+  id: string;
+  userId: string;
+  profilePhoto: string | null;
+  coverPhoto: string | null;
+  name: string | null;
+  position: string | null;
+  description: string | null;
+  address?: { street?: string | null };
+};
+
+async function getConnectProfile(): Promise<ConnectProfile | null> {
+  const auth = await getAuthInfo();
+  if ("error" in auth || auth.isExpired) return null;
+
+  const res = await fetch(`${CONNECT_API_ORIGIN}${URLS.profile.profile}`, {
+    headers: {
+      accept: "application/json",
+      authorization: `Bearer ${auth.accessToken}`,
+    },
+    cache: "no-store",
+  });
+
+  if (res.status === 404 || res.status === 401) return null;
+  if (!res.ok) throw new Error("Failed to load profile");
+
+  const json = await res.json();
+  return json?.data?.profile ?? json?.profile ?? null;
+}
 
 export default async function HomePage() {
-  const authInfo = await getAuthInfo();
+  const [connectProfile, authInfo] = await Promise.all([
+    getConnectProfile(),
+    getAuthInfo(),
+  ]);
+  console.log({ authInfo });
   const isAuthed = !("error" in authInfo) && !authInfo.isExpired;
-  const isExpired = !("error" in authInfo) && authInfo.isExpired;
 
   return (
     <main className="bg-black text-white">
       <section className="">
-        <ProfileHeader user={authInfo.user} />
+        <ProfileHeader connectProfile={connectProfile} user={authInfo.user} />
       </section>
       {/* <section className=''>
 				<NFCChecker />
@@ -37,9 +71,6 @@ export default async function HomePage() {
       <section className="p-4">
         <AccountSettingsList isAuthenticated={isAuthed} />
       </section>
-      {/* <section className="p-4 my-20 border-t border-white/10 text-xs text-white/50">
-        <pre>{JSON.stringify(authInfo, null, 2)}</pre>
-      </section> */}
     </main>
   );
 }

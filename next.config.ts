@@ -6,15 +6,32 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "cdn.sanity.io",
-        port: "",
+      },
+      {
+        protocol: "https",
+        hostname: "fra1.digitaloceanspaces.com",
+      },
+      {
+        protocol: "https",
+        hostname: "isce-image.fra1.digitaloceanspaces.com",
+      },
+      {
+        protocol: "https",
+        hostname: "encrypted-tbn0.gstatic.com",
+      },
+      {
+        protocol: "https",
+        hostname: "isce-image-uploader.s3.us-east-1.amazonaws.com",
+      },
+      {
+        protocol: "https",
+        hostname: "i.ytimg.com",
+      },
+      {
+        protocol: "https",
+        hostname: "hebbkx1anhila5yf.public.blob.vercel-storage.com",
       },
     ],
-    domains: [
-      "encrypted-tbn0.gstatic.com",
-      "isce-image-uploader.s3.us-east-1.amazonaws.com",
-      "i.ytimg.com",
-      "hebbkx1anhila5yf.public.blob.vercel-storage.com",
-    ], // add the hostname here
   },
 };
 

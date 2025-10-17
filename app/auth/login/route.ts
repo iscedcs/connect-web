@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { buildAuthLoginUrl } from "@/lib/auth-urls"; // the helper you already have
+import { buildAuthLoginUrl } from "@/lib/auth-urls";
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
