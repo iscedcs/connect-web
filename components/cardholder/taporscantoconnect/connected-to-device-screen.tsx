@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 
 export default function ConnectSuccessScreen({
-  cardImage = "/assets/card.jpg",
+  cardImage = "/cards/PuURPLE.png",
   message = "Device connected",
   onContinue,
 }: {
@@ -14,7 +14,7 @@ export default function ConnectSuccessScreen({
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
       <div className="flex-1 flex flex-col items-center justify-start pt-16">
-        <div className="w-[280px] rounded-2xl overflow-hidden shadow-md">
+        <div className="w-full rounded-2xl overflow-hidden shadow-md">
           <img
             src={cardImage}
             alt="Connected device"

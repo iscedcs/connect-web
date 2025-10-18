@@ -67,6 +67,7 @@ export const URLS = {
     one: "/user/one/{id}",
   },
   device: {
+    verify_token: "/device/verify-token",
     create: "/device/create",
   },
 };
