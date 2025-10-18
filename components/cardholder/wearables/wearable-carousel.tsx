@@ -75,7 +75,7 @@ export default function WearablesCarousel({
               {/* CONSISTENT MEDIA BOX */}
               <div className="w-full flex justify-center">
                 {/* fixed-height box so layout doesn’t jump; images are centered & contained */}
-                <div className="h-48 w-full max-w-sm rounded-2xl p-3 flex items-center justify-center">
+                <div className="h-1/2 w-full max-w-sm rounded-2xl p-3 flex items-center justify-center">
                   <img
                     src={s.image}
                     alt={s.title}

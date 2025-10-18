@@ -21,7 +21,7 @@ export default function WearablesScreen({
           Contactless Wearables
         </h1>
 
-        <div className="mt-6">
+        <div className="mt-20">
           <WearablesCarousel />
         </div>
       </div>

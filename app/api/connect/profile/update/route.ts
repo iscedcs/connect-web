@@ -1,4 +1,4 @@
-import { CONNECT_API_ORIGIN, URLS } from "@/lib/const";
+import { NEXT_PUBLIC_CONNECT_API_ORIGIN, URLS } from "@/lib/const";
 import { getBearerAndUserId } from "../../_lib/auth";
 
 export async function PATCH(req: Request) {
@@ -14,7 +14,7 @@ export async function PATCH(req: Request) {
     ...payload,
   };
 
-  const base = CONNECT_API_ORIGIN!;
+  const base = NEXT_PUBLIC_CONNECT_API_ORIGIN!;
   const upstream = `${base}${URLS.profile.update}`;
 
   const res = await fetch(upstream, {
