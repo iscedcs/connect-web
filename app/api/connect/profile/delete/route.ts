@@ -1,4 +1,4 @@
-import { CONNECT_API_ORIGIN, URLS } from "@/lib/const";
+import { NEXT_PUBLIC_CONNECT_API_ORIGIN, URLS } from "@/lib/const";
 import { getBearerAndUserId } from "../../_lib/auth";
 
 export async function DELETE() {
@@ -7,7 +7,7 @@ export async function DELETE() {
 
   const { token, userId } = got;
 
-  const base = CONNECT_API_ORIGIN!;
+  const base = NEXT_PUBLIC_CONNECT_API_ORIGIN!;
   const upstream = `${base}${URLS.profile.delete}`;
 
   const res = await fetch(upstream, {
