@@ -19,52 +19,15 @@ export default function OtpClientSection({
   productId,
 }: OtpClientSectionProps) {
   const router = useRouter();
-
   const userId = user?.id;
-
   const effectiveProductId = productId ?? cardId;
+
   const [created, setCreated] = React.useState(false);
   const [otpState, setOtpState] = React.useState<
     "idle" | "success" | "error" | "resending"
   >("idle");
-  const [verifiedToken, setVerifiedToken] = React.useState<string | null>(null);
 
-  const creatingRef = React.useRef(false);
-
-  // Log the received parameters for debugging
-
-  React.useEffect(() => {
-    if (
-      otpState === "success" &&
-      verifiedToken &&
-      effectiveProductId &&
-      !creatingRef.current
-    ) {
-      creatingRef.current = true;
-      (async () => {
-        const r = await createDevice({
-          token: verifiedToken,
-          productId: effectiveProductId,
-        });
-        if (r.ok) {
-          setCreated(true);
-        } else {
-          // fall back to error state if creation failed
-          setOtpState("error");
-          creatingRef.current = false;
-        }
-      })();
-    }
-  }, [otpState, verifiedToken, effectiveProductId]);
-
-  React.useEffect(() => {
-    if (cardId) {
-      console.log("Card ID received:", cardId);
-    }
-    if (deviceType) {
-      console.log("Device type received:", deviceType);
-    }
-  }, [cardId, deviceType]);
+  const inFlightRef = React.useRef(false);
 
   if (created) {
     return (
@@ -75,19 +38,48 @@ export default function OtpClientSection({
       />
     );
   }
+
   return (
     <OtpScreen
       state={otpState}
-      onResend={() => console.log("resend…")}
+      onResend={() => {}}
       onVerify={async (token) => {
         if (!userId) return "error";
-        const r = await verifyDeviceToken({ token, userId });
-        setOtpState(r.ok ? "success" : "error");
-        return r.ok ? "success" : "error";
-      }}
-      onVerified={(token) => {
-        // capture token so we can create automatically
-        setVerifiedToken(token);
+        if (inFlightRef.current) return "success";
+
+        //verify
+        const v = await verifyDeviceToken({
+          token,
+          userId,
+          init: { cache: "no-store" },
+        });
+        if (!v.ok) {
+          setOtpState("error");
+          return "error";
+        }
+
+        setOtpState("success");
+
+        //immediately create (exactly once)
+        if (!effectiveProductId) return "success";
+        inFlightRef.current = true;
+
+        const c = await createDevice({
+          token,
+          productId: effectiveProductId,
+          init: { cache: "no-store" },
+        });
+
+        // consider 409 as success (already connected)
+        if (c.ok || c.status === 409) {
+          setCreated(true);
+          return "success";
+        }
+
+        // creation failed → allow retry without re-verifying
+        inFlightRef.current = false;
+        setOtpState("error");
+        return "error";
       }}
     />
   );
