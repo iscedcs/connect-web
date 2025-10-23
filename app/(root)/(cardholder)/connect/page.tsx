@@ -49,11 +49,7 @@ export default function ConnectPage() {
 
   if (mode === "scan") {
     return (
-      <ConnectScanScreen
-        onTapInstead={() => setMode("tap")}
-        backHref="/"
-        previewSrc="/assets/2870ea38143ec7e1698cc7437b0c229b85605be9.jpg"
-      />
+      <ConnectScanScreen onTapInstead={() => setMode("tap")} backHref="/" />
     );
   }
 

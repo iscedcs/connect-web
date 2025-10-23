@@ -1,13 +1,15 @@
 "use client";
 
-import { Switch } from "@/components/ui/switch";
+import { DEVICE_TYPE } from "@/lib/const";
 import {
   DeleteIcon,
   DisconnectIcon,
   RefreshIcon,
   ToggleIcon,
 } from "@/lib/icons";
-import { CircleX, RefreshCw, Trash2 } from "lucide-react";
+import { getDeviceName } from "@/lib/utils";
+import { ChevronDown, ChevronUp, Cog, CreditCard } from "lucide-react";
+import { useState } from "react";
 
 type Device = {
   id: string;
@@ -29,11 +31,17 @@ export default function DevicesConnectedCard({
   manageHref?: string;
   enabled?: boolean;
   onToggle?: (v: boolean) => void;
-  devices: Device[];
+  devices: DeviceInterface[];
   onDisconnect?: (id: string) => void;
   onRefresh?: (id: string) => void;
   onDelete?: (id: string) => void;
 }) {
+  const [expandedDeviceId, setExpandedDeviceId] = useState<string | null>(null);
+
+  const toggleExpand = (id: string) => {
+    setExpandedDeviceId((prev) => (prev === id ? null : id));
+  };
+
   return (
     <div className="bg-neutral-900 rounded-2xl p-5">
       {/* Header */}
@@ -51,67 +59,66 @@ export default function DevicesConnectedCard({
 
       {/* List */}
       <div className="mt-4 space-y-4">
-        {devices.map((d, i) => (
-          <div key={d.id}>
-            <div className="flex items-start justify-between">
-              <div className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center overflow-hidden">
-                  {d.iconSrc ? (
-                    <img
-                      src={d.iconSrc}
-                      alt=""
-                      className="w-5 h-5 object-cover"
-                    />
-                  ) : (
-                    <div className="w-3 h-3 rounded-full bg-white/40" />
-                  )}
+        {devices.map((d, i) => {
+          const isExpanded = expandedDeviceId === d.id;
+          return (
+            <div key={d.id} className=" transition-all duration-300">
+              {/* Device row */}
+              <button
+                onClick={() => toggleExpand(d.id)}
+                className="flex items-start justify-between  w-full text-left">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center overflow-hidden">
+                    {d.type === DEVICE_TYPE.CARD ? (
+                      <CreditCard className="h-5 w-5" />
+                    ) : (
+                      <Cog className="h-5 w-5" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-base">{getDeviceName(d.type)}</p>
+                    <p className="text-[10px] text-white/60">{d.label}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-base">{d.name}</p>
-                  <p className="text-[10px] text-white/60">{d.address}</p>
+              </button>
+              <div
+                className={`h-px bg-white/10 transition-all ${
+                  isExpanded ? "opacity-100 mt-1 mb-4" : "opacity-0 mt-0 mb-0"
+                }`}
+              />
+
+              {/* Expandable actions */}
+              {isExpanded && (
+                <div className="mt-4  grid grid-cols-3 gap-3 text-center animate-in fade-in slide-in-from-top-2">
+                  <button
+                    onClick={() => onDisconnect?.(d.id)}
+                    className="flex flex-col items-center gap-2">
+                    <span className="w-12 h-12 rounded-full bg-neutral-800 flex items-center justify-center">
+                      <DisconnectIcon className="w-5 h-5" />
+                    </span>
+                    <span className="text-xs">Disconnect</span>
+                  </button>
+                  <button
+                    onClick={() => onRefresh?.(d.id)}
+                    className="flex flex-col items-center gap-2">
+                    <span className="w-12 h-12 rounded-full bg-neutral-800 flex items-center justify-center">
+                      <RefreshIcon className="w-5 h-5" />
+                    </span>
+                    <span className="text-xs">Refresh</span>
+                  </button>
+                  <button
+                    onClick={() => onDelete?.(d.id)}
+                    className="flex flex-col items-center gap-2">
+                    <span className="w-12 h-12 rounded-full bg-neutral-800 flex items-center justify-center">
+                      <DeleteIcon className="w-5 h-5" />
+                    </span>
+                    <span className="text-xs">Delete</span>
+                  </button>
                 </div>
-              </div>
-              <span className="text-[10px] text-white/60">
-                {d.lastSeenLabel ?? "Now"}
-              </span>
+              )}
             </div>
-
-            {/* Divider */}
-            {i < devices.length - 1 && (
-              <div className="mt-3 h-px bg-white/10" />
-            )}
-
-            {/* Actions (only on last row like your mock, but we’ll show for both) */}
-            {i === devices.length - 1 && (
-              <div className="mt-4 grid grid-cols-3 gap-3 text-center">
-                <button
-                  onClick={() => onDisconnect?.(d.id)}
-                  className="flex flex-col items-center gap-2">
-                  <span className="w-12 h-12 rounded-full bg-neutral-800 flex items-center justify-center">
-                    <DisconnectIcon className="w-5 h-5" />
-                  </span>
-                  <span className="text-xs">Disconnect</span>
-                </button>
-                <button
-                  onClick={() => onRefresh?.(d.id)}
-                  className="flex flex-col items-center gap-2">
-                  <span className="w-12 h-12 rounded-full bg-neutral-800 flex items-center justify-center">
-                    <RefreshIcon className="w-5 h-5" />
-                  </span>
-                  <span className="text-xs">Refresh</span>
-                </button>
-                <button
-                  onClick={() => onDelete?.(d.id)}
-                  className="flex flex-col items-center gap-2">
-                  <span className="w-12 h-12 rounded-full bg-neutral-800 flex items-center justify-center">
-                    <DeleteIcon className="w-5 h-5" />
-                  </span>
-                  <span className="text-xs">Delete</span>
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
