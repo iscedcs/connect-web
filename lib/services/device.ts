@@ -1,3 +1,5 @@
+import { AUTH_API, URLS } from "../const";
+
 type BaseRes<T = any> = { ok: boolean; status: number; data: T };
 
 const baseInit: RequestInit = {
@@ -34,4 +36,27 @@ export async function createDevice(params: {
   });
   const data = await res.json().catch(() => ({}));
   return { ok: res.ok, status: res.status, data };
+}
+
+export async function getUserDevices(userId: string, accessToken: string) {
+  const res = await fetch(
+    `${AUTH_API}${URLS.device.user.replace("{userId}", userId)}`,
+    {
+      headers: {
+        accept: "application/json",
+        authorization: `Bearer ${accessToken}`,
+      },
+      cache: "no-store",
+    }
+  );
+
+  if (!res.ok) {
+    if (res.status === 404) return [];
+    throw new Error("Failed to load user devices");
+  }
+
+  const json = await res.json();
+  // console.log("Device API response:", json);
+
+  return json?.data ?? json ?? [];
 }

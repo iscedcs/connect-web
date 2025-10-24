@@ -69,5 +69,14 @@ export const URLS = {
   device: {
     verify_token: "/device/verify-token",
     create: "/device/create",
+    user: "/device/user/{userId}",
+    update: "/device/update/{id}",
   },
+};
+
+export const DEVICE_TYPE = {
+  CARD: "6214bdef7dbcb",
+  WRISTBAND: "6214bdef6dbcb",
+  STICKER: "6214bdef5dbcb",
+  KEYCHAIN: "6214bdef4dbcb",
 };

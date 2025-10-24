@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { DEVICE_TYPE } from "./const";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -37,4 +38,21 @@ export function scaleSlides(slider: any) {
 export function distanceMod(a: number, b: number, n: number) {
   const d = Math.abs(a - b) % n;
   return Math.min(d, n - d);
+}
+
+export function getDeviceName(
+  type: "6214bdef7dbcb" | "6214bdef6dbcb" | "6214bdef5dbcb" | "6214bdef4dbcb"
+) {
+  switch (type) {
+    case DEVICE_TYPE.CARD:
+      return "Card";
+    case DEVICE_TYPE.STICKER:
+      return "Sticker";
+    case DEVICE_TYPE.WRISTBAND:
+      return "Wristband";
+    case DEVICE_TYPE.KEYCHAIN:
+      return "Keychain";
+    default:
+      return "Unknown Device";
+  }
 }

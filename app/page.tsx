@@ -4,43 +4,12 @@ import ConnectManagement from "@/components/pages/cardholder/home/contact-manage
 import WalletCard from "@/components/pages/cardholder/home/contact-wallet";
 import DevicesCard from "@/components/pages/cardholder/home/device-section";
 import EventCard from "@/components/pages/cardholder/home/event-card";
+import DevicesConnectedCard from "@/components/pages/cardholder/home/filled-state/device-connected";
 import ProfileHeader from "@/components/pages/cardholder/home/profile-header";
 import PromoBanner from "@/components/pages/cardholder/home/promo-banner";
 import StoreManagement from "@/components/pages/cardholder/home/store-management";
-import { NEXT_PUBLIC_CONNECT_API_ORIGIN, URLS } from "@/lib/const";
-
-type ConnectProfile = {
-  id: string;
-  userId: string;
-  profilePhoto: string | null;
-  coverPhoto: string | null;
-  name: string | null;
-  position: string | null;
-  description: string | null;
-  address?: { street?: string | null };
-};
-
-async function getConnectProfile(): Promise<ConnectProfile | null> {
-  const auth = await getAuthInfo();
-  if ("error" in auth || auth.isExpired) return null;
-
-  const res = await fetch(
-    `${NEXT_PUBLIC_CONNECT_API_ORIGIN}${URLS.profile.profile}`,
-    {
-      headers: {
-        accept: "application/json",
-        authorization: `Bearer ${auth.accessToken}`,
-      },
-      cache: "no-store",
-    }
-  );
-
-  if (res.status === 404 || res.status === 401) return null;
-  if (!res.ok) throw new Error("Failed to load profile");
-
-  const json = await res.json();
-  return json?.data?.profile ?? json?.profile ?? null;
-}
+import { getUserDevices } from "@/lib/services/device";
+import { getConnectProfile } from "@/lib/services/profile";
 
 export default async function HomePage() {
   const [connectProfile, authInfo] = await Promise.all([
@@ -49,6 +18,15 @@ export default async function HomePage() {
   ]);
   console.log({ authInfo });
   const isAuthed = !("error" in authInfo) && !authInfo.isExpired;
+  const accessToken = isAuthed ? authInfo.accessToken : null;
+  const userId = isAuthed ? authInfo.user.id : null;
+
+  let userDevices: DeviceInterface[] = [];
+  if (userId && accessToken) {
+    userDevices = await getUserDevices(userId, accessToken);
+  }
+  console.log("User Devices", `${userDevices}`);
+  const hasDevices = userDevices.length > 0;
 
   return (
     <main className="bg-black text-white">
@@ -63,8 +41,12 @@ export default async function HomePage() {
         <EventCard />
       </section>
       <section className="p-4 space-y-10">
-        <DevicesCard />
-        <WalletCard />
+        {hasDevices ? (
+          <DevicesConnectedCard devices={userDevices} />
+        ) : (
+          <DevicesCard />
+        )}
+        {/* <WalletCard /> */}
       </section>
       <section className="p-4 space-y-10">
         <ConnectManagement />
