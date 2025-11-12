@@ -1,7 +1,6 @@
 import { getAuthInfo } from "@/actions/auth";
 import AccountSettingsList from "@/components/pages/cardholder/home/account-settings";
 import ConnectManagement from "@/components/pages/cardholder/home/contact-management";
-import WalletCard from "@/components/pages/cardholder/home/contact-wallet";
 import DevicesCard from "@/components/pages/cardholder/home/device-section";
 import EventCard from "@/components/pages/cardholder/home/event-card";
 import DevicesConnectedCard from "@/components/pages/cardholder/home/filled-state/device-connected";
@@ -29,33 +28,38 @@ export default async function HomePage() {
   const hasDevices = userDevices.length > 0;
 
   return (
-    <main className="bg-black text-white">
-      <section className="">
-        <ProfileHeader connectProfile={connectProfile} user={authInfo.user} />
+    <main className="relative bg-black text-white min-h-screen overflow-x-hidden">
+      <section className="fixed  top-0 left-0 right-0 z-50  pointer-events-none">
+        <div className="max-w-md  mx-auto pointer-events-auto">
+          <ProfileHeader connectProfile={connectProfile} user={authInfo.user} />
+        </div>{" "}
       </section>
       {/* <section className=''>
 				<NFCChecker />
 			</section> */}
-      <section className="p-4 space-y-5">
-        <PromoBanner />
-        <EventCard />
-      </section>
-      <section className="p-4 space-y-10">
-        {hasDevices ? (
-          <DevicesConnectedCard devices={userDevices} />
-        ) : (
-          <DevicesCard />
-        )}
-        {/* <WalletCard /> */}
-      </section>
-      <section className="p-4 space-y-10">
-        <ConnectManagement />
-        <StoreManagement />
-      </section>
 
-      <section className="p-4">
-        <AccountSettingsList isAuthenticated={isAuthed} />
-      </section>
+      <div className="pt-80  space-y-10">
+        <section className="p-4 space-y-5">
+          <PromoBanner />
+          <EventCard />
+        </section>
+        <section className="p-4 space-y-10">
+          {hasDevices ? (
+            <DevicesConnectedCard devices={userDevices} />
+          ) : (
+            <DevicesCard />
+          )}
+          {/* <WalletCard /> */}
+        </section>
+        <section className="p-4 space-y-10">
+          <ConnectManagement />
+          <StoreManagement />
+        </section>
+
+        <section className="p-4">
+          <AccountSettingsList isAuthenticated={isAuthed} />
+        </section>
+      </div>
     </main>
   );
 }

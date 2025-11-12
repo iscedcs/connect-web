@@ -15,22 +15,22 @@ export default function HomeClientSection() {
       <PromoBanner />
       <EventCard />
       <DevicesConnectedCard
-        devices={[
-          {
-            id: "1",
-            name: "Wristband",
-            address: "Block 2 H Cl, Festac Town, Lagos 102102, Lagos, Nigeria",
-            iconSrc: "/assets/2701e4aa55ab26bea712d31de18c7bcc5e655929.png",
-            lastSeenLabel: "Now",
-          },
-          {
-            id: "2",
-            name: "II Sticker",
-            address: "Block 2 H Cl, Festac Town, Lagos 102102, Lagos, Nigeria",
-            iconSrc: "/assets/b31eff4fd906e021018be419d1f70aa5c7080e38.png",
-            lastSeenLabel: "Now",
-          },
-        ]}
+        devices={
+          [
+            {
+              id: "1",
+              label: "Wristband",
+              iconSrc: "/assets/2701e4aa55ab26bea712d31de18c7bcc5e655929.png",
+              lastSeenLabel: "Now",
+            },
+            {
+              id: "2",
+              label: "II Sticker",
+              iconSrc: "/assets/b31eff4fd906e021018be419d1f70aa5c7080e38.png",
+              lastSeenLabel: "Now",
+            },
+          ] as any
+        }
         enabled
         onToggle={(v: any) => console.log("devices toggle:", v)}
         onDisconnect={(id: any) => console.log("disconnect:", id)}
