@@ -46,7 +46,7 @@ export default function ProfileHeader({
       .toUpperCase() || "??";
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full backdrop-blur-md bg-black/70  pb-4">
       {/* Cover Image */}
       <div className="relative w-full h-32">
         <Image

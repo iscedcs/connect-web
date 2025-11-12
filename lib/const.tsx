@@ -63,6 +63,12 @@ export const URLS = {
     stats: "/api/card-interactions/stats",
     date_range: "/api/card-interactions/date-range",
   },
+  appointments: {
+    add: "/api/profiles/{profileId}/appointments/add",
+    create: "/device/create",
+    user: "/device/user/{userId}",
+    update: "/device/update/{id}",
+  },
   user: {
     one: "/user/one/{id}",
   },
