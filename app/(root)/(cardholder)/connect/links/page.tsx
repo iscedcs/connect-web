@@ -1,51 +1,27 @@
 // app/connect/links/page.tsx
-"use client";
+import { getAuthInfo } from "@/actions/auth";
+import CategoriesGrid from "@/components/cardholder/connect/links/categories-grid";
 
-import LinkAddedSuccess from "@/components/cardholder/connect/link-added-success";
-import LinkForm from "@/components/cardholder/connect/link-form";
-import LinkPickerGrid from "@/components/cardholder/connect/link-picker-grid";
-import { useState } from "react";
+export const dynamic = "force-dynamic";
 
-type Step =
-  | { view: "pick" }
-  | { view: "form"; preset?: { label?: string; icon?: string } }
-  | { view: "done" };
-
-export default function LinksPage() {
-  const [step, setStep] = useState<Step>({ view: "pick" });
-
-  if (step.view === "done") {
-    return (
-      <LinkAddedSuccess
-        avatarSrc="/assets/sample-link-avatar.jpg"
-        message="Bitcoin address has been added."
-        onCta={() => (window.location.href = "/profile")}
-      />
-    );
-  }
-
-  if (step.view === "form") {
-    return (
-      <LinkForm
-        presetLabel={step.preset?.label}
-        presetFavicon={step.preset?.icon}
-        onSave={async () => setStep({ view: "done" })}
-        backHref="/connect/links"
-      />
-    );
-  }
+export default async function AddLinksHubPage() {
+  const auth = await getAuthInfo();
+  const isAuthed = !("error" in auth) && !auth.isExpired;
 
   return (
-    <LinkPickerGrid
-      onPick={(key) => {
-        const presets: Record<string, { label?: string; icon?: string }> = {
-          btc: { label: "Bitcoin address", icon: "/icons/btc.png" },
-          yt: { label: "YouTube", icon: "/icons/youtube.png" },
-          x: { label: "X", icon: "/icons/x.png" },
-        };
-        setStep({ view: "form", preset: presets[key] ?? {} });
-      }}
-      backHref="/"
-    />
+    <main className="min-h-screen bg-black text-white">
+      <section className="px-5 pt-6 pb-3">
+        <h1 className="text-2xl font-semibold">
+          Which link would you love to add?
+        </h1>
+        <p className="text-white/60 text-sm mt-1">
+          {` Choose a category — you’ll configure details in the next step.`}
+        </p>
+      </section>
+
+      <section className="p-5">
+        <CategoriesGrid isAuthed={isAuthed} />
+      </section>
+    </main>
   );
 }

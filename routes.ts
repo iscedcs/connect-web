@@ -14,6 +14,7 @@ export const protectedRoutes = [
   "/connect",
   "/connect/links",
   "/connect/success",
+  "/devices",
   "/otp",
   "/otp/error",
   "/otp/idle",
