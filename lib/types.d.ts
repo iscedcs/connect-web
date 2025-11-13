@@ -16,6 +16,7 @@ interface UserInfo {
   userType?: string;
   iat?: number;
   exp?: number;
+  profileId?: string;
 }
 
 interface AuthInfo {

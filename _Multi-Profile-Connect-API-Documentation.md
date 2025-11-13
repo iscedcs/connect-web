@@ -403,7 +403,7 @@ Filters socials by platform.
 
 ### Create Contact
 
-**POST** `/api/profiles/{profileId}/contacts/add`
+**POST** `/api/**profiles**/{profileId}/contacts/add`
 
 Stores a contact number for the profile.
 

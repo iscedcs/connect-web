@@ -1,3 +1,5 @@
+import { JSX } from "react";
+
 export const rainbowIcon = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -181,20 +183,56 @@ export const LocationIcon = (props: React.SVGProps<SVGSVGElement>) => (
     />
   </svg>
 );
-export const ToggleIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="44"
-    height="24"
-    viewBox="0 0 44 24"
-    fill="none"
-    {...props}>
-    <path
-      d="M12 24C8.66667 24 5.83333 22.8333 3.5 20.5C1.16667 18.1667 0 15.3333 0 12C0 8.66667 1.16667 5.83333 3.5 3.5C5.83333 1.16667 8.66667 0 12 0H32C35.3333 0 38.1667 1.16667 40.5 3.5C42.8333 5.83333 44 8.66667 44 12C44 15.3333 42.8333 18.1667 40.5 20.5C38.1667 22.8333 35.3333 24 32 24H12ZM12 20H32C34.2 20 36.0833 19.2167 37.65 17.65C39.2167 16.0833 40 14.2 40 12C40 9.8 39.2167 7.91667 37.65 6.35C36.0833 4.78333 34.2 4 32 4H12C9.8 4 7.91667 4.78333 6.35 6.35C4.78333 7.91667 4 9.8 4 12C4 14.2 4.78333 16.0833 6.35 17.65C7.91667 19.2167 9.8 20 12 20ZM32 18C33.6667 18 35.0833 17.4167 36.25 16.25C37.4167 15.0833 38 13.6667 38 12C38 10.3333 37.4167 8.91667 36.25 7.75C35.0833 6.58333 33.6667 6 32 6C30.3333 6 28.9167 6.58333 27.75 7.75C26.5833 8.91667 26 10.3333 26 12C26 13.6667 26.5833 15.0833 27.75 16.25C28.9167 17.4167 30.3333 18 32 18Z"
-      fill="white"
-    />
-  </svg>
-);
+type ToggleIconProps = React.SVGProps<SVGSVGElement> & {
+  checked?: boolean;
+  onCheckedChange?: (checked: boolean) => void | Promise<void>;
+};
+
+export const ToggleIcon = ({
+  checked,
+  onCheckedChange,
+  ...props
+}: ToggleIconProps): JSX.Element => {
+  const isOn = !!checked;
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="44"
+      height="24"
+      viewBox="0 0 44 24"
+      fill="none"
+      role="button"
+      aria-pressed={isOn}
+      tabIndex={0}
+      onClick={(e) => {
+        e.stopPropagation();
+        onCheckedChange?.(!isOn);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onCheckedChange?.(!isOn);
+        }
+      }}
+      className="cursor-pointer transition-all duration-300"
+      {...props}>
+      <rect
+        width="44"
+        height="24"
+        rx="12"
+        fill={isOn ? "#e5e7eb" : "#1f2937"}
+        className="transition-colors duration-300"
+      />
+      <circle
+        cx={isOn ? 32 : 12}
+        cy="12"
+        r="8"
+        fill={isOn ? "#1f2937" : "#ffffff"}
+        className="transition-all duration-300"
+      />
+    </svg>
+  );
+};
 export const DeleteIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"

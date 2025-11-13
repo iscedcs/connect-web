@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter_Tight } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "sonner";
 
 const interTight = Inter_Tight({
   variable: "--inter-tight",
@@ -23,6 +24,13 @@ export default function RootLayout({
       <body
         className={`${interTight} antialiased min-h-svh max-w-md mx-auto bg-black`}>
         {children}
+        <Toaster
+          position="bottom-right"
+          richColors
+          expand
+          closeButton
+          duration={3000}
+        />
       </body>
     </html>
   );
