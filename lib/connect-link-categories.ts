@@ -92,6 +92,3 @@ export const LINK_CATEGORIES: {
     icon: WalletIcon,
   },
 ];
-
-// (Later) you’ll map each key to its backend endpoints.
-// e.g. socials -> POST /api/social/add, meetings -> POST /api/meeting/add, etc.
