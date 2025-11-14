@@ -35,3 +35,10 @@ export default function RootLayout({
     </html>
   );
 }
+
+// 444444;
+// bg-primary: 000000;
+// text-primary:6F6F70
+
+// 868686;
+// 151515;

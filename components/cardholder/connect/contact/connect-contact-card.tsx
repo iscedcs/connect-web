@@ -160,16 +160,16 @@ export default function ContactCard({
               size="icon"
               disabled={loading}
               className="hover:bg-transparent cursor-pointer"
-              onClick={handleDelete}>
-              <DeleteIcon className="w-4 h-4 text-white/60" />
+              onClick={() => setEditOpen(true)}>
+              <EditIcon className="w-4 h-4 text-white/60" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
               disabled={loading}
               className="hover:bg-transparent cursor-pointer"
-              onClick={() => setEditOpen(true)}>
-              <EditIcon className="w-4 h-4 text-white/60" />
+              onClick={handleDelete}>
+              <DeleteIcon className="w-4 h-4 text-white/60" />
             </Button>
           </div>
         ) : (
@@ -196,7 +196,7 @@ export default function ContactCard({
           </div>
 
           <div className="flex items-center gap-2">
-            <Star className="w-4 h-4" />
+            <Star className={`w-4 h-4 ${primary ? "text-yellow-400" : ""}`} />
             <ToggleIcon
               className="w-7 h-7"
               checked={primary}

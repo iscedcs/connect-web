@@ -1,11 +1,10 @@
-// app/connect/links/contact/page.tsx
 import { getAuthInfo } from "@/actions/auth";
-import ContactPage from "@/components/cardholder/connect/contact/connect-contact-page";
+import VideoPage from "@/components/cardholder/connect/video/connect-video-page";
 import { URLS } from "@/lib/const";
 
 export const dynamic = "force-dynamic";
 
-export default async function ContactManagementPage() {
+export default async function VideoLinksPage() {
   const auth = await getAuthInfo();
   const isAuthed = !("error" in auth) && !auth.isExpired;
 
@@ -38,32 +37,21 @@ export default async function ContactManagementPage() {
       console.error("❌ Error fetching profiles:", err);
     }
   }
-
-  //   console.log("✅ Final resolved profileId:", profileId);
-
-  if (!profileId)
-    return (
-      <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center">
-        <p className="text-white/70 text-sm text-center px-5">
-          No Connect profile found for this account. Please create a profile
-          first.
-        </p>
-      </main>
-    );
+  console.log("ProfileId:", profileId);
 
   return (
     <main className="min-h-screen bg-black text-white">
       <section className="px-5 pt-6 pb-3">
-        <h1 className="text-2xl font-semibold">Manage your contacts</h1>
+        <h1 className="text-2xl font-semibold">Add or Manage Videos</h1>
         <p className="text-white/60 text-sm mt-1">
-          Add phone numbers, or other contact points visible on your Connect
-          profile.
+          Show off your videos or playlists from YouTube, Vimeo, or others.
         </p>
       </section>
+
       <section className="p-5">
-        <ContactPage
-          accessToken={accessToken}
-          profileId={profileId}
+        <VideoPage
+          accessToken={auth?.accessToken}
+          profileId={profileId!}
           isAuthed={isAuthed}
         />
       </section>
