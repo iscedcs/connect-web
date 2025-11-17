@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { URLS } from "@/lib/const";
 import { Spinner } from "@/components/ui/spinner";
+import { ToggleIcon } from "@/lib/icons";
 
 export default function LinkModal({
   open,
@@ -14,17 +15,21 @@ export default function LinkModal({
   profileId,
   accessToken,
   onUpdated,
+  link,
 }: {
   open: boolean;
   onClose: () => void;
   profileId: string;
   accessToken: string;
   onUpdated: () => Promise<void>;
+  link?: any;
 }) {
-  const [title, setTitle] = useState("");
-  const [url, setUrl] = useState("");
-  const [image, setImage] = useState("globe");
-  const [visible, setVisible] = useState(true);
+  const isEdit = !!link;
+
+  const [title, setTitle] = useState(link?.title ?? "");
+  const [url, setUrl] = useState(link?.url ?? "");
+  const [image] = useState("globe");
+  const [visible, setVisible] = useState(link?.isVisible ?? true);
   const [loading, setLoading] = useState(false);
 
   if (!open) return null;
@@ -33,12 +38,16 @@ export default function LinkModal({
     if (!title.trim() || !url.trim()) return toast.error("All fields required");
     setLoading(true);
     try {
+      const endpoint = isEdit
+        ? URLS.links.update
+            .replace("{profileId}", profileId)
+            .replace("{id}", link.id)
+        : URLS.links.add.replace("{profileId}", profileId);
+
       const res = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
-        }${URLS.links.add.replace("{profileId}", profileId)}`,
+        `${process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL}${endpoint}`,
         {
-          method: "POST",
+          method: isEdit ? "PATCH" : "POST",
           headers: {
             Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
@@ -54,15 +63,14 @@ export default function LinkModal({
       );
 
       const json = await res.json();
+
       if (res.ok) {
-        toast.success("Link added");
+        toast.success(isEdit ? "Link updated" : "Link added");
         onClose();
         await onUpdated();
-      } else {
-        toast.error(json?.message ?? "Failed to add link");
-      }
+      } else toast.error(json?.message ?? "Failed");
     } catch {
-      toast.error("Error adding link");
+      toast.error("Error saving link");
     } finally {
       setLoading(false);
     }
@@ -71,7 +79,9 @@ export default function LinkModal({
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
       <div className="bg-neutral-900 rounded-2xl border border-white/10 p-6 w-[90%] max-w-md space-y-4">
-        <h2 className="text-lg font-semibold">Add New Link</h2>
+        <h2 className="text-lg font-semibold">
+          {isEdit ? "Edit Link" : "Add New Link"}
+        </h2>
 
         <div className="space-y-3">
           <div>
@@ -96,7 +106,11 @@ export default function LinkModal({
 
           <div className="flex items-center justify-between pt-2">
             <span className="text-sm text-white/70">Visible on profile</span>
-            <Switch checked={visible} onCheckedChange={setVisible} />
+            <ToggleIcon
+              className="w-8 h-8"
+              checked={visible}
+              onCheckedChange={setVisible}
+            />
           </div>
         </div>
 
@@ -109,9 +123,11 @@ export default function LinkModal({
               <>
                 <Spinner className="size-6" /> Saving...
               </>
+            ) : isEdit ? (
+              "Update"
             ) : (
               "Save"
-            )}{" "}
+            )}
           </Button>
         </div>
       </div>
