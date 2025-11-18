@@ -4,18 +4,33 @@ export const CONNECT_DEV_FEATURES = {
     enableAllRestoreActions: false,
     enableAllVisibilityActions: false,
     enableReorder: false,
-    enableLongPressSelection: true,
-    enableAutoCategoryGrouping: false, // A: auto-detect + group links by category
-    enableCategoryUI: false, // C: show category headers, collapse/expand
-    enableUserCategoryOverride: false, // C: allow editing category per link
-    enableCategoryManagement: false, // C: full category creation/rename/delete
+    enableLongPressSelection: false,
+    enableAutoCategoryGrouping: false,
+    enableCategoryUI: false,
+    enableCategoryManagement: false,
   },
   videos: {
     enableBulkActions: false,
     enableAllRestoreActions: false,
     enableAllVisibilityActions: false,
     enableGetVideoPlatform: false,
+    enableLongPressSelection: false,
+  },
+
+  meetings: {
+    enableBulkActions: false,
+    enableAllRestoreActions: false,
+    enableAllVisibilityActions: false,
+    enableGetByProvider: false,
+    enableLongPressSelection: false,
+  },
+
+  social: {
+    enableBulkActions: false,
+    enableAllRestoreActions: false,
+    enableAllVisibilityActions: true,
     enableLongPressSelection: true,
+    enableGrouping: false, // future
   },
 
   contacts: {
