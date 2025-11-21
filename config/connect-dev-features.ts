@@ -47,7 +47,7 @@ export const CONNECT_DEV_FEATURES = {
     enableBulkActions: false,
     enableAllRestoreActions: false,
     enableAllVisibilityActions: false,
-    enableLongPressSelection: true,
+    enableLongPressSelection: false,
     enableAutoDetectType: true,
   },
 

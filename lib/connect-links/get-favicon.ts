@@ -1,4 +1,4 @@
-export function getFaviconFromUrl(url: string, platform?: string, size: number = 64) {
+export function getFaviconFromUrl(url: string, size: number = 64) {
   try {
     const hostname = new URL(url).hostname;
 
