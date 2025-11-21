@@ -10,6 +10,7 @@ export default async function MeetingsPage() {
 
   const accessToken = auth?.accessToken;
   let profileId: string | null = null;
+  console.log("ProfileID:", profileId);
 
   if (accessToken) {
     try {
