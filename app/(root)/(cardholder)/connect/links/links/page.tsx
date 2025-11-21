@@ -11,9 +11,7 @@ export default async function LinkManagementPage() {
   const accessToken = auth?.accessToken;
   let profileId: string | null = null;
 
-  if (!accessToken) {
-    console.warn("⚠️ No access token found.");
-  } else {
+  if (accessToken) {
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL}${URLS.multi_profile.all}`,
@@ -30,21 +28,34 @@ export default async function LinkManagementPage() {
           (p: any) => p.is_default === true
         );
         profileId = defaultProfile?.id || json.data.profiles[0].id;
-      } else {
-        console.warn("⚠️ No profiles returned:", json);
       }
     } catch (err) {
       console.error("❌ Error fetching profiles:", err);
     }
   }
-  console.log("✅ Final resolved profileId:", profileId);
+
   return (
     <main className="min-h-screen bg-black text-white">
-      <section className="px-5 pt-6 pb-3">
-        <h1 className="text-2xl font-semibold">Manage your Links</h1>
-        <p className="text-white/60 text-sm mt-1">
-          Add or edit links that appear on your Connect profile.
+      <section className="px-5 pt-10 pb-4 relative">
+        {/* Glow */}
+        <div className="absolute inset-0 -z-10">
+          <div className="w-44 h-44 bg-primary/25 blur-3xl rounded-full absolute top-0 left-0 opacity-40"></div>
+          <div className="w-32 h-32 bg-white/10 blur-2xl rounded-full absolute bottom-4 right-4 opacity-25"></div>
+        </div>
+
+        <h1 className="text-3xl font-semibold leading-snug tracking-tight">
+          Manage Your
+          <span className="ml-1 bg-gradient-to-r from-primary/80 to-white/90 bg-clip-text text-transparent">
+            Profile Links
+          </span>
+        </h1>
+
+        <p className="text-white/60 text-sm mt-3 max-w-md leading-relaxed">
+          Showcase your work, social presence, and important destinations. Add
+          links that tell your story and help others discover the best of you.
         </p>
+
+        <div className="mt-6 h-px bg-gradient-to-r from-white/10 via-white/5 to-transparent"></div>
       </section>
 
       <section className="p-5">
