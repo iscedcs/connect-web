@@ -1,10 +1,10 @@
 import { getAuthInfo } from "@/actions/auth";
-import VideoPage from "@/components/cardholder/connect/video/connect-video-page";
+import AppointmentPage from "@/components/cardholder/connect/appointments/connect-appointment-page";
 import { URLS } from "@/lib/const";
 
 export const dynamic = "force-dynamic";
 
-export default async function VideoLinksPage() {
+export default async function AppointmentLinksPage() {
   const auth = await getAuthInfo();
   const isAuthed = !("error" in auth) && !auth.isExpired;
 
@@ -27,6 +27,7 @@ export default async function VideoLinksPage() {
         const defaultProfile = json.data.profiles.find(
           (p: any) => p.is_default === true
         );
+
         profileId = defaultProfile?.id || json.data.profiles[0].id;
       }
     } catch (err) {
@@ -36,30 +37,34 @@ export default async function VideoLinksPage() {
 
   return (
     <main className="min-h-screen bg-black text-white">
+      {/* HEADER */}
       <section className="px-5 pt-10 pb-4 relative">
-        {/* Glow */}
+        {/* Soft Glow Accent */}
         <div className="absolute inset-0 -z-10">
-          <div className="w-40 h-40 bg-primary/25 blur-[100px] absolute top-0 left-0"></div>
-          <div className="w-28 h-28 bg-white/10 blur-xl absolute bottom-4 right-4"></div>
+          <div className="w-40 h-40 bg-primary/20 blur-3xl rounded-full absolute top-0 left-0 opacity-40"></div>
+          <div className="w-32 h-32 bg-white/10 blur-2xl rounded-full absolute bottom-4 right-4 opacity-20"></div>
         </div>
 
         <h1 className="text-3xl font-semibold tracking-tight leading-snug">
-          Showcase Your
+          Appointment Scheduling
           <span className="ml-1 bg-gradient-to-r from-primary/80 to-white/90 bg-clip-text text-transparent">
-            Videos
+            Made Simple
           </span>
         </h1>
 
-        <p className="text-white/60 text-sm mt-3 max-w-md leading-relaxed">
-          Add videos from YouTube, Vimeo, or other platforms to highlight your
-          projects, tutorials, performances, or brand stories.
+        <p className="text-white/60 text-sm mt-3 leading-relaxed max-w-md">
+          Your time is valuable. Create dedicated booking links, manage their
+          visibility, and guide people to the right conversation — whether it's
+          a discovery call, consultation, or follow-up session.
         </p>
 
-        <div className="mt-6 h-px bg-gradient-to-r from-white/10 via-white/5 to-transparent"></div>
+        {/* Divider */}
+        <div className="mt-6 h-px w-full bg-gradient-to-r from-white/10 via-white/5 to-transparent"></div>
       </section>
 
-      <section className="p-5">
-        <VideoPage
+      {/* CONTENT */}
+      <section className="p-5 pb-14">
+        <AppointmentPage
           accessToken={auth?.accessToken}
           profileId={profileId!}
           isAuthed={isAuthed}

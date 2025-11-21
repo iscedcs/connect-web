@@ -28,9 +28,27 @@ export const CONNECT_DEV_FEATURES = {
   social: {
     enableBulkActions: false,
     enableAllRestoreActions: false,
-    enableAllVisibilityActions: true,
+    enableAllVisibilityActions: false,
+    enableLongPressSelection: false,
+    enableGrouping: false,
+  },
+
+  appointments: {
+    enableBulkActions: false,
+    enableAllRestoreActions: false,
+    enableAllVisibilityActions: false,
+    enableLongPressSelection: false,
+
+    enableAutoProviderDetection: true,
+    enableProviderUI: true,
+  },
+
+  spotify: {
+    enableBulkActions: false,
+    enableAllRestoreActions: false,
+    enableAllVisibilityActions: false,
     enableLongPressSelection: true,
-    enableGrouping: false, // future
+    enableAutoDetectType: true,
   },
 
   contacts: {

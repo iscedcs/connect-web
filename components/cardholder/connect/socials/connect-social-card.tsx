@@ -82,7 +82,7 @@ export default function SocialCard({
         URLS.profile_social.delete
           .replace("{profileId}", profileId)
           .replace("{id}", social.id),
-        "Your Social has been deleted successfully!🥺"
+        "Your Social has been deleted!🥺"
       );
     } finally {
       setDeleteing(false);
@@ -110,7 +110,7 @@ export default function SocialCard({
       URLS.profile_social.visible
         .replace("{profileId}", profileId)
         .replace("{id}", social.id),
-      "Wooh!!😋 You've enabled visibility for all!!🎉🎉"
+      "Wooh!!😋 You've enabled your social visibility!!🎉🎉"
     );
   };
 

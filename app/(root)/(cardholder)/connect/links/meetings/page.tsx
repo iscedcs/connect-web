@@ -11,9 +11,7 @@ export default async function MeetingsPage() {
   const accessToken = auth?.accessToken;
   let profileId: string | null = null;
 
-  if (!accessToken) {
-    console.warn("⚠️ No access token found.");
-  } else {
+  if (accessToken) {
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL}${URLS.multi_profile.all}`,
@@ -31,30 +29,42 @@ export default async function MeetingsPage() {
           json.data.profiles[0];
 
         profileId = defaultProfile.id;
-      } else {
-        console.warn("⚠️ No profiles returned:", json);
       }
     } catch (err) {
       console.error("❌ Error fetching profiles:", err);
     }
   }
 
-  console.log("ProfileId:", profileId);
-
   return (
     <main className="min-h-screen bg-black text-white">
-      <section className="px-5 pt-6 pb-3">
-        <h1 className="text-2xl font-semibold">Manage Your Meeting Links</h1>
-        <p className="text-white/60 text-sm mt-1 leading-relaxed">
-          Add your preferred meeting platforms and make it easier for people to
-          connect with you; whether for networking, professional discussions,
-          collaborations, or quick check-ins.
+      {/* HERO */}
+      <section className="px-5 pt-10 pb-4 relative">
+        {/* Ambient glow */}
+        <div className="absolute inset-0 -z-10">
+          <div className="w-44 h-44 bg-primary/20 blur-[90px] absolute top-0 left-0 opacity-40"></div>
+          <div className="w-32 h-32 bg-white/10 blur-2xl absolute bottom-6 right-6 opacity-25"></div>
+        </div>
+
+        <h1 className="text-3xl font-semibold leading-snug tracking-tight">
+          Meeting
+          <span className="ml-1 bg-gradient-to-r from-primary/80 to-white/90 text-transparent bg-clip-text">
+            Links
+          </span>
+        </h1>
+
+        <p className="text-white/60 mt-3 max-w-md text-sm leading-relaxed">
+          Make it easy for people to schedule time with you. Add your meeting
+          platforms, manage visibility, and set your default link for
+          professional conversations, networking, and collaborations.
         </p>
+
+        <div className="mt-6 h-px bg-gradient-to-r from-white/10 via-white/5 to-transparent"></div>
       </section>
 
+      {/* MAIN CONTENT */}
       <section className="p-5">
         <MeetingPage
-          accessToken={auth?.accessToken}
+          accessToken={accessToken}
           profileId={profileId!}
           isAuthed={isAuthed}
         />

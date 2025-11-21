@@ -100,7 +100,7 @@ export default function SocialPage({
       await fetch(
         `${
           process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
-        }${URLS.profile_social.delete
+        }${URLS.profile_social.bulk_delete
           .replace("{profileId}", profileId!)
           .replace("{id}", id)}`,
         { method: "PATCH", headers: { Authorization: `Bearer ${accessToken}` } }

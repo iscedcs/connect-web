@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { URLS } from "@/lib/const";
-import { DeleteIcon, EditIcon, ToggleIcon } from "@/lib/icons";
+import { DeleteIcon, EditIcon, EyesOpenIcon, ToggleIcon } from "@/lib/icons";
 import { Eye, Star, Video } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -235,7 +235,7 @@ export default function VideoCard({
       {!showRestore && !selectionMode && (
         <div className="flex justify-between items-center text-xs text-white/60 border-t border-white/10 pt-3">
           <div className="flex items-center gap-2">
-            <Eye className="w-4 h-4" />
+            <EyesOpenIcon className="w-4 h-4" />
             <ToggleIcon
               className="w-8 h-8"
               checked={visible}

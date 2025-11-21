@@ -134,7 +134,11 @@ export default function MeetingCard({
           {!selectionMode && (
             <>
               {/* Visibility */}
-              <ToggleIcon checked={visible} onCheckedChange={toggleVisible} />
+              <ToggleIcon
+                className="w-8 h-8"
+                checked={visible}
+                onCheckedChange={toggleVisible}
+              />
 
               {/* Set Default */}
               <Button
