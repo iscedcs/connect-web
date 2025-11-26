@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter_Tight } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import NextTopLoader from "nextjs-toploader";
 
 const interTight = Inter_Tight({
   variable: "--inter-tight",
@@ -23,7 +24,9 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${interTight} antialiased min-h-svh max-w-md mx-auto bg-black`}>
+        <NextTopLoader color="#ffffff" showSpinner={false} />
         {children}
+
         <Toaster
           position="bottom-right"
           richColors

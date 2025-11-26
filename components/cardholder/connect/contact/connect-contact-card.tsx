@@ -31,7 +31,11 @@ export default function ContactCard({
     contact.type === "EMAIL" ? Mail : contact.type === "PHONE" ? Phone : Star;
 
   // 🧠 Helper to call PATCH endpoints
-  const patchRequest = async (endpoint: string) => {
+  const patchRequest = async (
+    endpoint: string,
+    msg: string,
+    body: any = {}
+  ) => {
     setLoading(true);
     try {
       const res = await fetch(
@@ -40,13 +44,14 @@ export default function ContactCard({
           method: "PATCH",
           headers: {
             Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify({}),
+          body: JSON.stringify(body),
         }
       );
       const json = await res.json();
       if (res.ok) {
-        toast.success(json?.message ?? "Update successful");
+        toast.success(msg);
         await onUpdated();
       } else {
         toast.error(json?.message ?? "Failed to update");
@@ -92,11 +97,16 @@ export default function ContactCard({
   };
 
   const handleToggleVisible = async () => {
-    setVisible((prev: any) => !prev);
+    const newValue = !visible;
+    setVisible(newValue);
     await patchRequest(
       URLS.profile_contact.visible
         .replace("{profileId}", profileId)
-        .replace("{id}", contact.id)
+        .replace("{id}", contact.id),
+      newValue
+        ? "Everyone can this contact!🎉😁"
+        : "This contact is hidden to everyone!❌",
+      { is_visible: newValue }
     );
   };
 
@@ -105,7 +115,8 @@ export default function ContactCard({
     await patchRequest(
       URLS.profile_contact.primary
         .replace("{profileId}", profileId)
-        .replace("{id}", contact.id)
+        .replace("{id}", contact.id),
+      "You have successfully set this contact as primary!🎉😁"
     );
   };
 

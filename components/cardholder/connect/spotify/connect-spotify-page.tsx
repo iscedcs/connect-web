@@ -152,7 +152,8 @@ export default function SpotifyPage({
         <h2 className="text-lg font-semibold">Your Spotify Links</h2>
         <Button
           onClick={() => setModalOpen(true)}
-          className="rounded-full px-4 py-1">
+          className="rounded-full px-4 py-1"
+          variant="secondary">
           Add new
         </Button>
       </div>

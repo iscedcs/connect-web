@@ -80,15 +80,22 @@ export default function VideoCard({
   // -------------------------------------------------------------
   // ACTIVE ENDPOINTS
   // -------------------------------------------------------------
-  const patchRequest = async (endpoint: string, successMsg: string) => {
+  const patchRequest = async (
+    endpoint: string,
+    successMsg: string,
+    body: any = {}
+  ) => {
     setLoading(true);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL}${endpoint}`,
         {
           method: "PATCH",
-          headers: { Authorization: `Bearer ${accessToken}` },
-          body: JSON.stringify({}),
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
         }
       );
       const json = await res.json();
@@ -117,12 +124,14 @@ export default function VideoCard({
   };
 
   const handleToggleVisible = async () => {
-    setVisible(!visible);
+    const newValue = !visible;
+    setVisible(newValue);
     await patchRequest(
       URLS.videos.visible
         .replace("{profileId}", profileId)
         .replace("{id}", video.id),
-      "Visibility updated"
+      "Visibility updated",
+      { is_visible: newValue }
     );
   };
 

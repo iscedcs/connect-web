@@ -96,8 +96,10 @@ export default function MeetingModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
-      <div className="bg-neutral-900 p-6 rounded-xl w-[90%] max-w-md border border-white/10 space-y-4">
+    <div
+      className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center"
+      style={{ animation: "modalFade .25s ease" }}>
+      <div className="bg-neutral-900 p-6 rounded-xl w-[90%] max-w-md border border-white/10 space-y-4 animate-modalScale">
         <h2 className="text-lg font-semibold">
           {isEdit ? "Edit Meeting" : "Add Meeting Link"}
         </h2>

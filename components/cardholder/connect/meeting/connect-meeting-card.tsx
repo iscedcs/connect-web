@@ -49,15 +49,18 @@ export default function MeetingCard({
     pressTimer.current = null;
   };
 
-  const patch = async (endpoint: string, success: string) => {
+  const patch = async (endpoint: string, success: string, body: any = {}) => {
     setLoading(true);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL}${endpoint}`,
         {
           method: "PATCH",
-          headers: { Authorization: `Bearer ${accessToken}` },
-          body: JSON.stringify({}),
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
         }
       );
       const json = await res.json();
@@ -71,12 +74,14 @@ export default function MeetingCard({
   };
 
   const toggleVisible = async () => {
-    setVisible(!visible);
+    const newValue = !visible;
+    setVisible(newValue);
     await patch(
       URLS.meetings.visible
         .replace("{profileId}", profileId)
         .replace("{id}", meeting.id),
-      "Visibility updated"
+      "Visibility updated",
+      { is_visible: newValue }
     );
   };
 
@@ -100,9 +105,16 @@ export default function MeetingCard({
 
   return (
     <div
-      className={`bg-neutral-900/60 border border-white/10 rounded-xl p-4 flex justify-between items-center ${
-        selected ? "ring-2 ring-primary/70" : ""
-      }`}
+      className={`bg-neutral-900/60 border border-white/10 rounded-xl p-4 
+    flex justify-between items-center 
+    transition-all duration-200 
+    hover:bg-neutral-900 hover:shadow-lg
+    hover:scale-[1.05] hover:border-white/20 hover:-translate-y-[2px] hover:shadow-black/30
+    ${selected ? "ring-2 ring-primary/70" : ""}`}
+      style={{
+        animation: "fadeSlideIn 0.35s ease forwards",
+        opacity: 0,
+      }}
       onMouseDown={longPressStart}
       onMouseUp={longPressEnd}
       onMouseLeave={longPressEnd}

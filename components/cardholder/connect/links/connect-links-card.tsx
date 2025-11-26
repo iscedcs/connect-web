@@ -33,9 +33,7 @@ export default function LinkCard({
 }) {
   const [visible, setVisible] = useState(link.isVisible);
   const [loading, setLoading] = useState(false);
-
   const [editOpen, setEditOpen] = useState(false);
-
   const pressTimer = useRef<any>(null);
 
   const handleLongPressStart = () => {
@@ -52,15 +50,22 @@ export default function LinkCard({
     pressTimer.current = null;
   };
 
-  const patchRequest = async (endpoint: string, successMsg: string) => {
+  const patchRequest = async (
+    endpoint: string,
+    successMsg: string,
+    body: any = {}
+  ) => {
     setLoading(true);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL}${endpoint}`,
         {
           method: "PATCH",
-          headers: { Authorization: `Bearer ${accessToken}` },
-          body: JSON.stringify({}),
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
         }
       );
       const json = await res.json();
@@ -93,7 +98,7 @@ export default function LinkCard({
 
       const json = await res.json();
       if (res.ok) {
-        toast.success("Link deleted");
+        toast.success("Link deleted Successful!❌");
         await onUpdated();
       } else toast.error(json?.message ?? "Failed to delete");
     } catch {
@@ -113,20 +118,29 @@ export default function LinkCard({
   };
 
   const handleToggleVisible = async () => {
-    setVisible(!visible);
+    const newValue = !visible;
+    setVisible(newValue);
     await patchRequest(
       URLS.links.visible
         .replace("{profileId}", profileId)
         .replace("{id}", link.id),
-      "Visibility updated"
+      "Visibility updated",
+      { is_visible: newValue }
     );
   };
 
   return (
     <div
-      className={`bg-neutral-900/60 border border-white/10 rounded-xl p-4 flex justify-between items-center ${
-        selected ? "ring-2 ring-primary/70" : ""
-      }`}
+      className={`bg-neutral-900/60 border border-white/10 rounded-xl p-4 
+    flex justify-between items-center 
+    transition-all duration-200 
+    hover:bg-neutral-900 hover:shadow-lg
+    hover:scale-[1.05] hover:border-white/20 hover:-translate-y-[2px] hover:shadow-black/30
+    ${selected ? "ring-2 ring-primary/70" : ""}`}
+      style={{
+        animation: "fadeSlideIn 0.35s ease forwards",
+        opacity: 0,
+      }}
       onMouseDown={handleLongPressStart}
       onMouseUp={handleLongPressEnd}
       onMouseLeave={handleLongPressEnd}

@@ -52,14 +52,22 @@ export default function SocialCard({
     pressTimer.current = null;
   };
 
-  const patchRequest = async (endpoint: string, message: string) => {
+  const patchRequest = async (
+    endpoint: string,
+    message: string,
+    body: any = {}
+  ) => {
     setLoading(true);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL}${endpoint}`,
         {
           method: "PATCH",
-          headers: { Authorization: `Bearer ${accessToken}` },
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
         }
       );
 
@@ -105,20 +113,31 @@ export default function SocialCard({
 
   //DO
   const handleToggleVisible = async () => {
-    setVisible(!visible);
+    const newValue = !visible;
+    setVisible(newValue);
+
     await patchRequest(
       URLS.profile_social.visible
         .replace("{profileId}", profileId)
         .replace("{id}", social.id),
-      "Wooh!!😋 You've enabled your social visibility!!🎉🎉"
+
+      "Wooh!!😋 You've enabled your social visibility!!🎉🎉",
+      { is_visible: newValue }
     );
   };
 
   return (
     <div
-      className={`bg-neutral-900/60 border border-white/10 rounded-xl p-4 flex justify-between items-center ${
-        selected ? "ring-2 ring-primary/70" : ""
-      }`}
+      className={`bg-neutral-900/60 border border-white/10 rounded-xl p-4 
+    flex justify-between items-center 
+    transition-all duration-200 
+    hover:bg-neutral-900 hover:shadow-lg
+    hover:scale-[1.05] hover:border-white/20 hover:-translate-y-[2px] hover:shadow-black/30
+    ${selected ? "ring-2 ring-primary/70" : ""}`}
+      style={{
+        animation: "fadeSlideIn 0.35s ease forwards",
+        opacity: 0,
+      }}
       onMouseDown={handleLongPressStart}
       onMouseUp={handleLongPressEnd}
       onMouseLeave={handleLongPressEnd}
