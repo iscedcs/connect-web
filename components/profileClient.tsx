@@ -2,56 +2,109 @@
 
 import EditProfileForm from "@/components/cardholder/forms/editProfile-form";
 import ProfileSkeleton from "@/components/shared/skeleton/profile-skeleton";
-import { useProfile } from "@/hooks/useProfile";
 import { uploadImage } from "@/lib/client-upload";
 import { toast } from "sonner";
+import { useState, useEffect } from "react";
+import { URLS } from "@/lib/const";
+import { useRouter } from "next/navigation";
 
-export default function ProfileClient({ connectProfile, authUser }: any) {
-  const {
-    profile,
-    loading,
-    deleteProfile,
-    refetch,
-    createProfile,
-    updateProfile,
-  } = useProfile();
+export default function ProfileClient({
+  connectProfile,
+  authUser,
+  profileId,
+  accessToken,
+}: any) {
+  const [loading, setLoading] = useState(false);
+  const [profile, setProfile] = useState(connectProfile);
+  const router = useRouter();
+
+  async function refetch() {
+    if (!profileId || !accessToken) return;
+
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `${
+          process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+        }${URLS.multi_profile.one.replace("{profileId}", profileId)}`,
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
+      const json = await res.json();
+      setProfile(json.data?.profile ?? null);
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to refresh profile");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const mode: "create" | "update" = profile ? "update" : "create";
 
   if (loading) return <ProfileSkeleton />;
 
-  const hasConnect = !!profile || !!connectProfile;
-
-  const defaults = hasConnect
+  const defaults = profile
     ? {
-        name: (profile ?? connectProfile)?.name ?? "",
-        position: (profile ?? connectProfile)?.position ?? "",
-        bio: (profile ?? connectProfile)?.description ?? "",
-        address: (profile ?? connectProfile)?.address?.street ?? "",
-        profileImage: null,
-        coverImage: null,
+        name: profile?.name ?? "",
+        position: profile?.position ?? "",
+        bio: profile?.description ?? "",
+        address: profile?.address?.street ?? "",
+        profileImage: profile?.profilePhoto ?? null,
+        coverImage: profile?.coverPhoto ?? null,
       }
     : {
         name:
           [authUser?.firstName, authUser?.lastName].filter(Boolean).join(" ") ||
           "",
-        postion: authUser?.postion || "",
+        position: authUser?.position || "",
         bio: authUser?.description || "",
         address: authUser?.address || "",
         profileImage: null,
         coverImage: null,
       };
 
-  const mode: "create" | "update" = hasConnect ? "update" : "create";
+  async function updateProfileFn(payload: any) {
+    const res = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+      }${URLS.multi_profile.update_one.replace("{profileId}", profileId)}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message);
+  }
+
+  async function deleteProfileFn() {
+    const res = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+      }${URLS.multi_profile.delete_one.replace("{profileId}", profileId)}`,
+      {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+
+    if (!res.ok) throw new Error("Failed to delete profile");
+  }
 
   return (
     <main className="min-h-screen bg-black text-white">
-      {!hasConnect && (
-        <p className="px-4 pt-4 text-xs text-white/60">
-          No Connect profile yet. We prefilled details from your Auth account.
-        </p>
-      )}
       <EditProfileForm
         defaultValues={defaults}
-        onSubmit={async (data) => {
+        accessToken={accessToken}
+        mode={mode}
+        onSubmit={async (data: any) => {
           try {
             let profilePhotoUrl: string | undefined;
             let coverPhotoUrl: string | undefined;
@@ -60,10 +113,12 @@ export default function ProfileClient({ connectProfile, authUser }: any) {
               const up = await uploadImage(data.profileImage, "profiles");
               profilePhotoUrl = up.url;
             }
+
             if (data.coverImage instanceof File) {
               const up = await uploadImage(data.coverImage, "covers");
               coverPhotoUrl = up.url;
             }
+
             const structured = (data as any).structuredAddress;
 
             const payload: any = {
@@ -85,32 +140,38 @@ export default function ProfileClient({ connectProfile, authUser }: any) {
                     .join(", ")
                 : data.address || "",
             };
+
             if (profilePhotoUrl) payload.profilePhoto = profilePhotoUrl;
             if (coverPhotoUrl) payload.coverPhoto = coverPhotoUrl;
 
-            if (mode === "create") await createProfile(payload);
-            else await updateProfile(payload);
-
+            if (mode === "update") {
+              await updateProfileFn(payload);
+              toast.success("Profile updated");
+              router.push("/settings/account");
+            }
             await refetch();
-          } catch (e: any) {
-            console.error(e);
-            toast.error(e?.message || "Failed to save profile");
+          } catch (err: any) {
+            console.error(err);
+            toast.error(err.message || "Save error");
           }
         }}
       />
 
-      {hasConnect && (
-        <div className="px-4">
-          <button
-            className="mt-4 text-red-400 underline"
-            onClick={async () => {
-              await deleteProfile();
-              await refetch();
-            }}>
-            Delete profile
-          </button>
-        </div>
-      )}
+      <div className="px-4 pb-3">
+        <button
+          className="mt-4 text-red-400 underline cursor-pointer"
+          onClick={async () => {
+            try {
+              await deleteProfileFn();
+              toast.success("Profile deleted");
+              window.location.href = "/settings/account";
+            } catch {
+              toast.error("Delete failed");
+            }
+          }}>
+          Delete profile
+        </button>
+      </div>
     </main>
   );
 }

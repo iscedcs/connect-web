@@ -1,6 +1,5 @@
-import OtpClientSection from "@/components/pages/home/otpclientsection";
 import { getAuthInfo } from "@/actions/auth";
-import { redirect } from "next/navigation";
+import OtpClientSection from "@/components/pages/home/otpclientsection";
 
 interface PageProps {
   searchParams: Promise<{

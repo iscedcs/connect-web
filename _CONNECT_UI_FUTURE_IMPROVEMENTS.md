@@ -195,3 +195,19 @@ V2 — Fully polished typography, spacing, tone, and hero structure
 V3 (Planned) — Motion, glow, parallax, elevation system
 
 V4+ — Reordering, swipe actions, AI suggestions
+
+
+
+V2 For Forms:
+✅ Add “submissions count” on the card
+✅ Add swipe actions on mobile (delete / edit / visibility)
+✅ Add mini form preview on hover
+✅ Add animations like Videos module
+
+
+
+✔ Rewrite the wrapper to dynamically read keys
+✔ Add a reusable module-mapping system
+✔ Make badges (e.g. “3 files”, “5 socials”)
+✔ Show icons based on the platform automatically
+✔ Add smooth animation for the filled state    

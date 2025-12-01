@@ -8,16 +8,8 @@ import {
   ToggleIcon,
 } from "@/lib/icons";
 import { getDeviceName } from "@/lib/utils";
-import { ChevronDown, ChevronUp, Cog, CreditCard } from "lucide-react";
+import { CreditCard, Cog } from "lucide-react";
 import { useState } from "react";
-
-type Device = {
-  id: string;
-  name: string; // e.g., "Wristband"
-  address: string; // e.g., "Block 2 H Cl, Festac..."
-  iconSrc?: string; // device avatar
-  lastSeenLabel?: string; // e.g., "Now"
-};
 
 export default function DevicesConnectedCard({
   manageHref = "/devices",
@@ -43,77 +35,101 @@ export default function DevicesConnectedCard({
   };
 
   return (
-    <div className="bg-neutral-900 rounded-2xl p-5">
+    <div className="bg-[#151515] rounded-3xl p-6 text-white">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between">
         <div>
-          <h3 className="text-lg font-medium">Devices</h3>
+          <h3 className="text-[19px] font-medium">Devices</h3>
           <a
             href={manageHref}
-            className="text-sm text-white/70 inline-flex items-center gap-1">
+            className="text-sm text-white/60 inline-flex items-center gap-1">
             Manage your devices <span>›</span>
           </a>
         </div>
-        <ToggleIcon />
+
+        <div onClick={() => onToggle?.(!enabled)} className="cursor-pointer">
+          <ToggleIcon />
+        </div>
       </div>
 
-      {/* List */}
-      <div className="mt-4 space-y-4">
-        {devices.map((d, i) => {
+      {/* Device List */}
+      <div className="mt-6 space-y-6">
+        {devices.map((d) => {
           const isExpanded = expandedDeviceId === d.id;
+
           return (
-            <div key={d.id} className=" transition-all duration-300">
-              {/* Device row */}
+            <div key={d.id} className="w-full transition-all">
+              {/* Device Row */}
               <button
                 onClick={() => toggleExpand(d.id)}
-                className="flex items-start justify-between  w-full text-left">
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center overflow-hidden">
-                    {d.type === DEVICE_TYPE.CARD ? (
-                      <CreditCard className="h-5 w-5" />
-                    ) : (
-                      <Cog className="h-5 w-5" />
-                    )}
+                className="w-full flex items-start gap-3 text-left rounded-xl px-2 py-1 transition-all active:scale-[0.98]">
+                {/* Icon */}
+                <div
+                  className={`w-9 h-9 rounded-full bg-[#1C1C1C] flex items-center justify-center shrink-0 transition-all duration-200 ${
+                    isExpanded ? "scale-[1.05]" : "scale-100"
+                  }`}>
+                  {d.type === DEVICE_TYPE.CARD ? (
+                    <CreditCard className="h-5 w-5 stroke-[#868686]" />
+                  ) : (
+                    <Cog className="h-5 w-5 stroke-[#868686]" />
+                  )}
+                </div>
+
+                {/* TEXT + TIMESTAMP + DIVIDER */}
+                <div className="flex-1">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-[15px]">{getDeviceName(d.type)}</p>
+                      <p className="text-[11px] text-white/60 leading-tight">
+                        {d.label}
+                      </p>
+                    </div>
+
+                    <p className="text-[10px] text-white/60 ml-4 mt-[2px]">
+                      {d.assignedAt}
+                    </p>
                   </div>
-                  <div>
-                    <p className="text-base">{getDeviceName(d.type)}</p>
-                    <p className="text-[10px] text-white/60">{d.label}</p>
-                  </div>
+
+                  {!isExpanded && (
+                    <div className="border-b border-white/10 mt-4 w-full"></div>
+                  )}
                 </div>
               </button>
-              <div
-                className={`h-px bg-white/10 transition-all ${
-                  isExpanded ? "opacity-100 mt-1 mb-4" : "opacity-0 mt-0 mb-0"
-                }`}
-              />
 
-              {/* Expandable actions */}
+              {/* Expanded Actions */}
               {isExpanded && (
-                <div className="mt-4  grid grid-cols-3 gap-3 text-center animate-in fade-in slide-in-from-top-2">
-                  <button
-                    onClick={() => onDisconnect?.(d.id)}
-                    className="flex flex-col items-center gap-2">
-                    <span className="w-12 h-12 rounded-full bg-neutral-800 flex items-center justify-center">
-                      <DisconnectIcon className="w-5 h-5" />
-                    </span>
-                    <span className="text-xs">Disconnect</span>
-                  </button>
-                  <button
-                    onClick={() => onRefresh?.(d.id)}
-                    className="flex flex-col items-center gap-2">
-                    <span className="w-12 h-12 rounded-full bg-neutral-800 flex items-center justify-center">
-                      <RefreshIcon className="w-5 h-5" />
-                    </span>
-                    <span className="text-xs">Refresh</span>
-                  </button>
-                  <button
-                    onClick={() => onDelete?.(d.id)}
-                    className="flex flex-col items-center gap-2">
-                    <span className="w-12 h-12 rounded-full bg-neutral-800 flex items-center justify-center">
-                      <DeleteIcon className="w-5 h-5" />
-                    </span>
-                    <span className="text-xs">Delete</span>
-                  </button>
+                <div className="mt-5 grid grid-cols-3 gap-4 text-center animate-in fade-in slide-in-from-top-2 duration-200">
+                  {[
+                    {
+                      label: "Disconnect",
+                      icon: (
+                        <DisconnectIcon className="w-5 h-5 stroke-[#868686]" />
+                      ),
+                      fn: onDisconnect,
+                    },
+                    {
+                      label: "Refresh",
+                      icon: (
+                        <RefreshIcon className="w-5 h-5 stroke-[#868686]" />
+                      ),
+                      fn: onRefresh,
+                    },
+                    {
+                      label: "Delete",
+                      icon: <DeleteIcon className="w-5 h-5 stroke-[#868686]" />,
+                      fn: onDelete,
+                    },
+                  ].map((act, i) => (
+                    <button
+                      key={i}
+                      onClick={() => act.fn?.(d.id)}
+                      className="flex flex-col items-center gap-2">
+                      <span className="w-12 h-12 rounded-full bg-[#1C1C1C] flex items-center justify-center shadow-[0_0_10px_rgba(0,0,0,0.15)]">
+                        {act.icon}
+                      </span>
+                      <span className="text-xs text-white/70">{act.label}</span>
+                    </button>
+                  ))}
                 </div>
               )}
             </div>

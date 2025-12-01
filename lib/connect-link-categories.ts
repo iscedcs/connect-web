@@ -85,10 +85,10 @@ export const LINK_CATEGORIES: {
     href: "/connect/links/form",
     icon: FileTextIcon,
   },
-  {
-    key: "crypto",
-    title: "Crypto Wallet",
-    href: "/connect/links/crypto",
-    icon: WalletIcon,
-  },
+  // {
+  //   key: "crypto",
+  //   title: "Wallet",
+  //   href: "/connect/links/crypto",
+  //   icon: WalletIcon,
+  // },
 ];

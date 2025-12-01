@@ -60,6 +60,17 @@ export const CONNECT_DEV_FEATURES = {
     enableDownload: false,
   },
 
+  forms: {
+    enableBulkActions: false,
+    enableBulkRestore: false,
+    enableBulkVisible: false,
+
+    enableLongPressSelection: true,
+
+    enableCustomTemplates: false, // create_custom_template
+    enableTemplateCreation: false, // from template
+  },
+
   contacts: {
     enableReorder: false,
     enableMerge: false,

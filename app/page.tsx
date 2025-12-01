@@ -1,5 +1,6 @@
 import { getAuthInfo } from "@/actions/auth";
 import AccountSettingsList from "@/components/pages/cardholder/home/account-settings";
+import ConnectManagementWrapper from "@/components/pages/cardholder/home/connect-management-wrapper";
 import ConnectManagement from "@/components/pages/cardholder/home/contact-management";
 import DevicesCard from "@/components/pages/cardholder/home/device-section";
 import EventCard from "@/components/pages/cardholder/home/event-card";
@@ -25,6 +26,7 @@ export default async function HomePage() {
     userDevices = await getUserDevices(userId, accessToken);
   }
   console.log("User Devices", `${userDevices}`);
+  console.log("User Detials", `${connectProfile}`);
   const hasDevices = userDevices.length > 0;
 
   return (
@@ -52,12 +54,21 @@ export default async function HomePage() {
           {/* <WalletCard /> */}
         </section>
         <section className="p-4 space-y-10">
-          <ConnectManagement />
-          <StoreManagement />
+          {accessToken && connectProfile?.id && (
+            <ConnectManagementWrapper
+              profileId={connectProfile.id}
+              accessToken={accessToken}
+            />
+          )}
+
+          {/* <StoreManagement /> */}
         </section>
 
         <section className="p-4">
-          <AccountSettingsList isAuthenticated={isAuthed} />
+          <AccountSettingsList
+            isAuthenticated={isAuthed}
+            profileId={connectProfile?.id!}
+          />
         </section>
       </div>
     </main>

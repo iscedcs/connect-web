@@ -21,7 +21,12 @@ export default function ImagePicker({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const pick = () => inputRef.current?.click();
 
-  const url = value ? URL.createObjectURL(value) : null;
+  const url =
+    typeof value === "string"
+      ? value
+      : value instanceof File
+      ? URL.createObjectURL(value)
+      : null;
 
   // profile: tall small box; cover: wide box
   const base = variant === "profile" ? "w-28 h-40" : "w-full h-32";

@@ -21,26 +21,37 @@ type Row = {
   onClick?: (e: React.MouseEvent) => void;
 };
 
-const baseRows: Row[] = [
-  { href: "/profile", label: "Edit profile", Icon: EditIcon },
-  { href: "/account", label: "Account settings", Icon: AccountSettingsIcon },
-  {
-    href: "/notifications",
-    label: "Notification settings",
-    Icon: NotificationIcon,
-  },
-  { href: "/invite", label: "Invite a friend", Icon: InviteIcon },
-  { href: "/support", label: "Contact support", Icon: ContactIcon },
-  { href: "/terms", label: "Terms of service", Icon: TermsIcon },
-  { href: "/privacy", label: "Privacy policy", Icon: PrivacyIcon },
-];
-
 export default function AccountSettingsList({
   isAuthenticated,
+  profileId,
 }: {
   isAuthenticated: boolean;
+  profileId: string;
 }) {
   const router = useRouter();
+
+  const baseRows: Row[] = [
+    {
+      href: `/settings/account/edit/${profileId}`,
+      label: "Edit profile",
+      Icon: EditIcon,
+    },
+    {
+      href: "/settings/account",
+      label: "Account settings",
+      Icon: AccountSettingsIcon,
+    },
+    {
+      href: "/notifications",
+      label: "Notification settings",
+      Icon: NotificationIcon,
+    },
+    { href: "/invite", label: "Invite a friend", Icon: InviteIcon },
+    { href: "/support", label: "Contact support", Icon: ContactIcon },
+    { href: "/terms", label: "Terms of service", Icon: TermsIcon },
+    { href: "/privacy", label: "Privacy policy", Icon: PrivacyIcon },
+  ];
+
   const authRow: Row = isAuthenticated
     ? {
         href: "/auth/logout",

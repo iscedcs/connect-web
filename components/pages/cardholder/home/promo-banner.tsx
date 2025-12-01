@@ -4,23 +4,34 @@ import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
+import Link from "next/link";
 
 const initialSlides: Slide[] = [
   {
     id: 1,
     icon: "/assets/rainbow_95231491.svg",
+    href: "https://www.isce.tech/store",
     title: "Request for your contactless device!",
     subtitle: "Make an order request",
   },
   {
     id: 2,
     icon: "/assets/rainbow_95231491.svg",
-    title: "Virtual & Offline bookings",
-    subtitle: "Host, Attend & Bookmark events",
+    href: "/connect",
+    title: "Activate a new device",
+    subtitle: "By scanning or tapping",
   },
   {
     id: 3,
     icon: "/assets/rainbow_95231491.svg",
+    href: "https://events-web-two.vercel.app/",
+    title: "Virtual & Offline bookings",
+    subtitle: "Host, Attend & Bookmark events",
+  },
+  {
+    id: 4,
+    icon: "/assets/rainbow_95231491.svg",
+    href: "/wallet",
     title: "Contactless Wallet",
     subtitle: "Free & fast transactions",
   },
@@ -82,8 +93,10 @@ export default function PromoBanner() {
             <div className="flex flex-col">
               <p className="text-sm font-medium">{slide.title}</p>
               <div className="flex items-center gap-1 text-xs text-gray-400">
-                <span>{slide.subtitle}</span>
-                <span className="text-lg">›</span>
+                <Link href={slide.href!} className="gap-2 space-x-1.5">
+                  <span>{slide.subtitle}</span>
+                  <span className="text-lg">›</span>
+                </Link>
               </div>
             </div>
 

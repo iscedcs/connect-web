@@ -71,6 +71,7 @@ export const URLS = {
     restore_one: "/api/profiles/restore/{profileId}",
     set_default_one: "/api/profiles/set-default/{profileId}",
     get_default: "/api/profiles/default",
+    clone_a_profile: "/api/profiles/clone/{profileId}",
   },
   profile_contact: {
     add: "/api/profiles/{profileId}/contacts/add",
@@ -181,6 +182,41 @@ export const URLS = {
     bulk_delete: "/api/profiles/{profileId}/files/all/delete",
     bulk_restore: "/api/profiles/{profileId}/files/all/restore",
     bulk_visible: "/api/profiles/{profileId}/files/visibility/all",
+  },
+  forms: {
+    add: "/api/profiles/{profileId}/forms/add",
+    all: "/api/profiles/{profileId}/forms/all",
+    one: "/api/profiles/{profileId}/forms/one/{id}",
+    update: "/api/profiles/{profileId}/forms/update/{id}",
+    delete: "/api/profiles/{profileId}/forms/delete/{id}",
+    restore: "/api/profiles/{profileId}/forms/restore/{id}",
+    visible: "/api/profiles/{profileId}/forms/visibility/{id}",
+    submit_one: "/api/profiles/{profileId}/forms/submissions/{id}",
+    delete_submit:
+      "/api/profiles/{profileId}/forms/submissions/delete/{submissionId}",
+    create_template:
+      "/api/profiles/{profileId}/forms/from-template/{templateId}",
+    create_custom_template:
+      "/api/profiles/{profileId}/forms/form-templates/add",
+    bulk_delete: "/api/profiles/{profileId}/forms/all/delete",
+    bulk_restore: "/api/profiles/{profileId}/forms/all/restore",
+    bulk_visible: "/api/profiles/{profileId}/forms/visibility/all",
+  },
+
+  wallet: {
+    add: "/api/profiles/{profileId}/wallets/add",
+    all: "/api/profiles/{profileId}/wallets/all",
+    one: "/api/profiles/{profileId}/wallets/one/{id}",
+    update: "/api/profiles/{profileId}/wallets/update/{id}",
+    delete: "/api/profiles/{profileId}/wallets/delete/{id}",
+    restore: "/api/profiles/{profileId}/wallets/restore/{id}",
+    visible: "/api/profiles/{profileId}/wallets/visibility/{id}",
+    set_default: "/api/profiles/{profileId}/wallets/default/{id}",
+    get_default: "/api/profiles/{profileId}/wallets/default",
+    get_wallet_network: "/api/profiles/{profileId}/wallets/network/{network}",
+    bulk_delete: "/api/profiles/{profileId}/wallets/all/delete",
+    bulk_restore: "/api/profiles/{profileId}/wallets/all/restore",
+    bulk_visible: "/api/profiles/{profileId}/wallets/visibility/all",
   },
   user: {
     one: "/user/one/{id}",
