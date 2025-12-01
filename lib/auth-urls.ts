@@ -14,4 +14,3 @@ export function buildAuthLoginUrl(redirectTo: string) {
   url.searchParams.set("prompt", "login");
   return url.toString();
 }
-

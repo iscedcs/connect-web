@@ -51,19 +51,37 @@ export const CONNECT_DEV_FEATURES = {
     enableAutoDetectType: true,
   },
 
+  files: {
+    enableLongPressSelection: true,
+    enablePermanentDelete: true,
+    enableBulkActions: false,
+    enableBulkRestore: false, // future
+    enableBulkVisibility: true, // future
+    enableDownload: false,
+  },
+
+  forms: {
+    enableBulkActions: false,
+    enableBulkRestore: false,
+    enableBulkVisible: false,
+
+    enableLongPressSelection: true,
+
+    enableCustomTemplates: false, // create_custom_template
+    enableTemplateCreation: false, // from template
+  },
+
   contacts: {
     enableReorder: false,
     enableMerge: false,
   },
 
-  // future modules...
   gallery: {
     enableAlbums: false,
     enableBulkDelete: false,
   },
 
-  // global toggles
   global: {
-    showDevTools: false, // overrides showing internal DEV UI
+    showDevTools: false,
   },
 } as const;

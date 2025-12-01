@@ -2,7 +2,6 @@
 
 import ImagePicker from "@/components/shared/image-picker";
 import GoogleAddressField from "@/components/shared/location-auto-complete";
-import LocationAutocomplete from "@/components/shared/location-auto-complete";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -13,22 +12,30 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { AttachmentIcon, LocationIcon } from "@/lib/icons";
+import { AttachmentIcon } from "@/lib/icons";
 import { editProfileSchema, type EditProfileInput } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 type Props = {
   defaultValues?: Partial<EditProfileInput>;
+  accessToken: string;
+  mode: "create" | "update";
   onSubmit?: (data: EditProfileInput) => void | Promise<void>;
 };
 
 const BIO_MAX = 160;
 
-export default function EditProfileForm({ defaultValues, onSubmit }: Props) {
+export default function EditProfileForm({
+  defaultValues,
+  accessToken,
+  mode,
+  onSubmit,
+}: Props) {
+  const router = useRouter();
   const form = useForm<EditProfileInput>({
     resolver: zodResolver(editProfileSchema),
     mode: "onChange",
@@ -69,16 +76,20 @@ export default function EditProfileForm({ defaultValues, onSubmit }: Props) {
   const isSubmitting = form.formState.isSubmitting;
   const isValid = form.formState.isValid;
 
-  const submit = form.handleSubmit((data) => {
-    onSubmit?.(data);
+  const submit = form.handleSubmit(async (data) => {
+    if (onSubmit) {
+      await onSubmit(data);
+    }
   });
 
   return (
     <div className="mx-auto w-full max-w-screen-sm px-4 py-4">
       <div className="mb-3">
-        <Link href="/" className="inline-flex items-center gap-2 text-white/90">
+        <Button
+          onClick={() => router.back()}
+          className="inline-flex items-center gap-2 hover:bg-transparent cursor-pointer bg-transparent text-white/90">
           <ArrowLeft className="w-5 h-5" />
-        </Link>
+        </Button>
       </div>
 
       {/* Title */}
@@ -217,9 +228,15 @@ export default function EditProfileForm({ defaultValues, onSubmit }: Props) {
           <Button
             type="submit"
             variant="secondary"
-            className="w-full rounded-xl"
+            className="w-full rounded-xl cursor-pointer"
             disabled={!isValid || isSubmitting}>
-            {isSubmitting ? "Saving..." : "Next"}{" "}
+            {isSubmitting
+              ? mode === "update"
+                ? "Updating..."
+                : "Creating..."
+              : mode === "update"
+              ? "Save"
+              : "Create"}
           </Button>
         </form>
       </Form>

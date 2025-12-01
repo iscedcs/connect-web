@@ -1,6 +1,7 @@
 interface Slide {
   id: number;
-  icon: string;
+  icon?: string;
+  href?: string;
   title: string;
   subtitle: string;
 }

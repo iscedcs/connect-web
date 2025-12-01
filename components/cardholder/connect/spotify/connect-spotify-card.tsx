@@ -111,9 +111,18 @@ export default function SpotifyCard({
 
   return (
     <div
-      className={`bg-neutral-900/60 border border-white/10 rounded-xl p-4 flex justify-between items-center ${
-        selected ? "ring-2 ring-primary/70" : ""
-      }`}
+      className={`
+    bg-neutral-900/60 border border-white/10 rounded-xl p-4 
+    flex justify-between items-center 
+    transition-all duration-200 
+    hover:bg-neutral-900 hover:shadow-lg
+    hover:scale-[1.05] hover:border-white/20 hover:-translate-y-[2px] hover:shadow-black/30
+    ${selected ? "ring-2 ring-primary/70" : ""}
+  `}
+      style={{
+        animation: "fadeSlideIn 0.35s ease forwards",
+        opacity: 0,
+      }}
       onMouseDown={handleLongPressStart}
       onMouseUp={handleLongPressEnd}
       onTouchStart={handleLongPressStart}
@@ -122,10 +131,17 @@ export default function SpotifyCard({
       <div
         className="flex items-center gap-3 cursor-pointer"
         onClick={() => selectionMode && toggleSelect?.(spotify.id)}>
-        <div className="w-10 h-10 bg-neutral-800 rounded-full flex items-center justify-center">
+        <div
+          className="
+        w-10 h-10 rounded-full flex items-center justify-center 
+        bg-neutral-800 
+        transition-all duration-200  hover:shadow-[0_0_12px_rgba(30,215,96,0.25)]
+    hover:scale-[1.05]
+         hover:shadow-emerald-500/10
+      ">
           <img
             src={getFaviconFromUrl(spotify.externalUrl)}
-            className="w-6 h-6 rounded"
+            className="w-6 h-6 rounded select-none"
             alt="icon"
           />
         </div>
@@ -162,7 +178,7 @@ export default function SpotifyCard({
                 {isDeleting ? (
                   <Spinner />
                 ) : (
-                  <DeleteIcon className="w-4 h-4 text-white/60" />
+                  <DeleteIcon className="w-4 h-4 text-white/60 hover:text-red-400" />
                 )}
               </Button>
             </>

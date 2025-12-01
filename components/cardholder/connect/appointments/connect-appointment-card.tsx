@@ -56,7 +56,11 @@ export default function AppointmentCard({
     pressTimer.current = null;
   };
 
-  const patchRequest = async (endpoint: string, msg: string) => {
+  const patchRequest = async (
+    endpoint: string,
+    msg: string,
+    body: any = {}
+  ) => {
     setLoading(true);
     try {
       const res = await fetch(
@@ -67,7 +71,7 @@ export default function AppointmentCard({
             Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ is_default: true }),
+          body: JSON.stringify(body),
         }
       );
 
@@ -122,7 +126,8 @@ export default function AppointmentCard({
           .replace("{id}", appointment.id),
         newValue
           ? "😋 You've enabled your appointment visibility!!🎉🎉"
-          : "🙈 Your appointment is now hidden."
+          : "🙈 Your appointment is now hidden.",
+        { is_visible: newValue }
       );
     } catch {
       setVisible(!newValue);
@@ -147,9 +152,16 @@ export default function AppointmentCard({
 
   return (
     <div
-      className={`bg-neutral-900/60 border border-white/10 rounded-xl p-4 flex justify-between items-center ${
-        selected ? "ring-2 ring-primary/70" : ""
-      }`}
+      className={`bg-neutral-900/60 border border-white/10 rounded-xl p-4 
+    flex justify-between items-center 
+    transition-all duration-200 
+    hover:bg-neutral-900 hover:shadow-lg
+    hover:scale-[1.05] hover:border-white/20 hover:-translate-y-[2px] hover:shadow-black/30
+    ${selected ? "ring-2 ring-primary/70" : ""}`}
+      style={{
+        animation: "fadeSlideIn 0.35s ease forwards",
+        opacity: 0,
+      }}
       onMouseDown={handleLongPressStart}
       onMouseUp={handleLongPressEnd}
       onMouseLeave={handleLongPressEnd}
@@ -158,7 +170,9 @@ export default function AppointmentCard({
       <div
         className="flex items-center gap-3 cursor-pointer"
         onClick={() => selectionMode && toggleSelect?.(appointment.id)}>
-        <div className="w-10 h-10 bg-neutral-800 rounded-full flex items-center justify-center">
+        <div
+          className="w-10 h-10 bg-neutral-800 rounded-full flex items-center justify-center overflow-hidden
+        transition-all duration-200 hover:scale-[1.05]">
           <img
             src={getFaviconFromUrl(appointment.url)}
             className="w-6 h-6 rounded"

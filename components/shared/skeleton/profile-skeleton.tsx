@@ -2,61 +2,69 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ProfileSkeleton() {
   return (
-    <main className="min-h-screen bg-black text-white">
-      {/* Cover + avatar */}
-      <div className="relative">
-        <Skeleton className="h-40 w-full" />
-        <div className="absolute -bottom-10 left-6 flex items-end gap-4">
-          <Skeleton className="h-24 w-24 rounded-2xl" />
-          <div className="flex flex-col gap-2">
-            <Skeleton className="h-6 w-48" />
-            <Skeleton className="h-4 w-72" />
+    <main className="min-h-screen bg-black text-white animate-in fade-in duration-300">
+      {/* Cover */}
+      <div className="relative w-full h-44 overflow-hidden">
+        <Skeleton className="absolute inset-0 w-full h-full rounded-none" />
+
+        {/* Avatar + Name */}
+        <div className="absolute -bottom-12 left-6 flex items-end gap-4">
+          <Skeleton className="h-24 w-24 rounded-2xl ring-4 ring-black" />
+
+          <div className="flex flex-col gap-3">
+            <Skeleton className="h-5 w-40 rounded-md" />
+            <Skeleton className="h-4 w-28 rounded-md" />
           </div>
         </div>
       </div>
 
-      {/* Form card */}
-      <div className="pt-16 px-4">
-        <div className="mx-auto w-full max-w-2xl rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur">
+      {/* Form area */}
+      <div className="pt-20 pb-12 px-4">
+        <div className="mx-auto w-full max-w-screen-sm space-y-6">
+          {/* Title */}
+          <Skeleton className="h-7 w-64 rounded-md" />
+
           {/* Full name */}
-          <div className="mb-4">
-            <Skeleton className="h-4 w-24 mb-2" />
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-10 w-full rounded-xl" />
+          </div>
+
+          {/* Position */}
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-20" />
             <Skeleton className="h-10 w-full rounded-xl" />
           </div>
 
           {/* Bio */}
-          <div className="mb-4">
-            <Skeleton className="h-4 w-12 mb-2" />
-            <Skeleton className="h-24 w-full rounded-xl" />
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-16" />
+            <Skeleton className="h-20 w-full rounded-xl" />
           </div>
 
-          {/* Address */}
-          <div className="mb-4">
-            <Skeleton className="h-4 w-20 mb-2" />
+          {/* Google Address Autocomplete */}
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-32" />
             <Skeleton className="h-10 w-full rounded-xl" />
           </div>
 
-          {/* Images */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div>
-              <Skeleton className="h-4 w-28 mb-2" />
-              <Skeleton className="h-24 w-full rounded-xl" />
-            </div>
-            <div>
-              <Skeleton className="h-4 w-24 mb-2" />
-              <Skeleton className="h-24 w-full rounded-xl" />
-            </div>
+          {/* Profile Image */}
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-40" />
+            <Skeleton className="h-28 w-full rounded-xl" />
           </div>
 
-          {/* Submit */}
-          <div className="flex justify-end">
-            <Skeleton className="h-10 w-36 rounded-xl" />
+          {/* Cover Image */}
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-36" />
+            <Skeleton className="h-32 w-full rounded-xl" />
           </div>
-        </div>
 
-        {/* Delete button placeholder */}
-        <div className="mx-auto w-full max-w-2xl">
-          <Skeleton className="h-10 w-full mt-4 rounded-xl" />
+          {/* Submit Button */}
+          <Skeleton className="h-12 w-full rounded-xl" />
+
+          {/* Delete row placeholder */}
+          <Skeleton className="h-10 w-full rounded-xl opacity-60" />
         </div>
       </div>
     </main>

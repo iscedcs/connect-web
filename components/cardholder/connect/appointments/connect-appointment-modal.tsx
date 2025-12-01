@@ -91,8 +91,10 @@ export default function AppointmentModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-      <div className="bg-neutral-900 rounded-2xl border border-white/10 p-6 w-[90%] max-w-md space-y-4">
+    <div
+      className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+      style={{ animation: "modalFade .25s ease" }}>
+      <div className="bg-neutral-900 rounded-2xl border border-white/10 p-6 w-[90%] animate-modalScale max-w-md space-y-4">
         <h2 className="text-lg font-semibold">
           {isEdit ? "Edit Appointment" : "Add Appointment"}
         </h2>
