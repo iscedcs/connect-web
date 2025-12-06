@@ -211,3 +211,25 @@ V2 For Forms:
 ✔ Make badges (e.g. “3 files”, “5 socials”)
 ✔ Show icons based on the platform automatically
 ✔ Add smooth animation for the filled state    
+
+
+
+
+
+
+
+
+// PUBLIC
+✅ Desktop version
+✅ Framer Motion animations
+✅ Save Contact modal
+✅ Events & Store tab full UI
+✅ CTA: send WhatsApp message
+✅ Smart deep links (Open Spotify app, etc.)
+
+
+✅ Add CTA for “Add to Contacts (VCF download)”
+✅ Add analytics tracking (tap count)
+✅ Add custom theme per user (brand colors)
+✅ Add option to hide modules
+✅ Add Events + Store tabs

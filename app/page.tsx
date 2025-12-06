@@ -1,13 +1,11 @@
 import { getAuthInfo } from "@/actions/auth";
 import AccountSettingsList from "@/components/pages/cardholder/home/account-settings";
 import ConnectManagementWrapper from "@/components/pages/cardholder/home/connect-management-wrapper";
-import ConnectManagement from "@/components/pages/cardholder/home/contact-management";
 import DevicesCard from "@/components/pages/cardholder/home/device-section";
 import EventCard from "@/components/pages/cardholder/home/event-card";
 import DevicesConnectedCard from "@/components/pages/cardholder/home/filled-state/device-connected";
 import ProfileHeader from "@/components/pages/cardholder/home/profile-header";
 import PromoBanner from "@/components/pages/cardholder/home/promo-banner";
-import StoreManagement from "@/components/pages/cardholder/home/store-management";
 import { getUserDevices } from "@/lib/services/device";
 import { getConnectProfile } from "@/lib/services/profile";
 

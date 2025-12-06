@@ -1,5 +1,7 @@
 export const NEXT_PUBLIC_CONNECT_API_ORIGIN =
   process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL;
+export const NEXT_PUBLIC_EVENT_API_ORIGIN =
+  process.env.NEXT_PUBLIC_LIVE_EVENTS_BACKEND_URL;
 export const AUTH_API = process.env.NEXT_PUBLIC_LIVE_ISCEAUTH_BACKEND_URL;
 export const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 export const URLS = {
@@ -18,6 +20,7 @@ export const URLS = {
     update: "/api/profile/update",
     delete: "/api/profile/delete",
     stats: "/api/profile/stats",
+    public: "/api/profile/public/{deviceId}",
   },
   social: {
     add: "/api/social/add",
@@ -221,11 +224,19 @@ export const URLS = {
   user: {
     one: "/user/one/{id}",
   },
+  auth: {
+    quick_register: "/auth/signupUser",
+  },
   device: {
     verify_token: "/device/verify-token",
     create: "/device/create",
     user: "/device/user/{userId}",
     update: "/device/update/{id}",
+  },
+  events: {
+    all: "/events/all",
+    event_for_user: "/events/events",
+    public_user_events: "/events/public/{userId}",
   },
 };
 
