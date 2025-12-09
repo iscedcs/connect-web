@@ -9,23 +9,14 @@ export const publicRoutes = ["/"];
  * @type {string[]}
  */
 export const protectedRoutes = [
-  "/",
   "/bvn",
-  "/connect",
-  "/connect/links",
-  "/connect/success",
+  "/connect", // captures EVERYTHING inside /connect/**
   "/devices",
   "/otp",
-  "/otp/error",
-  "/otp/idle",
-  "/otp/resending",
-  "/otp/success",
   "/profile",
-  "/profile/edit",
   "/device",
   "/links",
-  "/settings",
+  "/settings", // captures /settings and all sublinks
   "/wallet",
-  "/wallet/empty",
   "/wearables",
 ];
