@@ -17,6 +17,7 @@ export const protectedRoutes = [
   "/device",
   "/links",
   "/settings", // captures /settings and all sublinks
+  "/settings/account",
   "/wallet",
   "/wearables",
 ];
