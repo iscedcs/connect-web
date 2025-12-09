@@ -56,3 +56,10 @@ export function getDeviceName(
       return "Unknown Device";
   }
 }
+
+export function generatePassword() {
+  return (
+    Math.random().toString(36).slice(-8) +
+    Math.random().toString(36).toUpperCase().slice(-4)
+  );
+}

@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { protectedRoutes } from "./routes";
 import { buildAuthLoginUrl } from "./lib/auth-urls";
+import { verifyToken } from "./lib/verify-jwt";
 
 function isProtectedPath(pathname: string) {
   // Exact or “startsWith” match for nested pages (e.g., /connect/links/...)
@@ -10,27 +11,7 @@ function isProtectedPath(pathname: string) {
   );
 }
 
-function hasNextAuthSessionCookie(req: NextRequest) {
-  return (
-    req.cookies.get("__Secure-next-auth.session-token")?.value ||
-    req.cookies.get("next-auth.session-token")?.value
-  );
-}
-
-function isExpired(jwt?: string) {
-  if (!jwt) return true;
-  try {
-    // Edge runtime: use atob (Buffer not available)
-    const payload = JSON.parse(atob(jwt.split(".")[1]));
-    if (!payload?.exp) return true;
-    const nowSec = Math.floor(Date.now() / 1000);
-    return payload.exp <= nowSec;
-  } catch {
-    return true;
-  }
-}
-
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Allow static/assets/callback/etc.
@@ -54,17 +35,20 @@ export function middleware(req: NextRequest) {
   if (pathname.startsWith("/api")) return NextResponse.next();
 
   const token = req.cookies.get("accessToken")?.value;
-  const nextAuthCookie = hasNextAuthSessionCookie(req);
-
-  const hasValidAccessToken = token && !isExpired(token);
-
-  if (hasValidAccessToken || nextAuthCookie) {
-    return NextResponse.next();
+  if (!token) {
+    const redirectUrl =
+      req.nextUrl.origin + pathname + (req.nextUrl.search || "");
+    return NextResponse.redirect(buildAuthLoginUrl(redirectUrl));
   }
-  const currentUrl =
-    req.nextUrl.origin + req.nextUrl.pathname + (req.nextUrl.search || "");
-  const authUrl = buildAuthLoginUrl(currentUrl);
-  return NextResponse.redirect(authUrl);
+
+  const { valid, payload } = await verifyToken(token);
+
+  if (!valid || !payload) {
+    const redirectUrl =
+      req.nextUrl.origin + pathname + (req.nextUrl.search || "");
+    return NextResponse.redirect(buildAuthLoginUrl(redirectUrl));
+  }
+  return NextResponse.next();
 }
 
 export const config = {

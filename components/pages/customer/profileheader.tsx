@@ -28,7 +28,7 @@ export default function ProfileHeaderPublic({
 
       {/* Profile section */}
       <div className="p-5 -mt-12 relative z-10">
-        <div className="flex items-center gap-4">
+        <div className=" flex items-center gap-4">
           <div className="w-16 h-16 rounded-full border-4 border-black overflow-hidden">
             <Image
               src={profile.profilePhoto || "/assets/default-avatar.jpg"}
@@ -39,7 +39,7 @@ export default function ProfileHeaderPublic({
             />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">{profile.name}</h1>
+            <h1 className="text-5xl font-extrabold">{profile.name}</h1>
             <p className="text-sm text-white/70">{profile.position}</p>
           </div>
         </div>

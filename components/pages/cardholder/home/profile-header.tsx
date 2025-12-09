@@ -3,6 +3,7 @@
 import MaxWidthWrapper from "@/components/maxwidth-wrapper";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { BellIcon, NotificationIcon } from "@/lib/icons";
 import { Mail, BarChart2, Bell } from "lucide-react";
 import Image from "next/image";
 
@@ -77,23 +78,21 @@ export default function ProfileHeader({
         <div className="flex flex-col w-full  space-y-4 ">
           {/* Role */}
           <div className="mb-3  items-start">
-            {!!roleOrBio && (
-              <p className="text-md text-gray-400">{roleOrBio}</p>
-            )}
+            {!!roleOrBio && <p className="text-sm text-white">{roleOrBio}</p>}
             {/* Name */}
-            <h2 className="text-xl font-semibold">{name}</h2>
+            <h2 className="text-2xl font-extrabold">{name}</h2>
           </div>
           {/* Buttons + Icons in one row */}
           <div className="flex w-full  items-center justify-between">
             <div className="flex gap-2">
               <Button
                 variant="secondary"
-                className="rounded-full border-none px-4 py-2">
+                className="rounded-full border-none px-4 py-2 cursor-pointer text-xs ">
                 Send money
               </Button>
               <Button
                 variant="default"
-                className="rounded-full bg-[#151515D9] px-4 py-2">
+                className="rounded-full bg-[#151515D9] border-[#868686] border-[0.5px] px-4 py-2 cursor-pointer text-xs ">
                 View contacts
               </Button>
             </div>
@@ -102,18 +101,18 @@ export default function ProfileHeader({
             <div className="flex items-center">
               <Button
                 size="icon"
-                className="rounded-full bg-transparent hover:bg-gray-800">
-                <Mail className="w-5 h-5" />
+                className="rounded-full bg-transparent hover:bg-transparent cursor-pointer">
+                <Mail className="w-10 h-10" />
               </Button>
               <Button
                 size="icon"
-                className="rounded-full bg-transparent hover:bg-gray-800">
-                <BarChart2 className="w-5 h-5" />
+                className="rounded-full bg-transparent hover:bg-transparent cursor-pointer">
+                <BarChart2 className="w-10 h-10" />
               </Button>
               <Button
                 size="icon"
-                className="rounded-full bg-transparent hover:bg-gray-800">
-                <Bell className="w-5 h-5" />
+                className="rounded-full bg-transparent hover:bg-transparent cursor-pointer">
+                <BellIcon className="w-10 h-10" />
               </Button>
             </div>
           </div>

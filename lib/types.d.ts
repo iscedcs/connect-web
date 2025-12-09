@@ -56,3 +56,12 @@ interface DeviceInterface {
   productId: string;
   type: "6214bdef7dbcb" | "6214bdef6dbcb" | "6214bdef5dbcb" | "6214bdef4dbcb";
 }
+
+interface ConnectItem {
+  id: string;
+  url: string;
+  icon?: string;
+  title?: string;
+  platform?: string;
+  label?: string;
+}

@@ -39,10 +39,10 @@ export default function DevicesConnectedCard({
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h3 className="text-[19px] font-medium">Devices</h3>
+          <h3 className="text-lg font-normal">Devices</h3>
           <a
             href={manageHref}
-            className="text-sm text-white/60 inline-flex items-center gap-1">
+            className="text-sm text-[#6F6F70] inline-flex items-center gap-1">
             Manage your devices <span>›</span>
           </a>
         </div>
@@ -79,13 +79,15 @@ export default function DevicesConnectedCard({
                 <div className="flex-1">
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="text-[15px]">{getDeviceName(d.type)}</p>
-                      <p className="text-[11px] text-white/60 leading-tight">
+                      <p className="text-base font-normal">
+                        {getDeviceName(d.type)}
+                      </p>
+                      <p className="text-[10px] text-[#868686] leading-tight">
                         {d.label}
                       </p>
                     </div>
 
-                    <p className="text-[10px] text-white/60 ml-4 mt-[2px]">
+                    <p className="text-[10px] text-[#868686] ml-4 mt-[2px]">
                       {d.assignedAt}
                     </p>
                   </div>

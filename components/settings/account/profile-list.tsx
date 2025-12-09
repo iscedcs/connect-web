@@ -6,6 +6,7 @@ import ProfileCard from "./profile-card";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { URLS } from "@/lib/const";
+import { LeftIcon } from "@/lib/icons";
 
 interface Profile {
   id: string;
@@ -45,7 +46,7 @@ export default function ProfileList({
         <Button
           onClick={() => router.back()}
           className="inline-flex items-center gap-2 bg-transparent hover:bg-transparent cursor-pointer text-white/90">
-          <ArrowLeft className="w-5 h-5" />
+          <LeftIcon className="w-5 h-5" />
         </Button>
       </div>
       {list.map((profile) => (
