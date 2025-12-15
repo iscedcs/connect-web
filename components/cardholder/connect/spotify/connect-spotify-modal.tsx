@@ -54,7 +54,9 @@ export default function SpotifyModal({
   if (!open) return null;
 
   const handleSubmit = async () => {
-    if (!url.trim()) return toast.error("A valid Spotify URL is required!");
+    if (!isEdit && !url.trim()) {
+      return toast.error("Please enter a spotify link");
+    }
 
     setLoading(true);
 
@@ -64,11 +66,12 @@ export default function SpotifyModal({
             .replace("{profileId}", profileId)
             .replace("{id}", spotify.id)
         : URLS.spotify.add.replace("{profileId}", profileId);
+      const method = isEdit ? "PATCH" : "POST";
 
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL}${endpoint}`,
         {
-          method: isEdit ? "PATCH" : "POST",
+          method,
           headers: {
             Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",

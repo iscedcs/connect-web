@@ -144,9 +144,9 @@ export default async function CustomerProfilePage({ params }: any) {
 
         {/* ACTION BUTTONS */}
         <div className="px-4 mt-4 flex items-center font-medium gap-3 flex-wrap">
-          <button className="px-5 py-2 cursor-pointer bg-white text-black rounded-full text-xs">
+          {/* <button className="px-5 py-2 cursor-pointer bg-white text-black rounded-full text-xs">
             Send money
-          </button>
+          </button> */}
 
           <button className="px-5 py-2 cursor-pointer bg-white/5 border-[0.5px] border-[#868686] rounded-full text-xs">
             <Link href={`/customer/${id}/save-contact`}>Save contact</Link>
@@ -171,53 +171,7 @@ export default async function CustomerProfilePage({ params }: any) {
       </section>
 
       {/* TABS */}
-      <PublicProfileTabs connectItems={connectItems} events={events} />
-
-      {/* <section className="px-4 mt-6">
-        {events.length === 0 && (
-          <p className="text-white/40 text-sm">No events found</p>
-        )}
-
-        {events.map((event: any) => (
-          <EventCard key={event.id} event={event} />
-        ))}
-      </section> */}
-      {/* <section className="mt-6 px-4">
-        <div className="bg-[#151515]  rounded-[22px] rounded-b-none p-4 pt-1">
-          {connectItems.map((item, index) => (
-            <div key={item.id}>
-              <a
-                href={item.url}
-                target="_blank"
-                className="flex items-center justify-between py-4 group">
-                <div className="flex items-start gap-4 flex-1">
-                  <span className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center overflow-hidden shrink-0">
-                    <img
-                      src={item.icon}
-                      alt=""
-                      className="w-6 h-6 object-contain"
-                    />
-                  </span>
-
-                  <div className="flex-1">
-                    <p className="text-sm text-white">{item.title}</p>
-                    <p className="text-[10px] text-white/50 mt-[2px] truncate max-w-[180px] block">
-                      {item.url}
-                    </p>
-                  </div>
-                </div>
-
-                <span className="text-3xl text-white/60 group-hover:text-white transition ml-4">
-                  <RightIcon />
-                </span>
-              </a>
-              {index !== connectItems.length - 1 && (
-                <div className="border-b border-white/10 flex-1 ml-[56px] " />
-              )}
-            </div>
-          ))}
-        </div>
-      </section> */}
+      <PublicProfileTabs connectItems={connectItems} events={events} id={id} />
     </main>
   );
 }

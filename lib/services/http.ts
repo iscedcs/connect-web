@@ -1,10 +1,9 @@
 import axios from "axios";
 
 export const http = axios.create({
-  timeout: 10000, // 10 seconds max
+  timeout: 10000,
 });
 
-// OPTIONAL: you can globally intercept errors
 http.interceptors.response.use(
   (res) => res,
   (err) => {

@@ -90,7 +90,7 @@ export default function SocialCard({
         URLS.profile_social.delete
           .replace("{profileId}", profileId)
           .replace("{id}", social.id),
-        "Your Social has been deleted!🥺"
+        "Your Social has been deleted!"
       );
     } finally {
       setDeleteing(false);
@@ -104,7 +104,7 @@ export default function SocialCard({
         URLS.profile_social.restore
           .replace("{profileId}", profileId)
           .replace("{id}", social.id),
-        "Yeepy! Your Social has been restored successfully!🫣🫣"
+        "Yeepy! Your Social has been restored successfully!"
       );
     } finally {
       setRestoring(false);
@@ -121,7 +121,7 @@ export default function SocialCard({
         .replace("{profileId}", profileId)
         .replace("{id}", social.id),
 
-      "Wooh!!😋 You've enabled your social visibility!!🎉🎉",
+      "Wooh!! You've enabled your social visibility!!",
       { is_visible: newValue }
     );
   };
@@ -131,6 +131,7 @@ export default function SocialCard({
       className={`bg-neutral-900/60 border border-white/10 rounded-xl p-4 
     flex justify-between items-center 
     transition-all duration-200 
+        w-full max-w-full overflow-hidden
     hover:bg-neutral-900 hover:shadow-lg
     hover:scale-[1.05] hover:border-white/20 hover:-translate-y-[2px] hover:shadow-black/30
     ${selected ? "ring-2 ring-primary/70" : ""}`}
@@ -143,28 +144,30 @@ export default function SocialCard({
       onMouseLeave={handleLongPressEnd}
       onTouchStart={handleLongPressStart}
       onTouchEnd={handleLongPressEnd}>
-      <div
-        className="flex items-center gap-3 cursor-pointer"
-        onClick={() => selectionMode && toggleSelect?.(social.id)}>
-        <div className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center overflow-hidden">
-          <img
-            src={getFaviconFromUrl(social.value)}
-            className="w-6 h-6 rounded"
-            alt="icon"
-          />{" "}
-        </div>
+      <div className="flex items-center justify-between gap-3 w-full overflow-hidden">
+        <div
+          className="flex items-center gap-3 cursor-pointer  min-w-0 flex-1"
+          onClick={() => selectionMode && toggleSelect?.(social.id)}>
+          <div className="w-10 h-10 shrink-0 rounded-full bg-neutral-800 flex items-center justify-center">
+            <img
+              src={getFaviconFromUrl(social.value)}
+              className="w-6 h-6"
+              alt="icon"
+            />{" "}
+          </div>
 
-        <div className="flex flex-col min-w-0">
-          <p className="text-sm font-medium truncate">{social.label}</p>
-          <p className="text-xs text-white/50 truncate max-w-[180px] block">
-            {social.value}
-          </p>
-          {selected && <p className="text-xs text-background mt-1">Selected</p>}
+          <div className="flex flex-col min-w-0 flex-1">
+            <p className="text-sm font-medium truncate">{social.label}</p>
+            <p className="text-xs text-white/50 truncate">{social.value}</p>
+            {selected && (
+              <p className="text-xs text-background mt-1">Selected</p>
+            )}
+          </div>
         </div>
       </div>
 
       {!showRestore ? (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 shrink-0">
           {!selectionMode && (
             <>
               <ToggleIcon

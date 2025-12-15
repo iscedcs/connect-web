@@ -8,3 +8,10 @@ export function getFaviconFromUrl(url: string, size: number = 64) {
     return "/icons/globe.svg";
   }
 }
+
+export function getFileType(url: string) {
+  if (url.match(/\.pdf$/i)) return "pdf";
+  if (url.match(/\.(png|jpg|jpeg|webp)$/i)) return "image";
+  if (url.match(/\.(doc|docx)$/i)) return "document";
+  return "other";
+}

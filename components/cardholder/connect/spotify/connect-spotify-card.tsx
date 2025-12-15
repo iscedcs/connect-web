@@ -30,7 +30,7 @@ export default function SpotifyCard({
   selected?: boolean;
   toggleSelect?: (id: string) => void;
 }) {
-  const [visible, setVisible] = useState(spotify.is_visible);
+  const [visible, setVisible] = useState(spotify.isVisible);
   const [editOpen, setEditOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -54,14 +54,18 @@ export default function SpotifyCard({
     pressTimer.current = null;
   };
 
-  const patch = async (endpoint: string, msg: string) => {
+  const patch = async (endpoint: string, msg: string, body: any = {}) => {
     setLoading(true);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL}${endpoint}`,
         {
           method: "PATCH",
-          headers: { Authorization: `Bearer ${accessToken}` },
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
         }
       );
       const json = await res.json();
@@ -105,17 +109,18 @@ export default function SpotifyCard({
       URLS.spotify.visible
         .replace("{profileId}", profileId)
         .replace("{id}", spotify.id),
-      newValue ? "Visible" : "Hidden"
+      "Now Visible to public",
+      { is_visible: newValue }
     );
   };
 
   return (
     <div
       className={`
-    bg-neutral-900/60 border border-white/10 rounded-xl p-4 
-    flex justify-between items-center 
-    transition-all duration-200 
-    hover:bg-neutral-900 hover:shadow-lg
+    bg-neutral-900/60 border border-white/10  rounded-xl p-4
+      grid justify-between items-center
+      transition-all duration-200
+      hover:bg-neutral-900 hover:shadow-lg
     hover:scale-[1.05] hover:border-white/20 hover:-translate-y-[2px] hover:shadow-black/30
     ${selected ? "ring-2 ring-primary/70" : ""}
   `}
@@ -137,7 +142,7 @@ export default function SpotifyCard({
         bg-neutral-800 
         transition-all duration-200  hover:shadow-[0_0_12px_rgba(30,215,96,0.25)]
     hover:scale-[1.05]
-         hover:shadow-emerald-500/10
+         hover:shadow-emerald-500/10 shrink-0
       ">
           <img
             src={getFaviconFromUrl(spotify.externalUrl)}
@@ -150,16 +155,22 @@ export default function SpotifyCard({
           <p className="text-sm font-medium truncate flex items-center gap-2">
             {spotify.title} <SpotifyTypeBadge type={spotify.type} />
           </p>
-          <p className="text-xs text-white/50 truncate max-w-[180px] block">
+          <p className="text-xs text-white/50 truncate max-w-[180px] block ">
             {spotify.externalUrl}
           </p>
-          {selected && <p className="text-xs text-background">Selected</p>}
+          {selected && <p className="text-xs text-background mt-1">Selected</p>}
         </div>
       </div>
 
       {/* RIGHT SIDE */}
       {!showRestore ? (
-        <div className="flex items-center gap-3">
+        <div
+          className="
+  flex items-center gap-3
+  justify-between
+  md:justify-start
+  pt-3 md:pt-0
+">
           {!selectionMode && (
             <>
               <ToggleIcon

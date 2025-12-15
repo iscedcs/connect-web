@@ -12,7 +12,7 @@ export function EventCard({ event }: any) {
   return (
     <a
       href={`/events/${event.cleanName ?? event.id}`}
-      className="flex items-start justify-between py-4 ">
+      className="flex items-start justify-between py-2 ">
       {/* LEFT: IMAGE + DETAILS */}
       <div className="flex items-start gap-4">
         <Image
