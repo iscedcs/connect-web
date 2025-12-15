@@ -1,6 +1,6 @@
 "use client";
 
-import MeetingListSkeleton from "@/components/shared/skeleton/link-list-skeleton";
+import MeetingListSkeleton from "@/components/shared/skeleton/meeting-skeleton";
 import MeetingCard from "./connect-meeting-card";
 
 export default function MeetingList({

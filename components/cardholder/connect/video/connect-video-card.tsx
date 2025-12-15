@@ -7,6 +7,8 @@ import { Eye, Star, Video } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import VideoModal from "./connect-video-modal";
+import { Spinner } from "@/components/ui/spinner";
+import { CONNECT_DEV_FEATURES } from "@/config/connect-dev-features";
 
 export default function VideoCard({
   video,
@@ -32,50 +34,24 @@ export default function VideoCard({
   const [loading, setLoading] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
 
-  const longPressTimeout = useRef<any>(null);
-  const longPressed = useRef(false);
+  const [isDeleting, setDeleting] = useState(false);
+  const [isRestoring, setRestoring] = useState(false);
+  const pressTimer = useRef<any>(null);
 
-  const LONG_PRESS_DURATION = 700; //ms
+  const handleLongPressStart = () => {
+    if (!CONNECT_DEV_FEATURES.videos.enableLongPressSelection) return;
 
-  const startLongPress = () => {
-    if (!toggleSelect) return;
-
-    longPressed.current = false;
-
-    longPressTimeout.current = setTimeout(() => {
-      longPressed.current = true;
-      toggleSelect(video.id);
-    }, LONG_PRESS_DURATION);
-  };
-
-  const cancelLongPress = () => {
-    clearTimeout(longPressTimeout.current);
-  };
-
-  const handleCardClick = () => {
-    cancelLongPress();
-
-    // A long press already triggered selection
-    if (longPressed.current) return;
-
-    // Already in selection mode → toggle
-    if (selectionMode && toggleSelect) {
-      toggleSelect(video.id);
-      return;
-    }
-
-    // Normal action → open edit modal
-    if (!showRestore) {
-      setEditOpen(true);
+    if (!pressTimer.current) {
+      pressTimer.current = setTimeout(() => {
+        toggleSelect?.(video.id);
+      }, 450);
     }
   };
 
-  const handleMouseDown = () => startLongPress();
-  const handleMouseUp = () => cancelLongPress();
-  const handleMouseLeave = () => cancelLongPress();
-
-  const handleTouchStart = () => startLongPress();
-  const handleTouchEnd = () => cancelLongPress();
+  const handleLongPressEnd = () => {
+    if (pressTimer.current) clearTimeout(pressTimer.current);
+    pressTimer.current = null;
+  };
 
   // -------------------------------------------------------------
   // ACTIVE ENDPOINTS
@@ -136,15 +112,17 @@ export default function VideoCard({
   };
 
   const handleRestore = async () => {
+    setRestoring(true);
     await patchRequest(
       URLS.videos.restore
         .replace("{profileId}", profileId)
         .replace("{id}", video.id),
-      "Video restored"
+      "Video restored successfully!"
     );
   };
 
   const handleDelete = async () => {
+    setDeleting(true);
     setLoading(true);
     try {
       const res = await fetch(
@@ -160,26 +138,25 @@ export default function VideoCard({
       );
       const json = await res.json();
       if (res.ok) {
-        toast.success("Video deleted");
+        toast.success("Video deleted!");
         await onUpdated();
       } else toast.error(json?.message ?? "Failed to delete");
     } catch {
       toast.error("Error deleting video");
     } finally {
       setLoading(false);
+      setDeleting(false);
     }
   };
 
   return (
     <div
-      onClick={handleCardClick}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseLeave}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
+      onMouseDown={handleLongPressStart}
+      onMouseUp={handleLongPressEnd}
+      onTouchStart={handleLongPressStart}
+      onTouchEnd={handleLongPressEnd}
       className={`
-        relative bg-neutral-900/60 border border-white/10 rounded-xl p-4 cursor-pointer
+        relative bg-neutral-900/60 border border-white/10 rounded-xl p-4 cursor-default
         transition-all duration-200
         ${
           selected
@@ -210,33 +187,38 @@ export default function VideoCard({
         </div>
 
         {/* Buttons disabled in selection mode */}
-        {!showRestore && !selectionMode && (
+        {!showRestore ? (
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              disabled={loading}
-              onClick={() => setEditOpen(true)}>
-              <EditIcon className="w-4 h-4 text-white/60" />
-            </Button>
+            {!selectionMode && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={loading}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditOpen(true);
+                  }}>
+                  <EditIcon className="w-4 h-4 text-white/60" />
+                </Button>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              disabled={loading}
-              onClick={handleDelete}>
-              <DeleteIcon className="w-4 h-4 text-white/60" />
-            </Button>
+                <Button variant="ghost" size="icon" onClick={handleDelete}>
+                  {isDeleting ? (
+                    <Spinner />
+                  ) : (
+                    <DeleteIcon className="w-4 h-4 text-white/60 hover:text-red-400" />
+                  )}
+                </Button>
+              </>
+            )}
           </div>
-        )}
-
-        {showRestore && (
+        ) : (
           <Button
             variant="secondary"
             size="sm"
             disabled={loading}
             onClick={handleRestore}>
-            Restore
+            {isRestoring ? <Spinner /> : "Restore"}
           </Button>
         )}
       </div>
@@ -262,18 +244,17 @@ export default function VideoCard({
             />
             <span>Featured</span>
           </div>
-          {/* EDIT MODAL */}
-          {editOpen && (
-            <VideoModal
-              open={editOpen}
-              onClose={() => setEditOpen(false)}
-              profileId={profileId}
-              accessToken={accessToken}
-              onUpdated={onUpdated}
-              video={video}
-            />
-          )}
         </div>
+      )}
+      {editOpen && (
+        <VideoModal
+          open={editOpen}
+          onClose={() => setEditOpen(false)}
+          profileId={profileId}
+          accessToken={accessToken}
+          onUpdated={onUpdated}
+          video={video}
+        />
       )}
     </div>
   );

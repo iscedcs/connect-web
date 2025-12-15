@@ -13,6 +13,7 @@ export const protectedRoutes = [
   "/connect", // captures EVERYTHING inside /connect/**
   "/devices",
   "/otp",
+  "/customer",
   "/profile",
   "/device",
   "/links",

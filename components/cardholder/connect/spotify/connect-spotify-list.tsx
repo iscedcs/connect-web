@@ -1,5 +1,6 @@
 "use client";
 
+import SpotifyListSkeleton from "@/components/shared/skeleton/SpotifyListSkeleton";
 import SpotifyCard from "./connect-spotify-card";
 import LinkListSkeleton from "@/components/shared/skeleton/link-list-skeleton";
 
@@ -24,7 +25,7 @@ export default function SpotifyList({
   toggleSelect?: (id: string) => void;
   selectionMode?: boolean;
 }) {
-  if (loading) return <LinkListSkeleton />;
+  if (loading) return <SpotifyListSkeleton />;
 
   if (!items?.length)
     return (

@@ -7,6 +7,8 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { URLS } from "@/lib/const";
 import { Spinner } from "@/components/ui/spinner";
+import { ToggleIcon } from "@/lib/icons";
+import { useEffect } from "react";
 
 export default function VideoModal({
   open,
@@ -24,16 +26,18 @@ export default function VideoModal({
   video?: any;
 }) {
   const isEdit = !!video;
-  const [title, setTitle] = useState(video?.title);
+  const [title, setTitle] = useState(video?.title ?? "");
   const [platform, setPlatform] = useState("youtube");
-  const [url, setUrl] = useState("");
-  const [isVisible, setIsVisible] = useState(true);
+  const [url, setUrl] = useState(video?.url ?? "");
+  const [isVisible, setIsVisible] = useState(video?.is_visible ?? true);
   const [loading, setLoading] = useState(false);
 
   if (!open) return null;
 
   const handleSubmit = async () => {
-    if (!url.trim()) return toast.error("Please enter a video URL");
+    if (!isEdit && !url.trim()) {
+      return toast.error("Please enter a video link");
+    }
     setLoading(true);
     try {
       const endpoint = isEdit
@@ -44,6 +48,23 @@ export default function VideoModal({
 
       const method = isEdit ? "PATCH" : "POST";
 
+      const payload: any = {
+        title,
+        platform,
+        is_visible: isVisible,
+      };
+
+      if (!isEdit || url !== video?.url) {
+        payload.url = url;
+      }
+
+      // {
+      //       title,
+      //       platform,
+      //       url,
+      //       is_visible: isVisible,
+      //     }
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL}${endpoint}`,
         {
@@ -52,12 +73,7 @@ export default function VideoModal({
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
           },
-          body: JSON.stringify({
-            title,
-            platform,
-            url,
-            is_visible: isVisible,
-          }),
+          body: JSON.stringify(payload),
         }
       );
 
@@ -119,12 +135,12 @@ export default function VideoModal({
             />
           </div>
 
-          <div className="flex items-center justify-between py-2">
+          {/* <div className="flex items-center justify-between py-2">
             <span className="text-sm text-white/70">
               Make visible on profile
             </span>
-            <Switch checked={isVisible} onCheckedChange={setIsVisible} />
-          </div>
+            <ToggleIcon checked={isVisible} onCheckedChange={setIsVisible} />
+          </div> */}
         </div>
 
         <div className="flex justify-end gap-3">
@@ -136,6 +152,8 @@ export default function VideoModal({
               <>
                 <Spinner className="size-6" /> Adding...
               </>
+            ) : isEdit ? (
+              "Update Video"
             ) : (
               "Add Video"
             )}{" "}

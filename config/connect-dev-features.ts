@@ -12,9 +12,9 @@ export const CONNECT_DEV_FEATURES = {
   videos: {
     enableBulkActions: false,
     enableAllRestoreActions: false,
-    enableAllVisibilityActions: false,
+    enableAllVisibilityActions: true,
     enableGetVideoPlatform: false,
-    enableLongPressSelection: false,
+    enableLongPressSelection: true,
   },
 
   meetings: {

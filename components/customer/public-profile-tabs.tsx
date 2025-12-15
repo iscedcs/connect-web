@@ -3,16 +3,55 @@
 import { useState } from "react";
 import { EventCard } from "@/components/customer/event-card";
 import { RightIcon } from "@/lib/icons";
+import {
+  getFaviconFromUrl,
+  getFileType,
+} from "@/lib/connect-links/get-favicon";
+import { FILE_TYPE_FILTERS } from "@/lib/connect-files/file-types";
+import Link from "next/link";
+import { InlineRenderer } from "./inline-renderers/inline-renderer";
+import { DockIcon } from "lucide-react";
 
 export default function PublicProfileTabs({
   connectItems,
   events,
+  id,
 }: {
   connectItems: any[];
   events: any[];
+  id?: any;
 }) {
   const [activeTab, setActiveTab] = useState<"connect" | "events">("connect");
+  const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
 
+  const socialItems = connectItems.filter((item) =>
+    [
+      "facebook",
+      "instagram",
+      "twitter",
+      "linkedin",
+      "tiktok",
+      "whatsapp",
+      "youtube",
+      "telegram",
+      "threads",
+    ].includes(item.title.toLowerCase())
+  );
+
+  const fileItems = connectItems.filter(
+    (item) => item.url && /\.(pdf|doc|docx|png|jpg|jpeg|webp)$/i.test(item.url)
+  );
+
+  const groupedFiles = FILE_TYPE_FILTERS.map((type) => ({
+    ...type,
+    files: fileItems.filter((f) => getFileType(f.url) === type.id),
+  })).filter((group) => group.files.length > 0);
+
+  const spotifyItems = connectItems.filter(
+    (item) =>
+      item.url?.includes("open.spotify.com") ||
+      item.title?.toLowerCase() === "spotify"
+  );
   return (
     <>
       <section className="mt-6 px-4 flex gap-8 text-base">
@@ -39,15 +78,173 @@ export default function PublicProfileTabs({
 
       {activeTab === "connect" && (
         <section className="mt-6 px-4">
-          <div className="bg-[#151515] rounded-[22px] rounded-b-none p-4 pt-1">
-            {connectItems.map((item, index) => (
-              <div key={item.id}>
-                <a
-                  href={item.url}
-                  target="_blank"
-                  className="flex items-center justify-between py-4 group">
+          {socialItems.length > 0 && (
+            <section className="mb-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-2xl font-extrabold text-white mb-3">
+                  Socials
+                </h3>
+                <Link
+                  href={`/customer/${id}/socials`}
+                  className="text-sm text-white/60">
+                  View all
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-4 gap-4">
+                {socialItems.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() =>
+                      setExpandedItemId(
+                        expandedItemId === item.id ? null : item.id
+                      )
+                    }
+                    className="flex items-center justify-center">
+                    <div className="w-14 h-14 rounded-full bg-black/60 flex items-center justify-center">
+                      <img
+                        src={getFaviconFromUrl(item.url, 64)}
+                        alt={item.title}
+                        className="w-7 h-7 object-contain"
+                      />
+                    </div>
+                  </button>
+                ))}
+              </div>
+              {expandedItemId && (
+                <div className="mt-4">
+                  {socialItems
+                    .filter((item) => item.id === expandedItemId)
+                    .map((item) => (
+                      <InlineRenderer key={item.id} item={item} />
+                    ))}
+                </div>
+              )}
+            </section>
+          )}
+
+          {spotifyItems.length > 0 && (
+            <section className="mb-8">
+              <div className="flex items-center justify-between">
+                <h3 className="text-2xl font-extrabold text-white mb-3">
+                  Spotify
+                </h3>
+
+                <Link
+                  href={`/customer/${id}/spotify`}
+                  className="text-sm text-white/60 hover:text-white transition">
+                  View all
+                </Link>
+              </div>
+
+              <div className="space-y-3">
+                {spotifyItems.slice(0, 3).map((item) => (
+                  <div key={item.id} className="flex flex-col">
+                    <button
+                      onClick={() =>
+                        setExpandedItemId(
+                          expandedItemId === item.id ? null : item.id
+                        )
+                      }
+                      className="flex items-center gap-4 bg-[#0f0f0f] rounded-xl p-4 hover:bg-[#1a1a1a] transition text-left">
+                      <span className="w-12 h-12 rounded-full bg-black flex items-center justify-center">
+                        <img
+                          src={getFaviconFromUrl(item.url, 64)}
+                          alt="Spotify"
+                          className="w-6 h-6"
+                        />
+                      </span>
+
+                      <div className="flex-1 truncate">
+                        <p className="text-sm font-medium truncate">
+                          {item.title || "Spotify"}
+                        </p>
+                      </div>
+
+                      <span
+                        className={`text-white/60 transition-transform ${
+                          expandedItemId === item.id ? "rotate-90" : ""
+                        }`}>
+                        <RightIcon />
+                      </span>
+                    </button>
+
+                    {expandedItemId === item.id && (
+                      <InlineRenderer item={item} />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {groupedFiles.length > 0 && (
+            <section className="mb-8">
+              <div className="flex items-center justify-between">
+                <h3 className="text-2xl font-extrabold text-white mb-3">
+                  Files
+                </h3>
+                <Link
+                  href={`/customer/${id}/files`}
+                  className="text-sm text-white/60">
+                  View all
+                </Link>
+              </div>
+
+              <div className="space-y-4">
+                {groupedFiles.map((group) => (
+                  <div key={group.id}>
+                    <p className="text-sm text-white/60 mb-2">{group.label}</p>
+
+                    <div className="space-y-2">
+                      {group.files.slice(0, 3).map((file) => (
+                        <div key={file.id} className="flex flex-col">
+                          <button
+                            onClick={() =>
+                              setExpandedItemId(
+                                expandedItemId === file.id ? null : file.id
+                              )
+                            }
+                            className="flex items-center gap-3 bg-[#0f0f0f] rounded-xl p-3 hover:bg-[#1a1a1a] transition text-left">
+                            <span className="w-10 h-10 rounded-full bg-black flex items-center justify-center">
+                              <DockIcon />
+                            </span>
+                            <div className="flex-1 truncate">
+                              <p className="text-sm truncate">{file.title}</p>
+                            </div>
+                            <span
+                              className={`text-white/60 transition-transform ${
+                                expandedItemId === file.id ? "rotate-90" : ""
+                              }`}>
+                              <RightIcon />
+                            </span>{" "}
+                          </button>
+
+                          {expandedItemId === file.id && (
+                            <InlineRenderer item={file} />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          <div className="bg-[#151515] rounded-[22px]  p-4 pt-1">
+            <h3 className="text-2xl font-extrabold text-white mb-3">Others</h3>
+            {connectItems.map((item) => (
+              <div key={item.id} className="flex flex-col">
+                <button
+                  onClick={() =>
+                    setExpandedItemId(
+                      expandedItemId === item.id ? null : item.id
+                    )
+                  }
+                  className="flex items-center justify-between py-4 group text-left">
                   <div className="flex items-start gap-4 flex-1">
-                    <span className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center overflow-hidden shrink-0">
+                    <span className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center shrink-0">
                       <img
                         src={item.icon}
                         alt=""
@@ -57,20 +254,21 @@ export default function PublicProfileTabs({
 
                     <div className="flex-1">
                       <p className="text-sm text-white">{item.title}</p>
-                      <p className="text-[10px] text-white/50 mt-[2px] truncate max-w-[180px] block">
+                      <p className="text-[10px] text-white/50 truncate max-w-[180px]">
                         {item.url}
                       </p>
                     </div>
                   </div>
 
-                  <span className="text-3xl text-white/60 group-hover:text-white transition ml-4">
+                  <span
+                    className={`text-white/60 transition-transform ${
+                      expandedItemId === item.id ? "rotate-90" : ""
+                    }`}>
                     <RightIcon />
                   </span>
-                </a>
+                </button>
 
-                {index !== connectItems.length - 1 && (
-                  <div className="border-b border-white/10 flex-1 ml-[56px]" />
-                )}
+                {expandedItemId === item.id && <InlineRenderer item={item} />}
               </div>
             ))}
           </div>

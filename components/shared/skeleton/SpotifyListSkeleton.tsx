@@ -2,7 +2,7 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function FileListSkeleton() {
+export default function SpotifyListSkeleton() {
   return (
     <div className="space-y-3 py-6">
       {Array.from({ length: 4 }).map((_, i) => (
@@ -10,29 +10,28 @@ export default function FileListSkeleton() {
           key={i}
           className="
             bg-neutral-900/60 border border-white/10 rounded-xl p-4
-            flex justify-between items-center
+            grid justify-between items-center
             animate-pulse
           ">
-          {/* LEFT */}
-          <div className="flex items-center gap-3 min-w-0">
-            {/* File icon */}
-            <Skeleton className="w-10 h-10 rounded-xl shrink-0" />
+          {/* LEFT SIDE */}
+          <div className="flex items-center gap-3">
+            {/* Spotify icon */}
+            <Skeleton className="w-10 h-10 rounded-full" />
 
-            {/* Filename + size */}
             <div className="flex flex-col gap-2 min-w-0">
-              <Skeleton className="h-4 w-44 rounded-md" />
-              <Skeleton className="h-3 w-20 rounded-md" />
+              {/* Title + badge */}
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-36" />
+                <Skeleton className="h-4 w-12 rounded-full" />
+              </div>
 
-              {/* Selected label placeholder */}
-              <Skeleton className="h-3 w-16 rounded-md opacity-60" />
+              {/* URL */}
+              <Skeleton className="h-3 w-56" />
             </div>
           </div>
 
-          {/* RIGHT */}
-          <div className="flex items-center gap-3 shrink-0 ml-4">
-            {/* Download */}
-            <Skeleton className="w-8 h-8 rounded-md" />
-
+          {/* RIGHT SIDE */}
+          <div className="flex items-center gap-3 pt-3 md:pt-0">
             {/* Toggle */}
             <Skeleton className="w-8 h-8 rounded-full" />
 
