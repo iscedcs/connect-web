@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { BellIcon, NotificationIcon } from "@/lib/icons";
 import { Mail, BarChart2, Bell } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 type ConnectProfile = {
   profilePhoto: string | null;
@@ -34,7 +35,7 @@ export default function ProfileHeader({
   const name =
     connectProfile?.name ||
     [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
-    "User";
+    "Connect User";
 
   const roleOrBio = connectProfile?.position || "";
 
@@ -85,16 +86,18 @@ export default function ProfileHeader({
           {/* Buttons + Icons in one row */}
           <div className="flex w-full  items-center justify-between">
             <div className="flex gap-2">
-              <Button
+              {/* <Button
                 variant="secondary"
                 className="rounded-full border-none px-4 py-2 cursor-pointer text-xs ">
                 Send money
-              </Button>
-              <Button
-                variant="default"
-                className="rounded-full bg-[#151515D9] border-[#868686] border-[0.5px] px-4 py-2 cursor-pointer text-xs ">
-                View contacts
-              </Button>
+              </Button> */}
+              <Link href="/contacts">
+                <Button
+                  variant="default"
+                  className="rounded-full bg-[#151515D9] border-[#868686] border-[0.5px] px-4 py-2 cursor-pointer text-xs ">
+                  View contacts
+                </Button>
+              </Link>
             </div>
 
             {/* Icons */}

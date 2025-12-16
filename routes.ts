@@ -2,23 +2,22 @@
  * These routes don't require authentication
  * @type {string[]}
  */
-export const publicRoutes = ["/"];
+export const publicRoutes = ["/customer", "/terms", "/privacy", "/support"];
 
 /**
  * Protected routes that require authentication
  * @type {string[]}
  */
 export const protectedRoutes = [
+  "/",
   "/bvn",
-  "/connect", // captures EVERYTHING inside /connect/**
+  "/home",
+  "/connect",
   "/devices",
   "/otp",
-  "/customer",
   "/profile",
   "/device",
-  "/links",
-  "/settings", // captures /settings and all sublinks
-  "/settings/account",
+  "/settings",
   "/wallet",
   "/wearables",
 ];

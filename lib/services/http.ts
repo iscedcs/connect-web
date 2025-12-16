@@ -8,10 +8,8 @@ http.interceptors.response.use(
   (res) => res,
   (err) => {
     console.log("HTTP error →", err?.message);
-    return Promise.reject({
-      success: false,
-      message: err?.response?.data?.message || "Network or server error",
-      status: err?.response?.status ?? 500,
-    });
+    return Promise.reject(
+      new Error(err?.response?.data?.message || "Network or server error")
+    );
   }
 );

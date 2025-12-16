@@ -10,7 +10,8 @@ import { XSquare } from "lucide-react";
 import AppointmentList from "./connect-appointment-list";
 import AppointmentModal from "./connect-appointment-modal";
 import { Spinner } from "@/components/ui/spinner";
-import { DeleteIcon, EyesOpenIcon } from "@/lib/icons";
+import { DeleteIcon, EyesOpenIcon, LeftIcon } from "@/lib/icons";
+import { useRouter } from "next/navigation";
 
 export default function AppointmentPage({
   accessToken,
@@ -31,7 +32,7 @@ export default function AppointmentPage({
   const [isDeleting, setDeleteing] = useState(false);
   const [isRestoring, setRestoring] = useState(false);
   const [visible, setVisible] = useState(false);
-
+  const router = useRouter();
   const [selected, setSelected] = useState<string[]>([]);
   const selectionMode =
     CONNECT_DEV_FEATURES.appointments.enableLongPressSelection &&
@@ -61,7 +62,7 @@ export default function AppointmentPage({
           }
         );
       }
-      toast.success("Your appointments has been deleted🥺");
+      toast.success("Your appointments has been deleted!");
       clearSelection();
       await fetchAppointments();
     } finally {
@@ -81,7 +82,7 @@ export default function AppointmentPage({
           headers: { Authorization: `Bearer ${accessToken}` },
         }
       );
-      toast.success("Your clients can now see all your appointments🎉");
+      toast.success("Your clients can now see all your appointments");
       clearSelection();
       fetchAppointments();
     } finally {
@@ -144,7 +145,7 @@ export default function AppointmentPage({
         }${URLS.appointments.bulk_restore.replace("{profileId}", profileId!)}`,
         { method: "PATCH", headers: { Authorization: `Bearer ${accessToken}` } }
       );
-      toast.success("Yeepy! You've restored all your appointments!🫣🫣");
+      toast.success("You've restored all your appointments!");
       await fetchAppointments();
     } catch (error) {
       toast.error("Failed to restore");
@@ -159,6 +160,12 @@ export default function AppointmentPage({
 
   return (
     <div>
+      <button
+        type="button"
+        className="cursor-pointer"
+        onClick={() => router.back()}>
+        <LeftIcon />
+      </button>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-medium">Your Appointment Links</h2>
         <Button

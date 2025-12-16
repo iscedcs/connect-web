@@ -6,25 +6,20 @@ import { getConnectModules } from "@/lib/services/connect-modules";
 import ConnectManagementList from "./filled-state/connect-management-list";
 
 export default function ConnectManagementWrapper({
-  profileId,
-  accessToken,
+  initialModules,
 }: {
-  profileId: string;
-  accessToken: string;
+  initialModules: any;
 }) {
+  if (!initialModules) return <ConnectManagement />;
+
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!profileId || !accessToken) return;
     async function load() {
-      const modules = await getConnectModules(profileId, accessToken);
-
-      console.log("🔥 CONNECT MODULE DEBUG:", modules);
-
       const preparedRows: any[] = [];
 
-      if (modules.contact?.contacts?.length)
+      if (initialModules.contact?.contacts?.length)
         preparedRows.push({
           id: "contact",
           iconSrc: "/assets/Vector.svg",
@@ -34,17 +29,17 @@ export default function ConnectManagementWrapper({
         });
 
       // LINKS
-      if (modules.links?.links?.length)
+      if (initialModules.links?.links?.length)
         preparedRows.push({
           id: "links",
           iconSrc: "/assets/336333cb08daaa72b8ac20c655e5f8de719c62f0.png",
           title: "Links",
           subtitle: "Your external links",
-          href: "/connect/links",
+          href: "/connect/links/links",
         });
 
       // SOCIALS
-      if (modules.socials?.socials?.length)
+      if (initialModules.socials?.socials?.length)
         preparedRows.push({
           id: "socials",
           iconSrc: "/assets/entypo_email.svg",
@@ -54,7 +49,7 @@ export default function ConnectManagementWrapper({
         });
 
       // VIDEOS
-      if (modules.videos?.videos?.length)
+      if (initialModules.videos?.videos?.length)
         preparedRows.push({
           id: "videos",
           iconSrc: "/assets/logos_youtube-icon.svg",
@@ -64,7 +59,7 @@ export default function ConnectManagementWrapper({
         });
 
       // FILES
-      if (modules.files?.files?.length)
+      if (initialModules.files?.files?.length)
         preparedRows.push({
           id: "files",
           iconSrc: "/assets/bi_filetype-pdf.svg",
@@ -74,7 +69,7 @@ export default function ConnectManagementWrapper({
         });
 
       // FORMS
-      if (modules.forms?.forms?.length)
+      if (initialModules.forms?.forms?.length)
         preparedRows.push({
           id: "forms",
           iconSrc: "/assets/forms_2020q4_48dp.png",
@@ -84,7 +79,7 @@ export default function ConnectManagementWrapper({
         });
 
       // MEETINGS
-      if (modules.meetings?.meetings?.length)
+      if (initialModules.meetings?.meetings?.length)
         preparedRows.push({
           id: "meetings",
           iconSrc: "/assets/Ellipse9.svg",
@@ -94,7 +89,7 @@ export default function ConnectManagementWrapper({
         });
 
       // SPOTIFY
-      if (modules.spotify?.items?.length)
+      if (initialModules.spotify?.items?.length)
         preparedRows.push({
           id: "spotify",
           iconSrc: "/assets/logos_spotify-icon.svg",
@@ -102,13 +97,22 @@ export default function ConnectManagementWrapper({
           subtitle: "Your Spotify profile",
           href: "/connect/links/spotify",
         });
+      //APPOINTMENTS
+      if (initialModules.appointments?.appointments?.length)
+        preparedRows.push({
+          id: "appointments",
+          iconSrc: "/assets/calendar_5264073.png",
+          title: "Appointment",
+          subtitle: "Your appointment bookings",
+          href: "/connect/links/appointments",
+        });
 
       setRows(preparedRows);
       setLoading(false);
     }
 
     load();
-  }, [profileId, accessToken]);
+  }, []);
 
   if (loading) return null;
 

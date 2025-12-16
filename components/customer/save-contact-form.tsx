@@ -23,26 +23,31 @@ export default function SaveContactForm({ profileId }: { profileId: string }) {
   const [agree, setAgree] = useState(false);
   const [loading, setLoading] = useState(false);
   const [owner, setOwner] = useState<any>(null);
+  const [realProfileId, setRealProfileId] = useState<string | null>(null);
 
   /** Fetch profile owner name */
   useEffect(() => {
     async function loadProfile() {
       const data = await fetchPublicProfile(profileId);
-      setOwner(data?.profile || null);
+      if (!data?.profile?.id) return;
+
+      setOwner(data.profile);
+      setRealProfileId(data.profile.id);
     }
     loadProfile();
   }, [profileId]);
 
   async function submit() {
-    if (!owner) return;
+    if (!owner && !profileId) return;
     setLoading(true);
 
     const res = await saveContactFlow({
-      profileId,
+      profileId: realProfileId!,
       firstName,
       lastName,
       email,
       phone: `${countryCode}${phone}`,
+      note,
     });
 
     setLoading(false);
@@ -125,11 +130,6 @@ export default function SaveContactForm({ profileId }: { profileId: string }) {
       </div>
       <div className="pb-6  space-y-2">
         <label className="flex text-[#868686] items-center gap-2 text-xs mt-6">
-          {/* <input
-            type="checkbox"
-            checked={agree}
-            onChange={(e) => setAgree(e.target.checked)}
-          /> */}
           <button
             type="button"
             onClick={() => setAgree(!agree)}

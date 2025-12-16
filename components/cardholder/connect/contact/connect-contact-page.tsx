@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import ContactList from "./connect-contact-list";
 import ContactModal from "./connect-contact-modal";
+import { useRouter } from "next/navigation";
+import { LeftIcon } from "@/lib/icons";
 
 interface Contact {
   id: string;
@@ -32,7 +34,7 @@ export default function ContactPage({
   });
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-
+  const router = useRouter();
   const fetchContacts = async () => {
     if (!profileId || !accessToken) return;
     setLoading(true);
@@ -79,6 +81,12 @@ export default function ContactPage({
 
   return (
     <div>
+      <button
+        type="button"
+        className="cursor-pointer"
+        onClick={() => router.back()}>
+        <LeftIcon />
+      </button>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-medium">Your Contacts</h2>
         <Button

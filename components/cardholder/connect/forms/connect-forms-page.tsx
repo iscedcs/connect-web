@@ -7,6 +7,8 @@ import { CONNECT_DEV_FEATURES } from "@/config/connect-dev-features";
 import { XSquare, DeleteIcon, FilterIcon } from "lucide-react";
 import FormList from "./connect-forms-list";
 import FormsModal from "@/components/forms/form-modal";
+import { useRouter } from "next/navigation";
+import { LeftIcon } from "@/lib/icons";
 
 const FORM_FILTERS = [
   { id: "all", label: "All" },
@@ -28,7 +30,7 @@ export default function FormsPage({
   const [selectedType, setSelectedType] = useState("all");
   const [modalOpen, setModalOpen] = useState(false);
   const [formToEdit, setFormToEdit] = useState(null);
-
+  const router = useRouter();
   const [selected, setSelected] = useState<string[]>([]);
   const __DEV_FEATURES = CONNECT_DEV_FEATURES.forms;
   const allowSelection = __DEV_FEATURES.enableBulkActions;
@@ -155,6 +157,12 @@ export default function FormsPage({
 
   return (
     <>
+      <button
+        type="button"
+        className="cursor-pointer"
+        onClick={() => router.back()}>
+        <LeftIcon />
+      </button>
       {/* HEADER */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Your Forms</h2>

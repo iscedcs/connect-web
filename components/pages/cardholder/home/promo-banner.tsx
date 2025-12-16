@@ -24,17 +24,17 @@ const initialSlides: Slide[] = [
   {
     id: 3,
     icon: "/assets/rainbow_95231491.svg",
-    href: "https://events-web-two.vercel.app/",
+    href: "https://www.gada.isce.tech",
     title: "Virtual & Offline bookings",
     subtitle: "Host, Attend & Bookmark events",
   },
-  {
-    id: 4,
-    icon: "/assets/rainbow_95231491.svg",
-    href: "/wallet",
-    title: "Contactless Wallet",
-    subtitle: "Free & fast transactions",
-  },
+  // {
+  //   id: 4,
+  //   icon: "/assets/rainbow_95231491.svg",
+  //   href: "/wallet",
+  //   title: "Contactless Wallet",
+  //   subtitle: "Free & fast transactions",
+  // },
 ];
 
 export default function PromoBanner() {

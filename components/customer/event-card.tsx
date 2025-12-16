@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export function EventCard({ event }: any) {
   const date = new Date(event.startDate);
@@ -10,10 +11,11 @@ export function EventCard({ event }: any) {
   });
 
   return (
-    <a
-      href={`/events/${event.cleanName ?? event.id}`}
+    <Link
+      href={`${process.env.NEXT_PUBLIC_EVENT_LIVE_URL}/event/${event.cleanName}`}
+      target="_blank"
+      rel="noopener noreferrer"
       className="flex items-start justify-between py-2 ">
-      {/* LEFT: IMAGE + DETAILS */}
       <div className="flex items-start gap-4">
         <Image
           src={event.image}
@@ -52,6 +54,6 @@ export function EventCard({ event }: any) {
           </span>
         </div>
       </div>
-    </a>
+    </Link>
   );
 }

@@ -7,6 +7,8 @@ import { URLS } from "@/lib/const";
 import VideoList from "./connect-video-list";
 import VideoModal from "./connect-video-modal";
 import { CONNECT_DEV_FEATURES } from "@/config/connect-dev-features";
+import { useRouter } from "next/navigation";
+import { LeftIcon } from "@/lib/icons";
 
 interface VideoItem {
   id: string;
@@ -39,7 +41,7 @@ export default function VideoPage({
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
-
+  const router = useRouter();
   const allowSelection = __DEV_FEATURES.enableBulkActions;
 
   const selectionMode = allowSelection && selected.length > 0;
@@ -211,7 +213,12 @@ export default function VideoPage({
           </div>
         </div>
       )}
-
+      <button
+        type="button"
+        className="cursor-pointer"
+        onClick={() => router.back()}>
+        <LeftIcon />
+      </button>
       <div className="flex justify-between items-center mb-6 mt-4">
         <h2 className="text-lg font-medium">Your Videos</h2>
         {!selectionMode && (
