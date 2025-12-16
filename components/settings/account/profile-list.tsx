@@ -43,11 +43,11 @@ export default function ProfileList({
   return (
     <div className="space-y-4">
       <div className="mb-3">
-        <Button
+        <button
           onClick={() => router.back()}
           className="inline-flex items-center gap-2 bg-transparent hover:bg-transparent cursor-pointer text-white/90">
-          <LeftIcon className="w-5 h-5" />
-        </Button>
+          <LeftIcon />
+        </button>
       </div>
       {list.map((profile) => (
         <ProfileCard
@@ -66,7 +66,7 @@ export default function ProfileList({
 
       <Button
         variant="ghost"
-        className="w-full text-white/50 cursor-pointer"
+        className="w-full underline text-white/50 cursor-pointer"
         onClick={() => (window.location.href = "/settings/account/deleted")}>
         View deleted profiles
       </Button>

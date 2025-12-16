@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { URLS } from "@/lib/const";
 
 import { CONNECT_DEV_FEATURES } from "@/config/connect-dev-features";
-import { DeleteIcon, EyesOpenIcon } from "@/lib/icons";
+import { DeleteIcon, EyesOpenIcon, LeftIcon } from "@/lib/icons";
 import { XSquare } from "lucide-react";
 import {
   detectMeetingProvider,
@@ -14,6 +14,7 @@ import {
 } from "@/lib/connect-meetings/providers";
 import MeetingList from "./connect-meeting-list";
 import MeetingModal from "./connect-meeting-modal";
+import { useRouter } from "next/navigation";
 
 interface MeetingItem {
   id: string;
@@ -41,7 +42,7 @@ export default function MeetingPage({
 
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-
+  const router = useRouter();
   const [selected, setSelected] = useState<string[]>([]);
   const selectionMode =
     CONNECT_DEV_FEATURES.meetings.enableLongPressSelection &&
@@ -156,6 +157,12 @@ export default function MeetingPage({
 
   return (
     <div>
+      <button
+        type="button"
+        className="cursor-pointer"
+        onClick={() => router.back()}>
+        <LeftIcon />
+      </button>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-medium">Your Meeting Links</h2>
         <Button variant="secondary" onClick={() => setModalOpen(true)}>

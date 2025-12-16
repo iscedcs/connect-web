@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { URLS } from "@/lib/const";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { LeftIcon } from "@/lib/icons";
 
 interface Profile {
   id: string;
@@ -60,13 +61,12 @@ export default function DeletedProfileList({
   return (
     <div className="space-y-6">
       {/* Back Button */}
-      <Button
-        variant="secondary"
-        className="inline-flex bg-transparent hover:bg-transparent cursor-pointer items-center gap-2"
+      <button
+        type="button"
+        className="cursor-pointer"
         onClick={() => router.back()}>
-        <ArrowLeft className="w-4 h-4 text-white " />
-      </Button>
-
+        <LeftIcon />
+      </button>
       {list.length === 0 ? (
         <p className="text-white/40 text-sm">No deleted profiles found.</p>
       ) : (

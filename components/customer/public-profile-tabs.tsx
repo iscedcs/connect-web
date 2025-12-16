@@ -24,8 +24,10 @@ export default function PublicProfileTabs({
   const [activeTab, setActiveTab] = useState<"connect" | "events">("connect");
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
 
-  const socialItems = connectItems.filter((item) =>
-    [
+  const socialItems = connectItems.filter((item) => {
+    if (!item.title) return false;
+
+    return [
       "facebook",
       "instagram",
       "twitter",
@@ -35,8 +37,8 @@ export default function PublicProfileTabs({
       "youtube",
       "telegram",
       "threads",
-    ].includes(item.title.toLowerCase())
-  );
+    ].includes(item.title.toLowerCase());
+  });
 
   const fileItems = connectItems.filter(
     (item) => item.url && /\.(pdf|doc|docx|png|jpg|jpeg|webp)$/i.test(item.url)
@@ -253,7 +255,9 @@ export default function PublicProfileTabs({
                     </span>
 
                     <div className="flex-1">
-                      <p className="text-sm text-white">{item.title}</p>
+                      <p className="text-sm text-white">
+                        {item.title || item.label}
+                      </p>
                       <p className="text-[10px] text-white/50 truncate max-w-[180px]">
                         {item.url}
                       </p>

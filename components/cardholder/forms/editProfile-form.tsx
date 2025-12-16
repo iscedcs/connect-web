@@ -85,11 +85,9 @@ export default function EditProfileForm({
   return (
     <div className="mx-auto w-full max-w-screen-sm px-4 py-4">
       <div className="mb-3">
-        <Button
-          onClick={() => router.back()}
-          className="inline-flex items-center gap-2 hover:bg-transparent cursor-pointer bg-transparent text-white/90">
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
+        <button onClick={() => router.back()} className=" cursor-pointer ">
+          <ArrowLeft />
+        </button>
       </div>
 
       {/* Title */}

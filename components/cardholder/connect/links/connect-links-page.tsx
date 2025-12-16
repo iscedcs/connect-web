@@ -7,12 +7,13 @@ import { URLS } from "@/lib/const";
 import LinkList from "./connect-links-list";
 import LinkModal from "./connect-links-modal";
 import { CONNECT_DEV_FEATURES } from "@/config/connect-dev-features";
-import { DeleteIcon, EyesOpenIcon } from "@/lib/icons";
+import { DeleteIcon, EyesOpenIcon, LeftIcon } from "@/lib/icons";
 import { ArrowUpDown, XSquare } from "lucide-react";
 import {
   detectCategory,
   LinkCategory,
 } from "@/lib/connect-links/categories/category";
+import { useRouter } from "next/navigation";
 
 interface LinkItem {
   id: string;
@@ -43,7 +44,7 @@ export default function LinkPage({
   });
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-
+  const router = useRouter();
   const [selected, setSelected] = useState<string[]>([]);
   const selectionMode =
     CONNECT_DEV_FEATURES.links.enableLongPressSelection && selected.length > 0;
@@ -190,6 +191,12 @@ export default function LinkPage({
 
   return (
     <div>
+      <button
+        type="button"
+        className="cursor-pointer"
+        onClick={() => router.back()}>
+        <LeftIcon />
+      </button>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-medium">Your Links</h2>
         <Button

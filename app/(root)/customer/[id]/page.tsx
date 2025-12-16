@@ -1,8 +1,6 @@
-import { EventCard } from "@/components/customer/event-card";
 import PublicProfileTabs from "@/components/customer/public-profile-tabs";
-import { URLS } from "@/lib/const";
-import { CartIcon, EmailIcon, PhoneIcon, RightIcon } from "@/lib/icons";
-import { fetchUserEvents } from "@/lib/services/events";
+import { EmailIcon, PhoneIcon } from "@/lib/icons";
+import { fetchPublicUserEvent } from "@/lib/services/events";
 import { fetchPublicProfile } from "@/lib/services/public-profile";
 import Link from "next/link";
 
@@ -16,6 +14,7 @@ const ICONS: Record<string, string> = {
   file: "/assets/bi_filetype-pdf.svg",
   socials: "/assets/entypo_email.svg",
   google_forms: "/assets/forms_2020q4_48dp.png",
+  appointments: "/assets/calendar_5264073.png",
   // crypto: "/assets/icons/crypto.svg",
   link: "/assets/336333cb08daaa72b8ac20c655e5f8de719c62f0.png",
 };
@@ -88,6 +87,15 @@ function buildConnectList(data: any) {
       icon: ICONS.google_forms,
     })
   );
+  data.appointments?.forEach((a: any) =>
+    list.push({
+      id: a.id,
+      type: "appointment", // 👈 add type (important)
+      title: a.label || "Book An Appointment With me", // 👈 user-facing label
+      url: a.url,
+      icon: ICONS.appointments,
+    })
+  );
 
   data.wallets?.forEach((w: any) =>
     list.push({
@@ -108,6 +116,9 @@ export default async function CustomerProfilePage({ params }: any) {
   const { id } = await params;
   const profileData = await fetchPublicProfile(id);
 
+  const userId = profileData?.profile?.userId;
+  const events = await fetchPublicUserEvent(userId);
+
   if (!profileData)
     return (
       <main className="min-h-screen flex items-center justify-center bg-black text-white">
@@ -117,38 +128,53 @@ export default async function CustomerProfilePage({ params }: any) {
 
   const { profile, contact, device } = profileData;
 
-  const events = await fetchUserEvents(device?.userId);
+  console.log("PUBLIC PROFILE USERID:", userId, events);
+
   const connectItems = buildConnectList(profileData);
 
   return (
     <main className="min-h-screen bg-black text-white pb-16">
       <section>
+        {/* COVER */}
         <img
           src={profile.coverPhoto}
           className="w-full h-44 md:h-64 object-cover"
         />
 
-        <div className="px-4 -mt-14 md:-mt-20 flex items-end gap-2">
+        {/* PROFILE IDENTITY */}
+        <div className="px-4 -mt-14 md:-mt-20 flex items-end gap-3">
           <img
             src={profile.profilePhoto}
-            className="w-20 h-20  rounded-full border-4 border-black object-cover"
+            className="w-20 h-20 rounded-full border-4 border-black object-cover"
           />
 
           <div>
             <h1 className="text-3xl md:text-4xl font-extrabold leading-tight">
               {profile.name}
             </h1>
-            <p className="text-white -mt-1">{profile.position}</p>
+            <p className="text-sm text-white/80 -mt-0.5">{profile.position}</p>
           </div>
         </div>
 
-        {/* ACTION BUTTONS */}
-        <div className="px-4 mt-4 flex items-center font-medium gap-3 flex-wrap">
-          {/* <button className="px-5 py-2 cursor-pointer bg-white text-black rounded-full text-xs">
-            Send money
-          </button> */}
+        {/* ABOUT (new block, same header context) */}
+        {profile.bio && (
+          <div className="px-4 mt-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="h-px w-6 bg-white/20" />
+              <span className="text-[10px] uppercase tracking-wider text-white/50">
+                Bio
+              </span>
+            </div>
 
-          <button className="px-5 py-2 cursor-pointer bg-white/5 border-[0.5px] border-[#868686] rounded-full text-xs">
+            <p className="max-w-md text-xs leading-relaxed text-white/70">
+              {profile.bio}
+            </p>
+          </div>
+        )}
+
+        {/* ACTIONS */}
+        <div className="px-4 mt-4 flex items-center font-medium gap-3 flex-wrap">
+          <button className="px-5 py-2 bg-white/5 border border-[#868686] rounded-full text-xs">
             <Link href={`/customer/${id}/save-contact`}>Save contact</Link>
           </button>
 
@@ -163,15 +189,12 @@ export default async function CustomerProfilePage({ params }: any) {
                 <EmailIcon />
               </a>
             )}
-            {/* <button>
-              <CartIcon />
-            </button> */}
           </div>
         </div>
       </section>
 
       {/* TABS */}
-      <PublicProfileTabs connectItems={connectItems} events={events} id={id} />
+      <PublicProfileTabs connectItems={connectItems} events={events!} id={id} />
     </main>
   );
 }

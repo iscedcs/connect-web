@@ -41,12 +41,12 @@ export default function AccountSettingsList({
       label: "Account settings",
       Icon: AccountSettingsIcon,
     },
-    {
-      href: "/notifications",
-      label: "Notification settings",
-      Icon: NotificationIcon,
-    },
-    { href: "/invite", label: "Invite a friend", Icon: InviteIcon },
+    // {
+    //   href: "/notifications",
+    //   label: "Notification settings",
+    //   Icon: NotificationIcon,
+    // },
+    // { href: "/invite", label: "Invite a friend", Icon: InviteIcon },
     { href: "/support", label: "Contact support", Icon: ContactIcon },
     { href: "/terms", label: "Terms of service", Icon: TermsIcon },
     { href: "/privacy", label: "Privacy policy", Icon: PrivacyIcon },

@@ -6,6 +6,7 @@ import EventCard from "@/components/pages/cardholder/home/event-card";
 import DevicesConnectedCard from "@/components/pages/cardholder/home/filled-state/device-connected";
 import ProfileHeader from "@/components/pages/cardholder/home/profile-header";
 import PromoBanner from "@/components/pages/cardholder/home/promo-banner";
+import { getConnectModules } from "@/lib/services/connect-modules";
 import { getUserDevices } from "@/lib/services/device";
 import { getConnectProfile } from "@/lib/services/profile";
 
@@ -27,6 +28,11 @@ export default async function HomePage() {
   console.log("User Detials", `${connectProfile}`);
   const hasDevices = userDevices.length > 0;
 
+  let connectModules = null;
+
+  if (connectProfile?.id && accessToken) {
+    connectModules = await getConnectModules(connectProfile.id, accessToken);
+  }
   return (
     <main className="relative bg-black text-white min-h-screen overflow-x-hidden">
       <section className="fixed  top-0 left-0 right-0 z-50  pointer-events-none">
@@ -53,10 +59,7 @@ export default async function HomePage() {
         </section>
         <section className="p-4 space-y-10">
           {accessToken && connectProfile?.id && (
-            <ConnectManagementWrapper
-              profileId={connectProfile.id}
-              accessToken={accessToken}
-            />
+            <ConnectManagementWrapper initialModules={connectModules} />
           )}
 
           {/* <StoreManagement /> */}

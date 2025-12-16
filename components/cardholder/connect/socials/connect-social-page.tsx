@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { URLS } from "@/lib/const";
 
 import { CONNECT_DEV_FEATURES } from "@/config/connect-dev-features";
-import { DeleteIcon, EyesOpenIcon } from "@/lib/icons";
+import { DeleteIcon, EyesOpenIcon, LeftIcon } from "@/lib/icons";
 import { XSquare, ArrowUpDown } from "lucide-react";
 import {
   detectSocialPlatform,
@@ -14,6 +14,7 @@ import {
 } from "@/lib/connect-social/detect-provider";
 import SocialList from "./connect-social-list";
 import SocialModal from "./connect-social-modal";
+import { useRouter } from "next/navigation";
 
 interface SocialItem {
   id: string;
@@ -44,7 +45,7 @@ export default function SocialPage({
 
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-
+  const router = useRouter();
   const [selected, setSelected] = useState<string[]>([]);
   const selectionMode =
     CONNECT_DEV_FEATURES.social.enableLongPressSelection && selected.length > 0;
@@ -140,6 +141,12 @@ export default function SocialPage({
 
   return (
     <div>
+      <button
+        type="button"
+        className="cursor-pointer"
+        onClick={() => router.back()}>
+        <LeftIcon />
+      </button>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-medium">Social Profiles</h2>
 

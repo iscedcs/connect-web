@@ -10,9 +10,10 @@ import {
   SpotifyType,
 } from "@/lib/connect-spotify/detect-type";
 import { CONNECT_DEV_FEATURES } from "@/config/connect-dev-features";
-import { DeleteIcon } from "@/lib/icons";
+import { DeleteIcon, LeftIcon } from "@/lib/icons";
 import { XSquare } from "lucide-react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface SpotifyItem {
   id: string;
@@ -44,7 +45,7 @@ export default function SpotifyPage({
   const [loading, setLoading] = useState(true);
 
   const [modalOpen, setModalOpen] = useState(false);
-
+  const router = useRouter();
   const [selected, setSelected] = useState<string[]>([]);
   const selectionMode =
     CONNECT_DEV_FEATURES.spotify.enableLongPressSelection &&
@@ -148,6 +149,12 @@ export default function SpotifyPage({
 
   return (
     <>
+      <button
+        type="button"
+        className="cursor-pointer"
+        onClick={() => router.back()}>
+        <LeftIcon />
+      </button>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Your Spotify Links</h2>
         <Button

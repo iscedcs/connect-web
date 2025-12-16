@@ -5,9 +5,10 @@ import { buildAuthLoginUrl } from "./lib/auth-urls";
 import { verifyToken } from "./lib/verify-jwt";
 
 function isProtectedPath(pathname: string) {
-  // Exact or “startsWith” match for nested pages (e.g., /connect/links/...)
-  return protectedRoutes.some(
-    (p) => pathname === p || pathname.startsWith(p + "/")
+  return protectedRoutes.some((route) =>
+    route === "/"
+      ? pathname === "/"
+      : pathname === route || pathname.startsWith(route + "/")
   );
 }
 
@@ -52,9 +53,7 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  // Run on everything except static files (we still early-return in code)
   matcher: [
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    "/api/auth/:path*",
+    "/((?!_next|[^?]*\\.(?:css|js|png|jpg|jpeg|svg|ico|webp|woff2?|ttf)).*)",
   ],
 };

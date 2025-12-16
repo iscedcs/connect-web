@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { CONNECT_DEV_FEATURES } from "@/config/connect-dev-features";
 import { URLS } from "@/lib/const";
-import { DeleteIcon } from "@/lib/icons";
+import { DeleteIcon, LeftIcon } from "@/lib/icons";
 import { FilterIcon, XSquare } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -11,12 +11,13 @@ import FileList from "./connect-files-list";
 import FilesModal from "./connect-files-modal";
 import { detectFileType } from "@/lib/connect-files/detect-file-type";
 import { FILE_TYPE_FILTERS } from "@/lib/connect-files/file-types";
+import { useRouter } from "next/navigation";
 
 export default function FilesPage({ accessToken, profileId, isAuthed }: any) {
   const [files, setFiles] = useState({ active: [], deleted: [] });
   const [loading, setLoading] = useState(true);
   const [selectedType, setSelectedType] = useState("all");
-
+  const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
 
   const [selected, setSelected] = useState<string[]>([]);
@@ -116,6 +117,12 @@ export default function FilesPage({ accessToken, profileId, isAuthed }: any) {
 
   return (
     <>
+      <button
+        type="button"
+        className="cursor-pointer"
+        onClick={() => router.back()}>
+        <LeftIcon />
+      </button>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Your Uploaded Files</h2>
         <Button
