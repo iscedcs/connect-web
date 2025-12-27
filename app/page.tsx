@@ -24,8 +24,9 @@ export default async function HomePage() {
   if (userId && accessToken) {
     userDevices = await getUserDevices(userId, accessToken);
   }
-  console.log("User Devices", `${userDevices}`);
-  console.log("User Detials", `${connectProfile}`);
+  // console.log("User Profile ID", `${connectProfile?.id}`);
+  // console.log("User Devices", `${userDevices}`);
+  // console.log("User Detials", `${connectProfile}`);
   const hasDevices = userDevices.length > 0;
 
   let connectModules = null;

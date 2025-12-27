@@ -7,6 +7,7 @@ import Link from "next/link";
 import { BarcodeDetector as PolyfilledBarcodeDetector } from "barcode-detector";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { extractDeviceFromURL } from "@/lib/device-extract";
 
 type DetectorCtor =
   | (new (opts?: { formats?: string[] }) => BarcodeDetector)
@@ -27,6 +28,7 @@ export default function ConnectScanScreen({
   const rafRef = useRef<number | null>(null);
   const detectorRef = useRef<BarcodeDetector | null>(null);
   const detectorCtorRef = useRef<DetectorCtor>(undefined);
+  const hasNavigatedRef = useRef(false);
 
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
@@ -43,50 +45,43 @@ export default function ConnectScanScreen({
     setReady(false);
   }
 
-  function extractParamsFromText(text: string): {
-    cardid?: string;
-    type?: string;
-  } {
-    // If it's a URL, try to read ?cardid and ?type
-    try {
-      const u = new URL(text);
-      const cardid = u.searchParams.get("cardId") ?? undefined;
-      const type = u.searchParams.get("type") ?? undefined;
-      if (cardid) return { cardid, type };
-    } catch {
-      // Not a URL — fall through
-    }
-
-    // If raw text looks like a plausible product/card id, treat it as cardid
-    const plausible = /^[a-z0-9\-]{6,}$/i.test(text) ? text : undefined;
-    return { cardid: plausible };
-  }
-
   function navigateWith(resultText: string) {
-    const { cardid, type } = extractParamsFromText(resultText);
-    if (!cardid) {
-      setStatus("Unsupported code. Try a different QR or use NFC tap.");
+    const extracted = extractDeviceFromURL(resultText);
+
+    if (!extracted?.cardid) {
+      setStatus("Invalid ISCE QR code");
+      hasNavigatedRef.current = false;
       return;
     }
 
-    // Stop camera first
     stopEverything();
 
-    const qs = new URLSearchParams({ cardid });
-    if (type) qs.set("type", type);
+    const params = new URLSearchParams({
+      cardid: extracted?.cardid!,
+    });
 
-    router.push(`/otp/idle?${qs.toString()}`);
+    if (extracted?.type) {
+      params.set("type", extracted.type);
+    }
+
+    router.push(`/otp/idle?${params.toString()}`);
   }
 
   // ---- scanner loop --------------------------------------------------------
 
   async function scanLoop() {
-    if (!videoRef.current || !canvasRef.current || !detectorRef.current) return;
-
+    if (
+      !videoRef.current ||
+      !canvasRef.current ||
+      !detectorRef.current ||
+      hasNavigatedRef.current
+    ) {
+      rafRef.current = requestAnimationFrame(scanLoop);
+      return;
+    }
     const video = videoRef.current;
     const canvas = canvasRef.current;
-
-    if (!video.videoWidth || !video.videoHeight) {
+    if (video.readyState < 2) {
       rafRef.current = requestAnimationFrame(scanLoop);
       return;
     }
@@ -110,22 +105,26 @@ export default function ConnectScanScreen({
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     try {
-      // Detect from canvas (works in native + polyfill)
-      const codes = await detectorRef.current.detect(
-        canvas as unknown as CanvasImageSource
-      );
+      const isNative =
+        typeof window !== "undefined" && "BarcodeDetector" in window;
+
+      const source = isNative ? video : canvas;
+
+      const codes = await detectorRef.current.detect(source as any);
       if (codes.length > 0) {
-        const best = (codes[0] as any).rawValue;
-        if (best) {
+        const value = (codes[0] as any).rawValue;
+
+        console.log("QR DETECTED:", value);
+
+        if (value) {
           setStatus("Code detected. Processing…");
-          navigateWith(best);
+          navigateWith(value);
           return;
         }
       }
     } catch (e) {
       console.warn("Barcode detect failed:", e);
     }
-
     rafRef.current = requestAnimationFrame(scanLoop);
   }
 
@@ -172,10 +171,20 @@ export default function ConnectScanScreen({
         }
 
         streamRef.current = stream;
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play().catch(() => {});
-        }
+
+        if (!videoRef.current) return;
+
+        videoRef.current.srcObject = stream;
+        videoRef.current.setAttribute("playsinline", "true");
+        await videoRef.current.play();
+
+        await new Promise<void>((resolve) => {
+          if (videoRef.current!.videoWidth > 0) {
+            resolve();
+          } else {
+            videoRef.current!.onloadedmetadata = () => resolve();
+          }
+        });
 
         setReady(true);
         setStatus("Point your camera at the code");
@@ -202,8 +211,7 @@ export default function ConnectScanScreen({
   // ---- UI ------------------------------------------------------------------
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col">
-      {/* top safety banner */}
+    <div className="h-[100svh] bg-black text-white flex flex-col">
       <div className="mx-auto w-full">
         <div className="flex bg-white/10 px-3 py-2 text-xs backdrop-blur">
           <span className="mr-2">
@@ -223,8 +231,7 @@ export default function ConnectScanScreen({
       {/* camera preview */}
       <div className="mx-auto w-full max-w-screen-sm flex-1 px-4 pb-4">
         <div className="relative w-full overflow-hidden rounded-xl">
-          {/* 9/16 viewfinder box */}
-          <div className="w-full aspect-[9/16] bg-black">
+          <div className="w-full aspect-[9/12] bg-black">
             {error ? (
               <div className="w-full h-full flex items-center justify-center text-center px-6">
                 <p className="text-sm text-white/80">{error}</p>

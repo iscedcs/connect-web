@@ -45,7 +45,7 @@ export const LINK_CATEGORIES: {
   {
     key: "video",
     title: "Video",
-    href: "/connect/links/video",
+    href: "/connect/links/videos",
     icon: VideoIcon,
   },
   {
@@ -82,7 +82,7 @@ export const LINK_CATEGORIES: {
   {
     key: "form",
     title: "Form",
-    href: "/connect/links/form",
+    href: "/connect/links/forms",
     icon: FileTextIcon,
   },
   // {

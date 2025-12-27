@@ -7,7 +7,7 @@ import YouTubeInline from "./youtube-inline";
 import InstagramInline from "./instagram-inline";
 import LinkInline from "./link-inline";
 
-export function InlineRenderer({ item }: { item: any }) {
+export function InlineRenderer({ item, id }: { item: any; id?: string }) {
   const url = item.url ?? "";
   const platform = detectSocialPlatform(item.url);
 
@@ -27,7 +27,7 @@ export function InlineRenderer({ item }: { item: any }) {
       if (/\.(pdf|png|jpg|jpeg|webp)$/i.test(item.url)) {
         return <FileInline file={item} />;
       }
-      return <LinkInline item={item} />;
+      return <LinkInline item={item} deviceId={id!} />;
 
     // if (url.includes("youtube.com")) return <YouTubeInline />
   }

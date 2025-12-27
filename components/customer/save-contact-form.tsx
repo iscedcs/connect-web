@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { saveContactFlow } from "@/lib/services/save-contact";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { Button } from "../ui/button";
-import { ArrowLeft } from "lucide-react";
-import { fetchPublicProfile } from "@/lib/services/public-profile";
 import { CheckIcon } from "@/lib/icons";
+import { fetchPublicProfile } from "@/lib/services/public-profile";
+import { saveContactFlow } from "@/lib/services/save-contact";
+import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function SaveContactForm({ profileId }: { profileId: string }) {
   const router = useRouter();
@@ -49,6 +48,7 @@ export default function SaveContactForm({ profileId }: { profileId: string }) {
       phone: `${countryCode}${phone}`,
       note,
     });
+    console.log("Exchanged Conatct:", res);
 
     setLoading(false);
 

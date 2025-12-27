@@ -5,7 +5,7 @@ export function getFaviconFromUrl(url: string, size: number = 64) {
     // Google favicon service
     return `https://www.google.com/s2/favicons?sz=${size}&domain=${hostname}`;
   } catch {
-    return "/icons/globe.svg";
+    return "/assets/forms_2020q4_48dp.png";
   }
 }
 

@@ -20,6 +20,7 @@ export default function SpotifyCard({
   selectionMode,
   selected,
   toggleSelect,
+  onEdit,
 }: {
   spotify: any;
   profileId: string;
@@ -28,10 +29,11 @@ export default function SpotifyCard({
   showRestore?: boolean;
   selectionMode?: boolean;
   selected?: boolean;
+  onEdit?: () => void;
   toggleSelect?: (id: string) => void;
 }) {
   const [visible, setVisible] = useState(spotify.isVisible);
-  const [editOpen, setEditOpen] = useState(false);
+  // const [editOpen, setEditOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const [isDeleting, setDeleting] = useState(false);
@@ -178,10 +180,7 @@ export default function SpotifyCard({
                 onCheckedChange={handleToggleVisible}
               />
 
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setEditOpen(true)}>
+              <Button variant="ghost" size="icon" onClick={onEdit}>
                 <EditIcon className="w-4 h-4 text-white/70" />
               </Button>
 
@@ -201,7 +200,7 @@ export default function SpotifyCard({
         </Button>
       )}
 
-      {editOpen && (
+      {/* {editOpen && (
         <SpotifyModal
           open={editOpen}
           onClose={() => setEditOpen(false)}
@@ -210,7 +209,7 @@ export default function SpotifyCard({
           onUpdated={onUpdated}
           spotify={spotify}
         />
-      )}
+      )} */}
     </div>
   );
 }

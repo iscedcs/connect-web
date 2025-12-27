@@ -47,6 +47,8 @@ export default function SocialPage({
   const [modalOpen, setModalOpen] = useState(false);
   const router = useRouter();
   const [selected, setSelected] = useState<string[]>([]);
+  const [editingSocial, setEditingSocial] = useState<SocialItem | null>(null);
+
   const selectionMode =
     CONNECT_DEV_FEATURES.social.enableLongPressSelection && selected.length > 0;
 
@@ -188,6 +190,7 @@ export default function SocialPage({
         selectedIds={selected}
         selectionMode={selectionMode}
         toggleSelect={toggleSelect}
+        onEdit={(social) => setEditingSocial(social)}
       />
 
       {socials.deleted.length > 0 && (
@@ -213,7 +216,21 @@ export default function SocialPage({
         </div>
       )}
 
-      {modalOpen && (
+      {(modalOpen || editingSocial) && (
+        <SocialModal
+          open={true}
+          social={editingSocial ?? undefined}
+          onClose={() => {
+            setModalOpen(false);
+            setEditingSocial(null);
+          }}
+          profileId={profileId!}
+          accessToken={accessToken!}
+          onUpdated={fetchSocials}
+        />
+      )}
+
+      {/* {modalOpen && (
         <SocialModal
           open={modalOpen}
           onClose={() => setModalOpen(false)}
@@ -221,7 +238,7 @@ export default function SocialPage({
           accessToken={accessToken!}
           onUpdated={fetchSocials}
         />
-      )}
+      )} */}
     </div>
   );
 }

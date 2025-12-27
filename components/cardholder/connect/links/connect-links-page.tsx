@@ -46,6 +46,8 @@ export default function LinkPage({
   const [modalOpen, setModalOpen] = useState(false);
   const router = useRouter();
   const [selected, setSelected] = useState<string[]>([]);
+  const [editingLink, setEditingLink] = useState<LinkItem | null>(null);
+
   const selectionMode =
     CONNECT_DEV_FEATURES.links.enableLongPressSelection && selected.length > 0;
 
@@ -257,6 +259,7 @@ export default function LinkPage({
         toggleSelect={toggleSelect}
         reorderMode={reorderMode}
         onReorderComplete={saveReorder}
+        onEdit={(link) => setEditingLink(link)}
       />
 
       {links.deleted.length > 0 && (
@@ -281,7 +284,21 @@ export default function LinkPage({
         </div>
       )}
 
-      {modalOpen && (
+      {(modalOpen || editingLink) && (
+        <LinkModal
+          open={true}
+          link={editingLink ?? undefined}
+          onClose={() => {
+            setModalOpen(false);
+            setEditingLink(null);
+          }}
+          profileId={profileId!}
+          accessToken={accessToken!}
+          onUpdated={fetchLinks}
+        />
+      )}
+
+      {/* {modalOpen && (
         <LinkModal
           open={modalOpen}
           onClose={() => setModalOpen(false)}
@@ -289,7 +306,7 @@ export default function LinkPage({
           accessToken={accessToken!}
           onUpdated={fetchLinks}
         />
-      )}
+      )} */}
     </div>
   );
 }

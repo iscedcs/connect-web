@@ -13,6 +13,7 @@ export default function AppointmentList({
   selectionMode = false,
   selectedIds = [],
   toggleSelect,
+  onEdit,
 }: {
   appointments: any;
   loading: boolean;
@@ -23,6 +24,7 @@ export default function AppointmentList({
   selectedIds?: string[];
   toggleSelect?: (id: string) => void;
   selectionMode?: boolean;
+  onEdit?: (appointment: any) => void;
 }) {
   if (loading) return <AppointmentListSkeleton />;
 
@@ -46,6 +48,7 @@ export default function AppointmentList({
           selected={selectedIds.includes(a.id)}
           selectionMode={selectionMode}
           toggleSelect={toggleSelect}
+          onEdit={() => onEdit?.(a)}
         />
       ))}
     </div>

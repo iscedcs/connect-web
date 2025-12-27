@@ -14,6 +14,7 @@ export default function MeetingList({
   selectedIds = [],
   toggleSelect,
   setDefaultMeeting,
+  onEdit,
 }: {
   meetings: any[];
   loading: boolean;
@@ -25,6 +26,7 @@ export default function MeetingList({
   selectedIds?: string[];
   toggleSelect?: (id: string) => void;
   setDefaultMeeting?: (id: string) => Promise<void>;
+  onEdit?: (meeting: any) => void;
 }) {
   if (loading) return <MeetingListSkeleton />;
 
@@ -49,6 +51,7 @@ export default function MeetingList({
           selected={selectedIds.includes(m.id)}
           toggleSelect={toggleSelect}
           setDefaultMeeting={setDefaultMeeting}
+          onEdit={() => onEdit?.(m)}
         />
       ))}
     </div>

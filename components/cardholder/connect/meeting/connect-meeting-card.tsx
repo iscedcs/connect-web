@@ -19,6 +19,7 @@ export default function MeetingCard({
   selected,
   toggleSelect,
   setDefaultMeeting,
+  onEdit,
 }: {
   meeting: any;
   profileId: string;
@@ -29,11 +30,12 @@ export default function MeetingCard({
   selectionMode?: boolean;
   selected?: boolean;
   toggleSelect?: (id: string) => void;
+  onEdit?: () => void;
 
   setDefaultMeeting?: (id: string) => Promise<void>;
 }) {
   const [visible, setVisible] = useState(meeting.isVisible);
-  const [editOpen, setEditOpen] = useState(false);
+  // const [editOpen, setEditOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const pressTimer = useRef<any>(null);
@@ -156,9 +158,14 @@ export default function MeetingCard({
               <Button
                 variant="ghost"
                 size="icon"
-                disabled={loading}
-                onClick={() => setDefaultMeeting?.(meeting.id)}>
-                ⭐
+                disabled={loading || meeting.isDefault}
+                onClick={() => setDefaultMeeting?.(meeting.id)}
+                className={
+                  meeting.isDefault
+                    ? " cursor-default"
+                    : "text-white/40 hover:text-yellow-400 text-lg"
+                }>
+                {meeting.isDefault ? "⭐" : "☆"}
               </Button>
 
               {/* Edit */}
@@ -166,7 +173,7 @@ export default function MeetingCard({
                 variant="ghost"
                 size="icon"
                 disabled={loading}
-                onClick={() => setEditOpen(true)}>
+                onClick={onEdit}>
                 <EditIcon className="w-4 h-4 text-white/70" />
               </Button>
 
@@ -191,7 +198,7 @@ export default function MeetingCard({
         </Button>
       )}
 
-      {editOpen && (
+      {/* {editOpen && (
         <MeetingModal
           open={editOpen}
           onClose={() => setEditOpen(false)}
@@ -200,7 +207,7 @@ export default function MeetingCard({
           onUpdated={onUpdated}
           meeting={meeting}
         />
-      )}
+      )} */}
     </div>
   );
 }

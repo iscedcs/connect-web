@@ -21,6 +21,8 @@ export default function FilesPage({ accessToken, profileId, isAuthed }: any) {
   const [modalOpen, setModalOpen] = useState(false);
 
   const [selected, setSelected] = useState<string[]>([]);
+  const [editingFile, setEditingFile] = useState<File | null>(null);
+
   const selectionMode =
     CONNECT_DEV_FEATURES.files.enableLongPressSelection && selected.length > 0;
 
@@ -185,6 +187,7 @@ export default function FilesPage({ accessToken, profileId, isAuthed }: any) {
         selectedIds={selected}
         selectionMode={selectionMode}
         toggleSelect={toggleSelect}
+        onEdit={(file) => setEditingFile(file)}
       />
       {files.deleted.length > 0 && (
         <div className="mt-10">
@@ -208,14 +211,18 @@ export default function FilesPage({ accessToken, profileId, isAuthed }: any) {
           />
         </div>
       )}
-      {modalOpen && (
+
+      {(modalOpen || editingFile) && (
         <FilesModal
-          open={modalOpen}
-          onClose={() => setModalOpen(false)}
-          profileId={profileId}
-          accessToken={accessToken}
+          open={true}
+          fileItem={editingFile ?? undefined}
+          onClose={() => {
+            setModalOpen(false);
+            setEditingFile(null);
+          }}
+          profileId={profileId!}
+          accessToken={accessToken!}
           onUpdated={fetchFiles}
-          fileItem={null}
         />
       )}
     </>

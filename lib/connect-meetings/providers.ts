@@ -15,7 +15,7 @@ export function detectMeetingProvider(url: string): MeetingProvider {
   if (u.includes("zoom.us") || u.includes("zoom.com")) return "zoom";
   if (u.includes("teams.microsoft.com")) return "teams";
   if (u.includes("webex.com")) return "webex";
-  if (u.includes("discord.com")) return "discord";
+  if (u.includes("discord.gg")) return "discord";
   if (u.includes("slack.com") || u.includes("app.slack.com")) return "slack";
 
   return "unknown";

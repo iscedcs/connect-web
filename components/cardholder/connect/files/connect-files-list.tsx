@@ -13,6 +13,7 @@ export default function FileList({
   selectionMode = false,
   selectedIds = [],
   toggleSelect,
+  onEdit,
 }: {
   items: any[];
   loading: boolean;
@@ -23,6 +24,7 @@ export default function FileList({
   selectedIds?: string[];
   toggleSelect?: (id: string) => void;
   selectionMode?: boolean;
+  onEdit?: (file: any) => void;
 }) {
   if (loading) return <FileListSkeleton />;
 
@@ -46,6 +48,7 @@ export default function FileList({
           selected={selectedIds.includes(file.id)}
           selectionMode={selectionMode}
           toggleSelect={toggleSelect}
+          onEdit={() => onEdit?.(file)}
         />
       ))}
     </div>

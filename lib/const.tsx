@@ -7,12 +7,6 @@ export const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 export const URLS = {
   contact: {
     leave: "/api/contact/leave",
-    recieved: "/api/contact/received",
-    one: "/api/contact/one/{id}",
-    delete: "/api/contact/delete/{id}",
-    search: "/api/contact/search",
-    recent: "/api/contact/recent",
-    stats: "/api/contact/stats",
   },
   profile: {
     create: "/api/profile/create",
@@ -88,6 +82,12 @@ export const URLS = {
     restore_all: "/api/profiles/{profileId}/contacts/all/restore",
     all_visible: "/api/profiles/{profileId}/contacts/visibility/all",
     primary: "/api/profiles/{profileId}/contacts/set-primary/{id}",
+    recieved: "/api/profiles/{profileId}/contact/received",
+    recieved_one: "/api/profiles/{profileId}/contact/one/{id}",
+    delete_recieved: "/api/profiles/{profileId}/contact/delete/{id}",
+    search_recieved: "/api/profiles/{profileId}/contact/search",
+    recent_recieved: "/api/profiles/{profileId}/contact/recent",
+    stats_recieved: "/api/profiles/{profileId}/contact/stats",
   },
   links: {
     add: "/api/profiles/{profileId}/links/add",
@@ -195,6 +195,7 @@ export const URLS = {
     restore: "/api/profiles/{profileId}/forms/restore/{id}",
     visible: "/api/profiles/{profileId}/forms/visibility/{id}",
     submit_one: "/api/profiles/{profileId}/forms/submissions/{id}",
+    public_form: "/api/profiles/{profileId}/forms/public/{id}",
     delete_submit:
       "/api/profiles/{profileId}/forms/submissions/delete/{submissionId}",
     create_template:
