@@ -90,8 +90,8 @@ function buildConnectList(data: any) {
   data.appointments?.forEach((a: any) =>
     list.push({
       id: a.id,
-      type: "appointment", // 👈 add type (important)
-      title: a.label || "Book An Appointment With me", // 👈 user-facing label
+      type: "appointment",
+      title: a.label || "Book An Appointment With me",
       url: a.url,
       icon: ICONS.appointments,
     })
@@ -135,13 +135,11 @@ export default async function CustomerProfilePage({ params }: any) {
   return (
     <main className="min-h-screen bg-black text-white pb-16">
       <section>
-        {/* COVER */}
         <img
           src={profile.coverPhoto}
           className="w-full h-44 md:h-64 object-cover"
         />
 
-        {/* PROFILE IDENTITY */}
         <div className="px-4 -mt-14 md:-mt-20 flex items-end gap-3">
           <img
             src={profile.profilePhoto}
@@ -156,7 +154,6 @@ export default async function CustomerProfilePage({ params }: any) {
           </div>
         </div>
 
-        {/* ABOUT (new block, same header context) */}
         {profile.bio && (
           <div className="px-4 mt-4">
             <div className="flex items-center gap-2 mb-1">
@@ -172,7 +169,6 @@ export default async function CustomerProfilePage({ params }: any) {
           </div>
         )}
 
-        {/* ACTIONS */}
         <div className="px-4 mt-4 flex items-center font-medium gap-3 flex-wrap">
           <button className="px-5 py-2 bg-white/5 border border-[#868686] rounded-full text-xs">
             <Link href={`/customer/${id}/save-contact`}>Save contact</Link>

@@ -1,14 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { CONNECT_DEV_FEATURES } from "@/config/connect-dev-features";
 import { getFaviconFromUrl } from "@/lib/connect-links/get-favicon";
 import { URLS } from "@/lib/const";
 import { DeleteIcon, EditIcon, ToggleIcon } from "@/lib/icons";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import SocialModal from "./connect-social-modal";
-import { Spinner } from "@/components/ui/spinner";
 
 export default function SocialCard({
   social,
@@ -19,13 +18,14 @@ export default function SocialCard({
   selectionMode,
   selected,
   toggleSelect,
+  onEdit,
 }: {
   social: any;
   profileId: string;
   accessToken: string;
   onUpdated: () => Promise<void>;
   showRestore?: boolean;
-
+  onEdit?: () => void;
   selectionMode?: boolean;
   selected?: boolean;
   toggleSelect?: (id: string) => void;
@@ -175,10 +175,7 @@ export default function SocialCard({
                 onCheckedChange={handleToggleVisible}
               />
 
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setEditOpen(true)}>
+              <Button variant="ghost" size="icon" onClick={onEdit}>
                 <EditIcon className="w-4 h-4 text-white/70" />
               </Button>
 
@@ -208,7 +205,7 @@ export default function SocialCard({
         </>
       )}
 
-      {editOpen && (
+      {/* {editOpen && (
         <SocialModal
           open={editOpen}
           onClose={() => setEditOpen(false)}
@@ -217,7 +214,7 @@ export default function SocialCard({
           onUpdated={onUpdated}
           social={social}
         />
-      )}
+      )} */}
     </div>
   );
 }

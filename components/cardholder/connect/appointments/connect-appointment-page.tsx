@@ -34,6 +34,8 @@ export default function AppointmentPage({
   const [visible, setVisible] = useState(false);
   const router = useRouter();
   const [selected, setSelected] = useState<string[]>([]);
+  const [editingAppointment, setEditingAppointment] = useState<null>(null);
+
   const selectionMode =
     CONNECT_DEV_FEATURES.appointments.enableLongPressSelection &&
     selected.length > 0;
@@ -220,6 +222,7 @@ export default function AppointmentPage({
         selectionMode={selectionMode}
         selectedIds={selected}
         toggleSelect={toggleSelect}
+        onEdit={(appointment) => setEditingAppointment(appointment)}
       />
 
       {appointments.deleted.length > 0 && (
@@ -256,7 +259,20 @@ export default function AppointmentPage({
         </div>
       )}
 
-      {modalOpen && (
+      {(modalOpen || editingAppointment) && (
+        <AppointmentModal
+          open={true}
+          appointment={editingAppointment ?? undefined}
+          onClose={() => {
+            setModalOpen(false);
+            setEditingAppointment(null);
+          }}
+          profileId={profileId!}
+          accessToken={accessToken!}
+          onUpdated={fetchAppointments}
+        />
+      )}
+      {/* {modalOpen && (
         <AppointmentModal
           open={modalOpen}
           onClose={() => setModalOpen(false)}
@@ -264,7 +280,7 @@ export default function AppointmentPage({
           accessToken={accessToken!}
           onUpdated={fetchAppointments}
         />
-      )}
+      )} */}
     </div>
   );
 }

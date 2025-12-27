@@ -20,12 +20,14 @@ export default function LinkCard({
   selectionMode,
   selected,
   toggleSelect,
+  onEdit,
 }: {
   link: any;
   profileId: string;
   accessToken: string;
   onUpdated: () => Promise<void>;
   showRestore?: boolean;
+  onEdit?: () => void;
 
   selectionMode?: boolean;
   selected?: boolean;
@@ -179,7 +181,7 @@ export default function LinkCard({
                 variant="ghost"
                 size="icon"
                 disabled={loading}
-                onClick={() => setEditOpen(true)}>
+                onClick={onEdit}>
                 <EditIcon className="w-4 h-4 text-white/70" />
               </Button>
 
@@ -202,7 +204,7 @@ export default function LinkCard({
           Restore
         </Button>
       )}
-      {editOpen && (
+      {/* {editOpen && (
         <LinkModal
           open={editOpen}
           onClose={() => setEditOpen(false)}
@@ -211,7 +213,7 @@ export default function LinkCard({
           onUpdated={onUpdated}
           link={link}
         />
-      )}
+      )} */}
     </div>
   );
 }

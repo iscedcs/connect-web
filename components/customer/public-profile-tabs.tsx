@@ -12,6 +12,9 @@ import Link from "next/link";
 import { InlineRenderer } from "./inline-renderers/inline-renderer";
 import { DockIcon } from "lucide-react";
 
+/** ---------------------------------------
+ * FETCH A DEVICE HOLDER PUBLIC CONNECT AND EVENT TABS 
+ -----------------------------------------*/
 export default function PublicProfileTabs({
   connectItems,
   events,
@@ -54,6 +57,17 @@ export default function PublicProfileTabs({
       item.url?.includes("open.spotify.com") ||
       item.title?.toLowerCase() === "spotify"
   );
+  function resolvePublicUrl(url: string, deviceId: string) {
+    if (!url) return "#";
+
+    // Public forms from backend: /forms/{id}
+    if (url.startsWith("/forms/")) {
+      return `/customer/${deviceId}${url}`;
+    }
+
+    return url;
+  }
+
   return (
     <>
       <section className="mt-6 px-4 flex gap-8 text-base">
@@ -239,11 +253,11 @@ export default function PublicProfileTabs({
             {connectItems.map((item) => (
               <div key={item.id} className="flex flex-col">
                 <button
-                  onClick={() =>
+                  onClick={() => {
                     setExpandedItemId(
                       expandedItemId === item.id ? null : item.id
-                    )
-                  }
+                    );
+                  }}
                   className="flex items-center justify-between py-4 group text-left">
                   <div className="flex items-start gap-4 flex-1">
                     <span className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center shrink-0">
@@ -259,7 +273,7 @@ export default function PublicProfileTabs({
                         {item.title || item.label}
                       </p>
                       <p className="text-[10px] text-white/50 truncate max-w-[180px]">
-                        {item.url}
+                        {resolvePublicUrl(item.url, id)}
                       </p>
                     </div>
                   </div>
@@ -272,7 +286,9 @@ export default function PublicProfileTabs({
                   </span>
                 </button>
 
-                {expandedItemId === item.id && <InlineRenderer item={item} />}
+                {expandedItemId === item.id && (
+                  <InlineRenderer item={item} id={id} />
+                )}
               </div>
             ))}
           </div>

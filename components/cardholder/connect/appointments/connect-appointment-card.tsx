@@ -20,6 +20,7 @@ export default function AppointmentCard({
   selectionMode,
   selected,
   toggleSelect,
+  onEdit,
 }: {
   appointment: any;
   profileId: string;
@@ -29,6 +30,7 @@ export default function AppointmentCard({
   selectionMode?: boolean;
   selected?: boolean;
   toggleSelect?: (id: string) => void;
+  onEdit?: () => void;
 }) {
   const [isDefault, setIsDefault] = useState(appointment.is_default ?? false);
   useEffect(() => {
@@ -36,7 +38,7 @@ export default function AppointmentCard({
   }, [appointment.is_default]);
   const [visible, setVisible] = useState(appointment.isVisible);
   const [loading, setLoading] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
+  // const [editOpen, setEditOpen] = useState(false);
   const [isDeleting, setDeleteing] = useState(false);
   const [isRestoring, setRestoring] = useState(false);
 
@@ -219,7 +221,7 @@ export default function AppointmentCard({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setEditOpen(true)}
+                  onClick={onEdit}
                   className="w-8 h-8 flex items-center justify-center">
                   <EditIcon className="w-4 h-4 text-white/70" />
                 </Button>
@@ -251,7 +253,7 @@ export default function AppointmentCard({
         </>
       )}
 
-      {editOpen && (
+      {/* {editOpen && (
         <AppointmentModal
           open={editOpen}
           onClose={() => setEditOpen(false)}
@@ -260,7 +262,7 @@ export default function AppointmentCard({
           onUpdated={onUpdated}
           appointment={appointment}
         />
-      )}
+      )} */}
     </div>
   );
 }

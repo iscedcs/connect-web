@@ -3,6 +3,9 @@ import { http } from "./http";
 
 const CONNECT_API = process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL;
 
+/** ---------------------------------------
+ * FETCH A DEVICE HOLDER PUBLIC PROFILE 
+ -----------------------------------------*/
 export async function fetchPublicProfile(deviceId: string) {
   try {
     const url = `${CONNECT_API}${URLS.profile.public.replace(

@@ -47,6 +47,10 @@ export default function SpotifyPage({
   const [modalOpen, setModalOpen] = useState(false);
   const router = useRouter();
   const [selected, setSelected] = useState<string[]>([]);
+  const [editingSpotify, setEditingSpotify] = useState<SpotifyItem | null>(
+    null
+  );
+
   const selectionMode =
     CONNECT_DEV_FEATURES.spotify.enableLongPressSelection &&
     selected.length > 0;
@@ -195,6 +199,7 @@ export default function SpotifyPage({
         selectedIds={selected}
         selectionMode={selectionMode}
         toggleSelect={toggleSelect}
+        onEdit={(spotify) => setEditingSpotify(spotify)}
       />
 
       {spotify.deleted.length > 0 && (
@@ -219,8 +224,20 @@ export default function SpotifyPage({
           />
         </div>
       )}
-
-      {modalOpen && (
+      {(modalOpen || editingSpotify) && (
+        <SpotifyModal
+          open={true}
+          spotify={editingSpotify ?? undefined}
+          onClose={() => {
+            setModalOpen(false);
+            setEditingSpotify(null);
+          }}
+          profileId={profileId!}
+          accessToken={accessToken!}
+          onUpdated={fetchItems}
+        />
+      )}
+      {/* {modalOpen && (
         <SpotifyModal
           open={modalOpen}
           onClose={() => setModalOpen(false)}
@@ -228,7 +245,7 @@ export default function SpotifyPage({
           accessToken={accessToken!}
           onUpdated={fetchItems}
         />
-      )}
+      )} */}
     </>
   );
 }

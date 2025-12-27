@@ -1,5 +1,8 @@
 import { URLS } from "@/lib/const";
 
+/** ---------------------------------------
+ * FETCH A DEVICE HOLDER PUBLIC EVENT 
+ -----------------------------------------*/
 export async function fetchPublicUserEvent(userId: string) {
   if (!userId) return [];
 

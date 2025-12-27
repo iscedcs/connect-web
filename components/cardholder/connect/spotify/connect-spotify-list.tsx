@@ -14,6 +14,7 @@ export default function SpotifyList({
   selectionMode = false,
   selectedIds = [],
   toggleSelect,
+  onEdit,
 }: {
   items: any[];
   loading: boolean;
@@ -23,6 +24,7 @@ export default function SpotifyList({
   showRestore?: boolean;
   selectedIds?: string[];
   toggleSelect?: (id: string) => void;
+  onEdit?: (spotify: any) => void;
   selectionMode?: boolean;
 }) {
   if (loading) return <SpotifyListSkeleton />;
@@ -47,6 +49,7 @@ export default function SpotifyList({
           selected={selectedIds.includes(item.id)}
           selectionMode={selectionMode}
           toggleSelect={toggleSelect}
+          onEdit={() => onEdit?.(item)}
         />
       ))}
     </div>

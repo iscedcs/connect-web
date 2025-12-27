@@ -13,6 +13,7 @@ export default function SocialList({
   selectionMode = false,
   selectedIds = [],
   toggleSelect,
+  onEdit,
 }: {
   socials: any[];
   loading: boolean;
@@ -23,6 +24,7 @@ export default function SocialList({
   selectionMode?: boolean;
   selectedIds?: string[];
   toggleSelect?: (id: string) => void;
+  onEdit?: (social: any) => void;
 }) {
   if (loading) return <SocialListSkeleton />;
 
@@ -46,6 +48,7 @@ export default function SocialList({
           selectionMode={selectionMode}
           selected={selectedIds.includes(s.id)}
           toggleSelect={toggleSelect}
+          onEdit={() => onEdit?.(s)}
         />
       ))}
     </div>

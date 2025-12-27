@@ -30,6 +30,7 @@ export default function LinkList({
   toggleSelect,
   reorderMode = false,
   onReorderComplete,
+  onEdit,
 }: {
   links: any[];
   loading: boolean;
@@ -42,6 +43,7 @@ export default function LinkList({
   toggleSelect?: (id: string) => void;
   reorderMode?: boolean;
   onReorderComplete?: (items: any[]) => void;
+  onEdit?: (link: any) => void;
 }) {
   if (loading) return <LinkListSkeleton />;
 
@@ -122,6 +124,7 @@ export default function LinkList({
                 selected={selectedIds.includes(l.id)}
                 selectionMode={selectionMode}
                 toggleSelect={toggleSelect}
+                onEdit={() => onEdit?.(l)}
               />
             ))}
           </div>

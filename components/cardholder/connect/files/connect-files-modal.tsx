@@ -29,9 +29,11 @@ export default function FilesModal({
   if (!open) return null;
 
   const isEdit = !!fileItem;
+  const [filename, setFilename] = useState(fileItem?.filename ?? "");
+
+  const [visible, setVisible] = useState(fileItem?.is_visible ?? true);
 
   const [file, setFile] = useState<File | null>(null);
-  const [visible, setVisible] = useState(true);
   const [loading, setLoading] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -53,26 +55,14 @@ export default function FilesModal({
     setLoading(true);
 
     try {
-      let payload: any = {
-        filename: file ? file.name : fileItem.filename,
-        is_visible: visible,
-      };
-      //   let payload: any = {
-      //     ...(isEdit
-      //       ? {
-      //           filename: fileItem.filename,
-      //           storage_key: fileItem.storage_key,
-      //           media_type: fileItem.media_type,
-      //           size_bytes: fileItem.size_bytes,
-      //           checksum: fileItem.checksum,
-      //           spaces_url: fileItem.spaces_url,
-      //           is_visible: visible,
-      //         }
-      //       : {}),
-      //   };
-
-      if (file) {
-        const upload = await uploadFile(file, `profiles/${profileId}/files`);
+      let payload: any;
+      if (isEdit) {
+        payload = {
+          filename,
+          is_visible: visible,
+        };
+      } else {
+        const upload = await uploadFile(file!, `profiles/${profileId}/files`);
 
         if (!upload.success) {
           toast.error("Upload to Spaces failed");
@@ -80,19 +70,18 @@ export default function FilesModal({
           return;
         }
 
-        const checksum = await generateChecksum(file);
+        const checksum = await generateChecksum(file!);
 
         payload = {
-          filename: file.name,
+          filename: file!.name,
           storage_key: upload.key,
-          media_type: file.type,
-          size_bytes: file.size,
+          media_type: file!.type,
+          size_bytes: file!.size,
           checksum,
           spaces_url: upload.url,
           is_visible: visible,
         };
       }
-
       const endpoint = isEdit
         ? URLS.files.update
             .replace("{profileId}", profileId)
@@ -147,6 +136,18 @@ export default function FilesModal({
               {isEdit ? "Update File" : "Upload File"}
             </h2>
 
+            {isEdit && (
+              <div className="space-y-1">
+                <label className="text-sm text-white/70">Filename</label>
+                <input
+                  value={filename}
+                  onChange={(e) => setFilename(e.target.value)}
+                  className="w-full rounded-lg bg-neutral-800 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/30"
+                  placeholder="Enter filename"
+                />
+              </div>
+            )}
+
             {/* Dropzone */}
             {!isEdit && (
               <motion.div
@@ -178,12 +179,10 @@ export default function FilesModal({
             />
 
             {/* Visibility */}
-            {!isEdit && (
-              <div className="flex items-center justify-between pt-2">
-                <span className="text-sm text-white/70">Visible</span>
-                <ToggleIcon checked={visible} onCheckedChange={setVisible} />
-              </div>
-            )}
+            <div className="flex items-center justify-between pt-2">
+              <span className="text-sm text-white/70">Visible</span>
+              <ToggleIcon checked={visible} onCheckedChange={setVisible} />
+            </div>
 
             {/* Buttons */}
             <div className="flex justify-end gap-3 pt-4">

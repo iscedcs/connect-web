@@ -22,6 +22,7 @@ export default function FileCard({
   selectionMode,
   selected,
   toggleSelect,
+  onEdit,
 }: {
   file: any;
   profileId: string;
@@ -31,6 +32,7 @@ export default function FileCard({
   selectionMode?: boolean;
   selected?: boolean;
   toggleSelect?: (id: string) => void;
+  onEdit?: () => void;
 }) {
   const [visible, setVisible] = useState(file.is_visible);
   const [loading, setLoading] = useState(false);
@@ -208,10 +210,7 @@ export default function FileCard({
                 onCheckedChange={handleToggleVisible}
               />
 
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setEditOpen(true)}>
+              <Button variant="ghost" size="icon" onClick={onEdit}>
                 <EditIcon className="w-4 h-4 text-white/70" />
               </Button>
 
@@ -239,17 +238,6 @@ export default function FileCard({
             </Button>
           )}
         </div>
-      )}
-
-      {editOpen && (
-        <FilesModal
-          open={editOpen}
-          onClose={() => setEditOpen(false)}
-          profileId={profileId}
-          accessToken={accessToken}
-          onUpdated={onUpdated}
-          fileItem={file}
-        />
       )}
     </div>
   );

@@ -44,6 +44,10 @@ export default function MeetingPage({
   const [modalOpen, setModalOpen] = useState(false);
   const router = useRouter();
   const [selected, setSelected] = useState<string[]>([]);
+  const [editingMeeting, setEditingMeeting] = useState<MeetingItem | null>(
+    null
+  );
+
   const selectionMode =
     CONNECT_DEV_FEATURES.meetings.enableLongPressSelection &&
     selected.length > 0;
@@ -196,6 +200,7 @@ export default function MeetingPage({
         selectedIds={selected}
         toggleSelect={toggleSelect}
         setDefaultMeeting={setDefaultMeeting}
+        onEdit={(meeting) => setEditingMeeting(meeting)}
       />
 
       {meetings.deleted.length > 0 && (
@@ -221,10 +226,14 @@ export default function MeetingPage({
         </div>
       )}
 
-      {modalOpen && (
+      {(modalOpen || editingMeeting) && (
         <MeetingModal
-          open={modalOpen}
-          onClose={() => setModalOpen(false)}
+          open={true}
+          meeting={editingMeeting ?? undefined}
+          onClose={() => {
+            setModalOpen(false);
+            setEditingMeeting(null);
+          }}
           profileId={profileId!}
           accessToken={accessToken!}
           onUpdated={fetchMeetings}

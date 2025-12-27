@@ -9,6 +9,7 @@ export type SocialPlatform =
   | "YouTube"
   | "WhatsApp"
   | "Telegram"
+  | "Discord"
   | "Website"
   | "Unknown";
 
@@ -22,6 +23,7 @@ const PLATFORM_PATTERNS: Record<SocialPlatform, RegExp[]> = {
   YouTube: [/youtube\.com/, /youtu\.be/],
   WhatsApp: [/wa\.me/, /whatsapp\.com/],
   Telegram: [/t\.me/],
+  Discord: [/discord\.gg/],
   Website: [
     /^https:\/\/(?!.*(linkedin|facebook|instagram|twitter|github|youtube|tiktok))/,
   ],
@@ -59,6 +61,8 @@ export function autoLabel(platform: SocialPlatform): string {
       return "WhatsApp Contact";
     case "Telegram":
       return "Telegram Channel";
+    case "Discord":
+      return "Discord Channel";
     case "Website":
       return "Website";
     default:
