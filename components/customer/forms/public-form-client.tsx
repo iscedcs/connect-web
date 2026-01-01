@@ -14,19 +14,44 @@ export default function PublicFormClient({ profile, form }: any) {
   }
 
   async function handleSubmit() {
+    for (const field of form.fields) {
+      if (field.required && !values[field.name]) {
+        toast.error(`${field.label} is required`);
+        return;
+      }
+    }
+
     setSubmitting(true);
 
-    // 🔌 PLACEHOLDER (connect when backend endpoint is ready)
-    console.log("FORM SUBMIT PAYLOAD", {
-      profileId: form.profileId,
-      formId: form.id,
-      responses: values,
-    });
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL}/api/profiles/${form.profileId}/forms/submit/public/${form.id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            answers: values,
+          }),
+        }
+      );
 
-    setTimeout(() => {
+      const json = await res.json();
+
+      if (!res.ok) {
+        toast.error(json?.message ?? "Submission failed");
+        return;
+      }
+
       toast.success("Form submitted successfully 🎉");
+
+      setValues({});
+    } catch (err) {
+      toast.error("Network error. Please try again.");
+    } finally {
       setSubmitting(false);
-    }, 1000);
+    }
   }
 
   return (

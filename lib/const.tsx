@@ -196,6 +196,7 @@ export const URLS = {
     visible: "/api/profiles/{profileId}/forms/visibility/{id}",
     submit_one: "/api/profiles/{profileId}/forms/submissions/{id}",
     public_form: "/api/profiles/{profileId}/forms/public/{id}",
+    public_submit: "/api/profiles/{profileId}/forms/submit/public/{id}",
     delete_submit:
       "/api/profiles/{profileId}/forms/submissions/delete/{submissionId}",
     create_template:
