@@ -44,6 +44,7 @@ export default function ContactViewModal({
           }
         );
         setContact(res.data.data.contact);
+        console.log({ res });
       } catch {
         toast.error("Failed to load contact");
         onClose();
@@ -58,12 +59,13 @@ export default function ContactViewModal({
   async function handleDelete() {
     setDeleting(true);
     try {
-      await http.delete(
+      await http.patch(
         `${
           process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
         }${URLS.profile_contact.delete_recieved
           .replace("{profileId}", profileId)
           .replace("{id}", contactId)}`,
+        null,
         {
           headers: { Authorization: `Bearer ${accessToken}` },
         }

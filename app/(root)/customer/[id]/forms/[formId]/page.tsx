@@ -20,5 +20,11 @@ export default async function PublicFormPage({ params }: any) {
     return <div className="p-6 text-white/60">Form not available</div>;
   }
 
-  return <PublicFormClient profile={profile} form={formRes.form} />;
+  return (
+    <PublicFormClient
+      profile={profile}
+      profileId={profile.id}
+      form={formRes.form}
+    />
+  );
 }
