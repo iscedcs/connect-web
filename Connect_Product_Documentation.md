@@ -1,5 +1,12 @@
 # Connect Product Documentation
 
+## Table of Contents
+- [1. Introduction](#1-introduction)
+- [2. Key Features](#2-key-features)
+- [3. User Guides](#3-user-guides)
+- [4. Technical Overview](#4-technical-overview)
+- [5. Future Features](#5-future-features)
+
 ## 1. Introduction
 
 Connect is a modern, digital networking solution within the ISCE Ecosystem, designed to bridge the gap between physical and digital interactions. It allows users to create a comprehensive digital profile containing contact information, social media links, files, meeting schedules, and more. This profile can be instantly shared with others through NFC-enabled devices (like cards or wearables) or by scanning a unique QR code.
@@ -13,7 +20,19 @@ This document is intended for a wide audience, including:
 
 ## 2. Key Features
 
-Connect is built around a modular design, allowing users to customize their digital profiles with the information that matters most to them. The following are the key features available in the current version of the product:
+Connect is built around a modular design, allowing users to customize their digital profiles with the information that matters most to them. The product's key features are:
+
+*   Contact
+*   Links
+*   Videos
+*   Socials
+*   Meetings
+*   Appointments
+*   Spotify
+*   Files
+*   Forms
+
+A detailed breakdown of each feature is provided below:
 
 ### 2.1. Contact
 The Contact module allows users to share their personal and professional contact information. This includes:
@@ -78,7 +97,7 @@ The Forms module allows users to create and share custom forms to collect inform
 This section provides step-by-step instructions for common tasks in the Connect application.
 
 ### 3.1. Creating Your Profile
-1.  **Sign Up:** Create a new account using your email address or a social login.
+1.  **Sign Up:** Create a new account using your email address or a social login. The sign-up process is governed by the secure ISCE auth system to protect your information.
 2.  **Personal Information:** Fill in your name, job title, and a short bio.
 3.  **Profile Picture:** Upload a professional headshot or a photo that represents you.
 4.  **Save:** Once you're done, save your profile.
