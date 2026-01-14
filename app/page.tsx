@@ -9,6 +9,14 @@ import PromoBanner from "@/components/pages/cardholder/home/promo-banner";
 import { getConnectModules } from "@/lib/services/connect-modules";
 import { getUserDevices } from "@/lib/services/device";
 import { getConnectProfile } from "@/lib/services/profile";
+import { generateMetadata } from "@/lib/metadata";
+
+export const metadata = generateMetadata({
+  title: "Home",
+  description:
+    "Manage your digital lifestyle, connect with NFC and QR codes, manage devices, and access all your Connect features in one place.",
+  keywords: ["home", "dashboard", "connect", "devices", "profile"],
+});
 
 export default async function HomePage() {
   const [connectProfile, authInfo] = await Promise.all([

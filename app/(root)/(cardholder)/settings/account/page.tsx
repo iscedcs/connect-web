@@ -1,6 +1,14 @@
 import { getAuthInfo } from "@/actions/auth";
 import ProfileList from "@/components/settings/account/profile-list";
 import { NEXT_PUBLIC_CONNECT_API_ORIGIN, URLS } from "@/lib/const";
+import { generateMetadata } from "@/lib/metadata";
+
+export const metadata = generateMetadata({
+  title: "Account Settings",
+  description:
+    "Manage your public contact card profiles. Create, edit, and organize multiple profiles for different purposes.",
+  keywords: ["account", "settings", "profiles", "manage", "contact cards"],
+});
 
 export default async function AccountSettingsPage() {
   const auth = await getAuthInfo();

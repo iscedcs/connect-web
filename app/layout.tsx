@@ -3,6 +3,7 @@ import { Inter_Tight } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import NextTopLoader from "nextjs-toploader";
+import { generateMetadata as generateMetadataUtil } from "@/lib/metadata";
 
 const interTight = Inter_Tight({
   variable: "--inter-tight",
@@ -10,10 +11,20 @@ const interTight = Inter_Tight({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
-export const metadata: Metadata = {
-  title: "Connect by ISCE",
-  description: "A dynamic digital lifestyle platform.",
-};
+export const metadata: Metadata = generateMetadataUtil({
+  title: undefined, // Will use default app name
+  description:
+    "A dynamic digital lifestyle platform for seamless connectivity and modern lifestyle management.",
+  keywords: [
+    "ISCE Connect",
+    "digital lifestyle",
+    "contact management",
+    "NFC",
+    "QR code",
+    "digital wallet",
+    "wearables",
+  ],
+});
 
 export default function RootLayout({
   children,
