@@ -6,7 +6,8 @@ export async function GET(req: Request) {
   const token = searchParams.get("token");
   const redirectTo = searchParams.get("redirect") || "/";
 
-  const appBase = process.env.NEXT_PUBLIC_URL!;
+  const requestOrigin = new URL(req.url).origin;
+  const appBase = process.env.NEXT_PUBLIC_URL || requestOrigin;
 
   if (!token) {
     return NextResponse.redirect(
@@ -23,7 +24,9 @@ export async function GET(req: Request) {
   }
 
   const safeRedirect =
-    redirectTo.startsWith("/") || redirectTo.startsWith(appBase);
+    redirectTo.startsWith("/") ||
+    redirectTo.startsWith(appBase) ||
+    redirectTo.startsWith(requestOrigin);
   const safe = safeRedirect ? redirectTo : "/";
 
   let maxAge = 60 * 60 * 24;
