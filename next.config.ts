@@ -1,5 +1,25 @@
 import type { NextConfig } from "next";
 
+function domain(url?: string) { 
+  if (!url) return "";
+  try {
+    return new URL(url).origin;
+  } catch {
+    return "";
+  }
+}
+
+const API_DOMAINS = [
+  process.env.NEXT_PUBLIC_URL,
+  process.env.AUTH_BASE_URL,
+  process.env.AUTH_LOGIN_PATH,
+  process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL,
+  process.env.NEXT_PUBLIC_LIVE_ISCEAUTH_BACKEND_URL,
+  process.env.NEXT_PUBLIC_LIVE_EVENTS_BACKEND_URL,
+  process.env.NEXT_PUBLIC_API_URL,
+  process.env.NEXT_PUBLIC_EVENT_LIVE_URL,
+].map(domain).filter(Boolean).join(" ");
+
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
@@ -39,10 +59,19 @@ const nextConfig: NextConfig = {
         // Apply security headers to all routes
         source: "/:path*",
         headers: [
+        
+        {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
+         {
+            key: "X-DNS-Prefetch-Control",
+            value: "on",
+          },
           // Prevent clickjacking attacks
           {
             key: "X-Frame-Options",
-            value: "DENY",
+            value: "SAMEORIGIN",
           },
           // Prevent MIME type sniffing
           {
@@ -62,7 +91,7 @@ const nextConfig: NextConfig = {
           // Permissions policy - restrict browser features
           {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+            value: "camera=(self), microphone=(self), geolocation=(self), interest-cohort=()",
           },
           // Content Security Policy - prevent XSS and injection attacks
           {
@@ -73,7 +102,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com data:",
               "img-src 'self' data: https: blob:",
-              "connect-src 'self' https://*.googleapis.com https://maps.googleapis.com https://*.digitaloceanspaces.com https://*.s3.*.amazonaws.com https://cdn.sanity.io https://*.blob.vercel-storage.com",
+              `connect-src 'self' ${API_DOMAINS} https://*.googleapis.com https://maps.googleapis.com https://*.digitaloceanspaces.com https://*.s3.*.amazonaws.com https://cdn.sanity.io https://*.blob.vercel-storage.com"`,
               "frame-src 'self' https://*.google.com https://*.googleapis.com",
               "object-src 'none'",
               "base-uri 'self'",
