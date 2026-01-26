@@ -1,5 +1,6 @@
 import "server-only";
 import { cookies } from "next/headers";
+import { decodeJwt } from "../verify-jwt";
 
 const NEXT_PUBLIC_CONNECT_API_ORIGIN =
   process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL!;
@@ -34,12 +35,4 @@ export async function connectFetch(
 }
 
 // tiny helper to decode JWT payload; use jose if you need signature verification
-export function decodeJwt<T = any>(jwt?: string): T | null {
-  if (!jwt) return null;
-  try {
-    const [, payload] = jwt.split(".");
-    return JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as T;
-  } catch {
-    return null;
-  }
-}
+export { decodeJwt };

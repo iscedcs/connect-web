@@ -1,5 +1,3 @@
-import { decodeJwt } from "./server/connect-fetch";
-
 export async function verifyToken(token: string) {
   try {
     const decoded = decodeJwt(token);
@@ -31,4 +29,28 @@ export function isTokenExpired(token: string | null): boolean {
   // console.log("Current server time:", nowSec, "Token expiration:", decoded.exp);
 
   return decoded.exp <= nowSec;
+}
+
+function base64UrlDecode(input: string): string {
+  const base64 = input.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), "=");
+
+  if (typeof globalThis.atob === "function") {
+    return globalThis.atob(padded);
+  }
+  if (typeof Buffer !== "undefined") {
+    return Buffer.from(padded, "base64").toString("utf8");
+  }
+  throw new Error("No base64 decoder available");
+}
+
+export function decodeJwt<T = any>(jwt?: string): T | null {
+  if (!jwt) return null;
+  try {
+    const [, payload] = jwt.split(".");
+    if (!payload) return null;
+    return JSON.parse(base64UrlDecode(payload)) as T;
+  } catch {
+    return null;
+  }
 }
