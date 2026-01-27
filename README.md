@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ISCE Connect Web
+
+Web application for the ISCE Connect ecosystem, built with Next.js. It powers cardholder and customer experiences, including profile management, shared links, files, events, and QR-based sharing flows.
+
+## Tech Stack
+
+- Next.js App Router
+- React 19, TypeScript
+- Tailwind CSS + Radix UI
+- PNPM for package management
 
 ## Getting Started
 
-First, run the development server:
+Install dependencies:
 
 ```bash
-npm run dev
-# or 
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Run the development server (configured to use port 3154):
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open `http://localhost:3154` in your browser.
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+- `pnpm dev` - start the dev server on port 3154
+- `pnpm build` - build for production
+- `pnpm start` - start the production server
+- `pnpm lint` - run Next.js linting
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Environment Variables
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Create a `.env` file with the required values. Common variables used by the app:
 
-## Deploy on Vercel
+- `NEXT_PUBLIC_URL`
+- `AUTH_BASE_URL`
+- `AUTH_LOGIN_PATH`
+- `NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL`
+- `NEXT_PUBLIC_LIVE_ISCEAUTH_BACKEND_URL`
+- `NEXT_PUBLIC_LIVE_EVENTS_BACKEND_URL`
+- `NEXT_PUBLIC_API_URL`
+- `NEXT_PUBLIC_EVENT_LIVE_URL`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project Structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `app/` - Next.js app router routes and layouts
+- `components/` - UI components and feature modules
+- `lib/` - utilities, services, and shared logic
+- `schemas/` - zod schemas and validation
+- `public/` - static assets
+
+## Documentation
+
+- `_Multi-Profile-Connect-API-Documentation.md`
+- `NEW_API_IMPROVEMENTS_ON_CONNECT.md`
+- `NEW_ENDPOINT_REQUEST_ON_CONNECT.md`
+- `_CONNECT_UI_FUTURE_IMPROVEMENTS.md`

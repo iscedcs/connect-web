@@ -193,7 +193,8 @@ export default function EditProfileForm({
               name="profileImage"
               render={({ field: { value, onChange } }) => (
                 <ImagePicker
-                  value={value ?? null}
+                  value={value instanceof File ? value : null}
+                  initialUrl={typeof value === "string" ? value : null}
                   onChange={onChange}
                   variant="profile"
                 />
@@ -208,7 +209,8 @@ export default function EditProfileForm({
               name="coverImage"
               render={({ field: { value, onChange } }) => (
                 <ImagePicker
-                  value={value ?? null}
+                  value={value instanceof File ? value : null}
+                  initialUrl={typeof value === "string" ? value : null}
                   onChange={onChange}
                   variant="cover"
                   placeholder={

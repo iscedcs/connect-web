@@ -5,6 +5,7 @@ import clsx from "clsx";
 
 type Props = {
   value?: File | null;
+  initialUrl?: string | null;
   onChange: (file: File | null) => void;
   variant?: "profile" | "cover";
   className?: string;
@@ -13,6 +14,7 @@ type Props = {
 
 export default function ImagePicker({
   value,
+  initialUrl,
   onChange,
   variant = "profile",
   className,
@@ -21,12 +23,11 @@ export default function ImagePicker({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const pick = () => inputRef.current?.click();
 
-  const url =
-    typeof value === "string"
-      ? value
-      : value instanceof File
-      ? URL.createObjectURL(value)
-      : null;
+  const url = value
+    ? URL.createObjectURL(value)
+    : initialUrl
+    ? initialUrl
+    : null;
 
   // profile: tall small box; cover: wide box
   const base = variant === "profile" ? "w-28 h-40" : "w-full h-32";
