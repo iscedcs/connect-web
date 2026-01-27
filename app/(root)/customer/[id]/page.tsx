@@ -1,4 +1,5 @@
 import PublicProfileTabs from "@/components/customer/public-profile-tabs";
+import ShareQrDialog from "@/components/customer/share-qr-dialog";
 import { EmailIcon, PhoneIcon } from "@/lib/icons";
 import { fetchPublicUserEvent } from "@/lib/services/events";
 import { fetchPublicProfile } from "@/lib/services/public-profile";
@@ -128,7 +129,7 @@ export default async function CustomerProfilePage({ params }: any) {
 
   const { profile, contact, device } = profileData;
 
-  console.log("PUBLIC PROFILE USERID:", userId, events);
+  // console.log("PUBLIC PROFILE USERID:", userId, events);
 
   const connectItems = buildConnectList(profileData);
 
@@ -173,11 +174,18 @@ export default async function CustomerProfilePage({ params }: any) {
           <button className="px-5 py-2 bg-white/5 border border-[#868686] rounded-full text-xs">
             <Link href={`/customer/${id}/save-contact`}>Exchange Contact</Link>
           </button>
-          <button className="px-5 py-2 bg-white/5 border border-[#868686] rounded-full text-xs">
+          {/* <button className="px-5 py-2 bg-white/5 border border-[#868686] rounded-full text-xs">
             <Link href="#">Save contact</Link>
-          </button>
+          </button> */}
 
-          <div className="flex items-center gap-4 text-xl ml-auto">
+          <div className="flex items-center gap-2 text-xl ml-auto">
+            <ShareQrDialog
+              profileId={id}
+              profile={profile}
+              contact={contact}
+              links={profileData?.links ?? profile?.links ?? []}
+              socials={profileData?.socials ?? profile?.socials ?? []}
+            />
             {contact?.primary?.phone_number && (
               <a href={`tel:${contact.primary.phone_number}`}>
                 <PhoneIcon />

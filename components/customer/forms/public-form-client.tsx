@@ -55,46 +55,70 @@ export default function PublicFormClient({ profile, form }: any) {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white px-4 pt-6 pb-16">
-      {/* Profile context */}
-      <div className="flex items-center gap-3 mb-6">
-        <img
-          src={profile.profilePhoto}
-          className="w-12 h-12 rounded-full border border-white/10"
-        />
-        <div>
-          <p className="font-semibold">{profile.name}</p>
-          <p className="text-xs text-white/50">{profile.position}</p>
-        </div>
-      </div>
-
-      {/* Form card */}
-      <div className="bg-neutral-900/80 border border-white/10 rounded-2xl p-5 space-y-4">
-        <div>
-          <h1 className="text-xl font-extrabold">{form.title}</h1>
-          {form.description && (
-            <p className="text-sm text-white/60 mt-1">{form.description}</p>
-          )}
-        </div>
-
-        {/* Fields */}
-        <div className="space-y-4">
-          {form.fields.map((field: any) => (
-            <FieldRenderer
-              key={field.id}
-              field={field}
-              value={values[field.name]}
-              onChange={handleChange}
-            />
-          ))}
+    <main className="min-h-screen bg-black text-white">
+      <div className="mx-auto w-full max-w-screen-sm px-4 pb-16 pt-6">
+        {/* Profile context */}
+        <div className="mb-6 rounded-2xl border border-white/10 bg-white/5 p-4">
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-12 overflow-hidden rounded-full border border-white/10 bg-white/10">
+              {profile.profilePhoto ? (
+                <img
+                  src={profile.profilePhoto}
+                  className="h-full w-full object-cover"
+                  alt={profile.name ?? "Profile photo"}
+                />
+              ) : null}
+            </div>
+            <div className="min-w-0">
+              <p className="font-semibold truncate">{profile.name}</p>
+              <p className="text-xs text-white/50 truncate">
+                {profile.position || "Contact form"}
+              </p>
+            </div>
+            <span className="ml-auto rounded-full border border-white/10 bg-white/10 px-2 py-1 text-[10px] uppercase tracking-wider text-white/60">
+              Public Form
+            </span>
+          </div>
         </div>
 
-        <Button
-          className="w-full mt-4"
-          onClick={handleSubmit}
-          disabled={submitting}>
-          {submitting ? "Submitting..." : "Submit"}
-        </Button>
+        {/* Form card */}
+        <div className="rounded-3xl border border-white/10 bg-neutral-950/80 p-5 shadow-[0_20px_60px_-40px_rgba(0,0,0,0.9)]">
+          <div className="mb-5">
+            <p className="text-xs uppercase tracking-wider text-white/40">
+              {form.category || "Form"}
+            </p>
+            <h1 className="mt-2 text-2xl font-semibold leading-tight">
+              {form.title}
+            </h1>
+            {form.description && (
+              <p className="mt-2 text-sm text-white/60">{form.description}</p>
+            )}
+          </div>
+
+          {/* Fields */}
+          <div className="space-y-4">
+            {form.fields.map((field: any) => (
+              <div
+                key={field.id}
+                className="rounded-2xl border border-white/10 bg-white/5 p-3"
+              >
+                <FieldRenderer
+                  field={field}
+                  value={values[field.name]}
+                  onChange={handleChange}
+                />
+              </div>
+            ))}
+          </div>
+
+          <Button
+            className="mt-6 h-12 w-full rounded-2xl text-base font-semibold"
+            onClick={handleSubmit}
+            disabled={submitting}
+          >
+            {submitting ? "Submitting..." : "Submit"}
+          </Button>
+        </div>
       </div>
     </main>
   );

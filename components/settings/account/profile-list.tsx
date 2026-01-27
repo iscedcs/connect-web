@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import ProfileCard from "./profile-card";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { URLS } from "@/lib/const";
 import { LeftIcon } from "@/lib/icons";
@@ -42,12 +42,19 @@ export default function ProfileList({
   const router = useRouter();
   return (
     <div className="space-y-4">
-      <div className="mb-3">
+      <div className="mb-3 flex items-center justify-between gap-3">
         <button
           onClick={() => router.back()}
           className="inline-flex items-center gap-2 bg-transparent hover:bg-transparent cursor-pointer text-white/90">
           <LeftIcon />
         </button>
+
+        <Button
+          className="h-10 px-4 rounded-full bg-gradient-to-r from-primary  text-white font-semibold shadow-md shadow-emerald-500/20 hover:from-emerald-500 hover:to-teal-400"
+          onClick={() => (window.location.href = "/settings/account/create")}>
+          <Plus className="h-4 w-4 mr-2" />
+          Create profile
+        </Button>
       </div>
       {list.map((profile) => (
         <ProfileCard
@@ -57,12 +64,6 @@ export default function ProfileList({
           onUpdated={refresh}
         />
       ))}
-
-      <Button
-        className="w-full mt-6 cursor-pointer"
-        onClick={() => (window.location.href = "/settings/account/create")}>
-        Create new profile
-      </Button>
 
       <Button
         variant="ghost"

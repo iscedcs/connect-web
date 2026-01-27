@@ -1,9 +1,16 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { URLS } from "@/lib/const";
+import { Copy, MoreHorizontal, Pencil, Star, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import CloneProfileButton from "./clone-profile-button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -28,6 +35,7 @@ export default function ProfileCard({
 
   const [isSettingDefault, setIsSettingDefault] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isCloning, setIsCloning] = useState(false);
 
   const handleSetDefault = async () => {
     if (isSettingDefault) return;
@@ -88,67 +96,110 @@ export default function ProfileCard({
     }
   };
 
+  const handleClone = async () => {
+    if (isCloning) return;
+
+    setIsCloning(true);
+
+    try {
+      const url = `${
+        process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+      }${URLS.multi_profile.clone_a_profile.replace(
+        "{profileId}",
+        profile.id
+      )}`;
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      const json = await res.json();
+
+      if (res.ok) {
+        toast.success("Profile cloned successfully");
+        window.location.href = "/settings/account";
+      } else {
+        toast.error(json.message);
+      }
+    } finally {
+      setIsCloning(false);
+    }
+  };
+
   return (
-    <div className="p-4 bg-neutral-900 rounded-xl border border-white/10">
-      <div className="flex items-center gap-3">
-        <img
-          src={profile.profilePhoto ?? "/assets/default-avatar.png"}
-          className="w-14 h-14 rounded-full object-cover"
-        />
+    <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-neutral-900/80 p-4 shadow-sm shadow-black/40 transition hover:border-white/20 hover:shadow-black/60">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="relative">
+            <img
+              src={profile.profilePhoto ?? "/assets/default-avatar.png"}
+              className="h-12 w-12 sm:h-14 sm:w-14 rounded-full object-cover ring-2 ring-white/10"
+            />
+            {profile.is_default && (
+              <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-400 ring-2 ring-neutral-900" />
+            )}
+          </div>
 
-        <div className="flex-1">
-          <p className="font-semibold">{profile.name}</p>
-          <p className="text-white/40 text-sm">{profile.position}</p>
+          <div className="min-w-0">
+            <p className="font-semibold text-white truncate">{profile.name}</p>
+            <p className="text-white/50 text-sm truncate">
+              {profile.position || "—"}
+            </p>
 
-          {profile.is_default && (
-            <span className="inline-block px-2 py-0.5 text-xs mt-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-              Default Profile
-            </span>
-          )}
+            {profile.is_default && (
+              <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs text-emerald-300 border border-emerald-500/20">
+                Default Profile
+              </span>
+            )}
+          </div>
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-1">
           <Button
-            size="sm"
-            className="cursor-pointer"
-            variant="secondary"
+            size="icon"
+            variant="ghost"
+            className="h-8 w-8 text-white/70 hover:text-white"
             onClick={() =>
               (window.location.href = `/settings/account/edit/${profile.id}`)
-            }>
-            Edit
+            }
+            aria-label="Edit profile">
+            <Pencil className="h-4 w-4" />
           </Button>
 
-          {!profile.is_default && (
-            <Button
-              size="sm"
-              className="cursor-pointer"
-              onClick={handleSetDefault}
-              disabled={isSettingDefault}>
-              {isSettingDefault ? (
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              ) : (
-                "Set default"
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8 text-white/70 hover:text-white"
+                aria-label="Profile actions">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleClone} disabled={isCloning}>
+                <Copy className="h-4 w-4" />
+                {isCloning ? "Cloning..." : "Clone profile"}
+              </DropdownMenuItem>
+              {!profile.is_default && (
+                <DropdownMenuItem
+                  onClick={handleSetDefault}
+                  disabled={isSettingDefault}>
+                  <Star className="h-4 w-4" />
+                  {isSettingDefault ? "Setting..." : "Set as default"}
+                </DropdownMenuItem>
               )}
-            </Button>
-          )}
-
-          <CloneProfileButton
-            profileId={profile.id}
-            accessToken={accessToken!}
-          />
-
-          <Button
-            size="sm"
-            className="cursor-pointer"
-            variant="destructive"
-            onClick={handleDelete}
-            disabled={isDeleting}>
-            {isDeleting ? (
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              "Delete"
-            )}
-          </Button>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={isDeleting}>
+                <Trash2 className="h-4 w-4" />
+                {isDeleting ? "Deleting..." : "Delete profile"}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </div>

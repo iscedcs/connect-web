@@ -50,7 +50,11 @@ export default function ProfileClient({
         name: profile?.name ?? "",
         position: profile?.position ?? "",
         bio: profile?.description ?? "",
-        address: profile?.address?.street ?? "",
+        address:
+          profile?.address?.street ??
+          profile?.address ??
+          profile?.location ??
+          "",
         profileImage: profile?.profilePhoto ?? null,
         coverImage: profile?.coverPhoto ?? null,
       }
