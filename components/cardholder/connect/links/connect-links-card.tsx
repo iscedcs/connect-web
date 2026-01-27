@@ -134,7 +134,7 @@ export default function LinkCard({
   return (
     <div
       className={`bg-neutral-900/60 border border-white/10 rounded-xl p-4 
-    flex justify-between items-center 
+    flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3
     transition-all duration-200 
     hover:bg-neutral-900 hover:shadow-lg
     hover:scale-[1.05] hover:border-white/20 hover:-translate-y-[2px] hover:shadow-black/30
@@ -150,7 +150,7 @@ export default function LinkCard({
       onTouchEnd={handleLongPressEnd}>
       {" "}
       <div
-        className="flex items-center gap-3 cursor-pointer"
+        className="flex items-center gap-3 cursor-pointer w-full min-w-0"
         onClick={() => selectionMode && toggleSelect?.(link.id)}>
         <div className="w-10 h-10 bg-neutral-800 rounded-full flex items-center justify-center">
           <img
@@ -169,7 +169,7 @@ export default function LinkCard({
         </div>
       </div>
       {!showRestore ? (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-start flex-shrink-0">
           {!selectionMode && (
             <>
               <ToggleIcon

@@ -41,9 +41,9 @@ export default function EditProfileForm({
     mode: "onChange",
     defaultValues: {
       name: "",
-      position: " ",
-      bio: " ",
-      address: " ",
+      position: "",
+      bio: "",
+      address: "",
 
       profileImage: null,
       coverImage: null,
