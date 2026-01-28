@@ -59,12 +59,7 @@ const nextConfig: NextConfig = {
         // Apply security headers to all routes
         source: "/:path*",
         headers: [
-        
-        {
-            key: "Strict-Transport-Security",
-            value: "max-age=63072000; includeSubDomains; preload",
-          },
-         {
+          {
             key: "X-DNS-Prefetch-Control",
             value: "on",
           },
@@ -101,7 +96,7 @@ const nextConfig: NextConfig = {
               "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://maps.googleapis.com https://*.googleapis.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com data:",
-              "img-src 'self' data: https: blob:",
+              "img-src 'self' data: https://cdn.sanity.io https://*.digitaloceanspaces.com https://*.s3.*.amazonaws.com https://i.ytimg.com https://*.blob.vercel-storage.com https://encrypted-tbn0.gstatic.com blob:",
               `connect-src 'self' ${API_DOMAINS} https://*.googleapis.com https://maps.googleapis.com https://open.spotify.com https://*.s3.amazonaws.com https://*.digitaloceanspaces.com  https://cdn.sanity.io https://*.blob.vercel-storage.com`,
               "frame-src 'self' https://*.google.com https://*.googleapis.com https://www.youtube.com https://open.spotify.com https://fra1.digitaloceanspaces.com",
               "object-src 'none'",
