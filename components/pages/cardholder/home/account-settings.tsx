@@ -79,6 +79,7 @@ export default function AccountSettingsList({
             <Link
               key={label}
               href={href!}
+              prefetch={href === "/auth/logout" ? false : undefined}
               className="flex items-center justify-between px-4 py-4 hover:bg-neutral-800 active:bg-neutral-800">
               <div className="flex items-center gap-3">
                 <Icon className="w-5 h-5 text-gray-200" />

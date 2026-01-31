@@ -6,11 +6,21 @@ export async function GET(req: Request) {
   const token = searchParams.get("token");
   const redirectTo = searchParams.get("redirect") || "/";
 
-  const appBase = process.env.NEXT_PUBLIC_URL!;
+  const requestOrigin = new URL(req.url).origin;
+  const appBase = process.env.NEXT_PUBLIC_URL || requestOrigin;
+
+  const safeRedirect =
+    redirectTo.startsWith("/") ||
+    redirectTo.startsWith(appBase) ||
+    redirectTo.startsWith(requestOrigin);
+  const safe = safeRedirect ? redirectTo : "/";
+
+  const callbackUrl = new URL("/auth/callback", appBase);
+  callbackUrl.searchParams.set("redirect", safe);
 
   if (!token) {
     return NextResponse.redirect(
-      `${process.env.AUTH_BASE_URL}/sign-in?redirect_uri=${appBase}`
+      `${process.env.AUTH_BASE_URL}/sign-in?redirect_uri=${callbackUrl.toString()}`
     );
   }
 
@@ -18,13 +28,9 @@ export async function GET(req: Request) {
 
   if (!valid) {
     return NextResponse.redirect(
-      `${process.env.AUTH_BASE_URL}/sign-in?redirect_uri=${appBase}`
+      `${process.env.AUTH_BASE_URL}/sign-in?redirect_uri=${callbackUrl.toString()}`
     );
   }
-
-  const safeRedirect =
-    redirectTo.startsWith("/") || redirectTo.startsWith(appBase);
-  const safe = safeRedirect ? redirectTo : "/";
 
   let maxAge = 60 * 60 * 24;
   try {
