@@ -10,11 +10,11 @@ export async function fetchPublicProfile(deviceId: string) {
   try {
     const url = `${CONNECT_API}${URLS.profile.public.replace(
       "{deviceId}",
-      deviceId
+      deviceId,
     )}`;
 
     const res = await http.get(url);
-
+    console.log(res.data?.data);
     return res.data?.data ?? null;
   } catch (err) {
     console.error("Public profile fetch failed →", err);

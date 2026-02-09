@@ -32,7 +32,7 @@ function buildConnectList(data: any) {
       title: item.title,
       url: item.url,
       icon: ICONS.spotify,
-    })
+    }),
   );
 
   data.meetings?.forEach((m: any) =>
@@ -41,7 +41,7 @@ function buildConnectList(data: any) {
       title: "Calendly",
       url: m.url,
       icon: ICONS.calendly,
-    })
+    }),
   );
 
   data.videos?.forEach((v: any) =>
@@ -50,7 +50,7 @@ function buildConnectList(data: any) {
       title: v.title,
       url: v.url,
       icon: ICONS.youtube,
-    })
+    }),
   );
 
   data.files?.forEach((f: any) =>
@@ -59,7 +59,7 @@ function buildConnectList(data: any) {
       title: f.title,
       url: f.url,
       icon: ICONS.file,
-    })
+    }),
   );
 
   data.socials?.forEach((s: any) =>
@@ -68,7 +68,7 @@ function buildConnectList(data: any) {
       title: s.platform,
       url: s.url,
       icon: ICONS.socials,
-    })
+    }),
   );
 
   data.links?.forEach((l: any) =>
@@ -77,7 +77,7 @@ function buildConnectList(data: any) {
       title: l.title,
       url: l.url,
       icon: ICONS.link,
-    })
+    }),
   );
 
   data.forms?.forEach((f: any) =>
@@ -86,7 +86,7 @@ function buildConnectList(data: any) {
       title: f.title,
       url: f.url,
       icon: ICONS.google_forms,
-    })
+    }),
   );
   data.appointments?.forEach((a: any) =>
     list.push({
@@ -95,7 +95,7 @@ function buildConnectList(data: any) {
       title: a.label || "Book An Appointment With me",
       url: a.url,
       icon: ICONS.appointments,
-    })
+    }),
   );
 
   data.wallets?.forEach((w: any) =>
@@ -104,7 +104,7 @@ function buildConnectList(data: any) {
       title: w.network || "Crypto Wallet",
       url: w.address,
       icon: ICONS.crypto,
-    })
+    }),
   );
 
   return list;
@@ -116,6 +116,7 @@ function buildConnectList(data: any) {
 export default async function CustomerProfilePage({ params }: any) {
   const { id } = await params;
   const profileData = await fetchPublicProfile(id);
+  // console.log(`Profile Data: ${profileData.profile.userId}`);
 
   const userId = profileData?.profile?.userId;
   const events = await fetchPublicUserEvent(userId);
