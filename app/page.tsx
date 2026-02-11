@@ -1,86 +1,65 @@
-import { getAuthInfo } from "@/actions/auth";
-import AccountSettingsList from "@/components/pages/cardholder/home/account-settings";
-import ConnectManagementWrapper from "@/components/pages/cardholder/home/connect-management-wrapper";
-import DevicesCard from "@/components/pages/cardholder/home/device-section";
-import EventCard from "@/components/pages/cardholder/home/event-card";
-import DevicesConnectedCard from "@/components/pages/cardholder/home/filled-state/device-connected";
-import ProfileHeader from "@/components/pages/cardholder/home/profile-header";
-import PromoBanner from "@/components/pages/cardholder/home/promo-banner";
-import { getConnectModules } from "@/lib/services/connect-modules";
-import { getUserDevices } from "@/lib/services/device";
-import { getConnectProfile } from "@/lib/services/profile";
-import { generateMetadata } from "@/lib/metadata";
+import { Navbar } from '@/components/landing/navbar';
+import { Hero } from '@/components/landing/hero';
+import { MarqueeBanner } from '@/components/landing/marquee-banner';
+import { Features } from '@/components/landing/features';
+import { HowItWorks } from '@/components/landing/how-it-works';
+import { ProfilePreview } from '@/components/landing/profile-preview';
+import { ModulesShowcase } from '@/components/landing/modules-showcase';
+import { Comparison } from '@/components/landing/comparison';
+import { UseCases } from '@/components/landing/use-cases';
+import { Testimonials } from '@/components/landing/testimonials';
+import { CtaSection } from '@/components/landing/cta-section';
+import { Footer } from '@/components/landing/footer';
+import { Metadata, Viewport } from 'next';
+import { redirect } from 'next/navigation';
 
-export const metadata = generateMetadata({
-  title: "Home",
-  description:
-    "Manage your digital lifestyle, connect with NFC and QR codes, manage devices, and access all your Connect features in one place.",
-  keywords: ["home", "dashboard", "connect", "devices", "profile"],
-});
+export const metadata: Metadata = {
+	title: 'Connect | The Future of Networking - ISCE Digital Concept',
+	description:
+		'Connect is a modern digital networking solution. Share your entire professional identity with a single tap. NFC cards, QR codes, and rich digital profiles.',
+	keywords: [
+		'digital business card',
+		'NFC networking',
+		'QR code profile',
+		'ISCE',
+		'Connect',
+		'professional networking',
+	],
+};
 
-export default async function HomePage() {
-  const [connectProfile, authInfo] = await Promise.all([
-    getConnectProfile(),
-    getAuthInfo(),
-  ]);
-  console.log({ authInfo });
-  const isAuthed = !("error" in authInfo) && !authInfo.isExpired;
-  const accessToken = isAuthed ? authInfo.accessToken : null;
-  const userId = isAuthed ? authInfo.user.id : null;
+export const viewport: Viewport = {
+	themeColor: '#000000',
+	width: 'device-width',
+	initialScale: 1,
+};
+type SearchParams = Promise<{ id: string }>;
 
-  let userDevices: DeviceInterface[] = [];
-  if (userId && accessToken) {
-    userDevices = await getUserDevices(userId, accessToken);
-  }
-  // console.log("User Profile ID", `${connectProfile?.id}`);
-  // console.log("User Devices", `${userDevices}`);
-  // console.log("User Detials", `${connectProfile}`);
-  const hasDevices = userDevices.length > 0;
+export default async function HomePage({
+	searchParams,
+}: {
+	children: React.ReactNode;
+	searchParams: SearchParams;
+}) {
+	const { id } = await searchParams;
 
-  let connectModules = null;
+	if (id) {
+		redirect(`/customer/${id}`);
+	}
 
-  if (connectProfile?.id && accessToken) {
-    connectModules = await getConnectModules(connectProfile.id, accessToken);
-  }
-  return (
-    <main className="relative bg-black text-white min-h-screen overflow-x-hidden">
-      <section className="fixed  top-0 left-0 right-0 z-50  pointer-events-none">
-        <div className="max-w-md  mx-auto pointer-events-auto">
-          <ProfileHeader connectProfile={connectProfile} user={authInfo.user} />
-        </div>{" "}
-      </section>
-      {/* <section className=''>
-				<NFCChecker />
-			</section> */}
-
-      <div className="pt-80  space-y-10">
-        <section className="p-4 space-y-5">
-          <PromoBanner />
-          <EventCard />
-        </section>
-        <section className="p-4 space-y-10">
-          {hasDevices ? (
-            <DevicesConnectedCard devices={userDevices} />
-          ) : (
-            <DevicesCard />
-          )}
-          {/* <WalletCard /> */}
-        </section>
-        <section className="p-4 space-y-10">
-          {accessToken && connectProfile?.id && (
-            <ConnectManagementWrapper initialModules={connectModules} />
-          )}
-
-          {/* <StoreManagement /> */}
-        </section>
-
-        <section className="p-4">
-          <AccountSettingsList
-            isAuthenticated={isAuthed}
-            profileId={connectProfile?.id!}
-          />
-        </section>
-      </div>
-    </main>
-  );
+	return (
+		<main className='relative'>
+			<Navbar />
+			<Hero />
+			<MarqueeBanner />
+			<Features />
+			<HowItWorks />
+			<ProfilePreview />
+			<ModulesShowcase />
+			<Comparison />
+			<UseCases />
+			<Testimonials />
+			<CtaSection />
+			<Footer />
+		</main>
+	);
 }

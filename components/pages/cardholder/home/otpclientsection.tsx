@@ -1,33 +1,21 @@
-"use client";
-import OtpScreen from "@/components/cardholder/otp/otp-screen";
-import React from "react";
+'use client';
+import OtpScreen from '@/components/cardholder/otp/otp-screen';
 
 interface OtpClientSectionProps {
-  cardId?: string;
-  deviceType?: string;
+	cardId?: string;
+	deviceType?: string;
 }
 
 export default function OtpClientSection({
-  cardId,
-  deviceType,
+	cardId,
+	deviceType,
 }: OtpClientSectionProps) {
-  // Log the received parameters for debugging
-  React.useEffect(() => {
-    if (cardId) {
-      console.log("Card ID received:", cardId);
-    }
-    if (deviceType) {
-      console.log("Device type received:", deviceType);
-    }
-  }, [cardId, deviceType]);
-
-  return (
-    <OtpScreen
-      state="idle"
-      cardId={cardId}
-      deviceType={deviceType}
-      onResend={() => console.log("resend…")}
-      onVerify={async (code) => (code === "944517" ? "success" : "error")}
-    />
-  );
+	return (
+		<OtpScreen
+			state='idle'
+			cardId={cardId}
+			deviceType={deviceType}
+			onVerify={async (code) => (code === '944517' ? 'success' : 'error')}
+		/>
+	);
 }

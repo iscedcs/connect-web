@@ -1,44 +1,50 @@
-import { cookies } from "next/headers";
-
-function decodeJwtPayload<T = any>(jwt: string): T | null {
-  try {
-    const base64 = jwt.split(".")[1];
-    return JSON.parse(Buffer.from(base64, "base64").toString("utf-8"));
-  } catch {
-    return null;
-  }
-}
+import { cookies } from 'next/headers';
+import { verifyToken } from '@/lib/verify-jwt';
 
 export async function getBearerAndUserId(): Promise<{
-  token?: string;
-  userId?: string;
-  error?: Response;
+	token?: string;
+	userId?: string;
+	error?: Response;
 }> {
-  const token = (await cookies()).get("accessToken")?.value;
+	const token = (await cookies()).get('accessToken')?.value;
 
-  if (!token) {
-    return {
-      error: new Response(JSON.stringify({ message: "Unauthorized" }), {
-        status: 401,
-        headers: { "content-type": "application/json" },
-      }),
-    };
-  }
+	if (!token) {
+		return {
+			error: new Response(JSON.stringify({ message: 'Unauthorized' }), {
+				status: 401,
+				headers: { 'content-type': 'application/json' },
+			}),
+		};
+	}
 
-  const payload = decodeJwtPayload<any>(token);
-  const userId = payload?.id || payload?.sub || payload?.userId;
+	const { valid, payload } = await verifyToken(token);
 
-  if (!userId) {
-    return {
-      error: new Response(
-        JSON.stringify({ message: "User id missing in token" }),
-        {
-          status: 401,
-          headers: { "content-type": "application/json" },
-        }
-      ),
-    };
-  }
+	if (!valid || !payload) {
+		return {
+			error: new Response(
+				JSON.stringify({ message: 'Invalid or expired token' }),
+				{
+					status: 401,
+					headers: { 'content-type': 'application/json' },
+				},
+			),
+		};
+	}
 
-  return { token, userId };
+	const userId =
+		(payload as any).id || (payload as any).sub || (payload as any).userId;
+
+	if (!userId) {
+		return {
+			error: new Response(
+				JSON.stringify({ message: 'User id missing in token' }),
+				{
+					status: 401,
+					headers: { 'content-type': 'application/json' },
+				},
+			),
+		};
+	}
+
+	return { token, userId };
 }
