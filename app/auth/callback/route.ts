@@ -27,16 +27,12 @@ export async function GET(req: Request) {
 	callbackUrl.searchParams.set('redirect', safe);
 
 	if (!token) {
-		console.warn('[auth/callback] No token in URL, redirecting to sign-in');
 		return NextResponse.redirect(buildSignInRedirect(callbackUrl));
 	}
 
 	const { valid } = await verifyToken(token);
 
 	if (!valid) {
-		console.warn(
-			'[auth/callback] Token verification failed, redirecting to sign-in',
-		);
 		return NextResponse.redirect(buildSignInRedirect(callbackUrl));
 	}
 

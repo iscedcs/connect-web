@@ -50,7 +50,6 @@ export class WebNFCUtils {
 			const reader = new NDEFReader();
 			return true;
 		} catch (error) {
-			console.warn('NFC capability check failed:', error);
 			return false;
 		}
 	}
@@ -68,7 +67,7 @@ export class WebNFCUtils {
 	async startScan(
 		onReading: (event: NFCReadingEvent) => void,
 		onError?: (error: Error) => void,
-		options?: NFCScanOptions
+		options?: NFCScanOptions,
 	): Promise<void> {
 		if (!WebNFCUtils.isNFCSupported()) {
 			throw new Error('Web NFC is not supported in this browser');
@@ -101,7 +100,7 @@ export class WebNFCUtils {
 			if (onError) {
 				this.reader.addEventListener('readingerror', (event: any) => {
 					onError(
-						new Error(event.error || 'Unknown NFC reading error')
+						new Error(event.error || 'Unknown NFC reading error'),
 					);
 				});
 			}
@@ -143,7 +142,7 @@ export class WebNFCUtils {
 					this.stopScan();
 					reject(error);
 				},
-				{ ...options, signal: controller.signal }
+				{ ...options, signal: controller.signal },
 			).catch(reject);
 		});
 	}
@@ -198,7 +197,7 @@ export class WebNFCUtils {
 	 * Scan for card data (ID and type)
 	 */
 	async scanForCardData(
-		options?: NFCScanOptions
+		options?: NFCScanOptions,
 	): Promise<{ id: string; type: string | null }> {
 		const event = await this.scanOnce(options);
 
@@ -231,7 +230,7 @@ export class WebNFCUtils {
 				{
 					records: [{ recordType: 'text', data: text }],
 				},
-				options
+				options,
 			);
 		} catch (error) {
 			throw new Error(`Failed to write NFC tag: ${error}`);
@@ -252,7 +251,7 @@ export class WebNFCUtils {
 				{
 					records: [{ recordType: 'url', data: url }],
 				},
-				options
+				options,
 			);
 		} catch (error) {
 			throw new Error(`Failed to write NFC tag: ${error}`);
@@ -316,7 +315,7 @@ declare global {
 		constructor();
 		write(
 			message: { records: any[] },
-			options?: { overwrite?: boolean; signal?: AbortSignal }
+			options?: { overwrite?: boolean; signal?: AbortSignal },
 		): Promise<void>;
 	}
 }

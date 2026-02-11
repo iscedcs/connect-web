@@ -1,39 +1,36 @@
-import { URLS } from "@/lib/const";
+import { URLS } from '@/lib/const';
 
 /** ---------------------------------------
- * FETCH A DEVICE HOLDER PUBLIC EVENT 
+ * FETCH A DEVICE HOLDER PUBLIC EVENT
  -----------------------------------------*/
 export async function fetchPublicUserEvent(userId: string) {
-  if (!userId) return [];
+	if (!userId) return [];
 
-  const baseUrl = process.env.NEXT_PUBLIC_LIVE_EVENTS_BACKEND_URL;
-  const path = URLS.events.public_user_events.replace("{userId}", userId);
-  const url = `${baseUrl}${path}`;
-  try {
-    const res = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      cache: "no-store",
-    });
+	const baseUrl = process.env.NEXT_PUBLIC_LIVE_EVENTS_BACKEND_URL;
+	const path = URLS.events.public_user_events.replace('{userId}', userId);
+	const url = `${baseUrl}${path}`;
+	try {
+		const res = await fetch(url, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			cache: 'no-store',
+		});
 
-    const payload = await res.json();
+		const payload = await res.json();
 
-    if (!res.ok) {
-      if (payload?.message === "No events found") {
-        return [];
-      }
+		if (!res.ok) {
+			if (payload?.message === 'No events found') {
+				return [];
+			}
+			return [];
+		}
 
-      console.error("Failed to fetch public events", payload);
-      return [];
-    }
-
-    return payload?.data ?? [];
-  } catch (error) {
-    console.error("Public events fetch error:", error);
-    return [];
-  }
+		return payload?.data ?? [];
+	} catch (error) {
+		return [];
+	}
 }
 
 // export async function fetchUserEvents(userId: string) {
@@ -44,7 +41,6 @@ export async function fetchPublicUserEvent(userId: string) {
 
 //     return res.data?.data?.events ?? [];
 //   } catch (err) {
-//     console.error("Events fetch failed →", err);
 //     return [];
 //   }
 // }

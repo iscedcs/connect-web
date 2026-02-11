@@ -120,9 +120,7 @@ export default function ConnectScanScreen({
 					return;
 				}
 			}
-		} catch (e) {
-			console.warn('Barcode detect failed:', e);
-		}
+		} catch {}
 		rafRef.current = requestAnimationFrame(scanLoop);
 	}
 

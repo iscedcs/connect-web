@@ -16,7 +16,6 @@ export async function fetchPublicProfile(deviceId: string) {
 		const res = await http.get(url);
 		return res.data?.data ?? null;
 	} catch (err) {
-		console.error('Public profile fetch failed →', err);
 		return null;
 	}
 }
