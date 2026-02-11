@@ -8,6 +8,10 @@ import { getPlatformInfo } from '@/lib/connect-social/detect-platform';
 import { ICONS, COVER_PHOTOS } from '@/lib/const';
 import Image from 'next/image';
 import Link from 'next/link';
+import type { Metadata } from 'next';
+
+/** Profile visibility - will be fetched from user settings in future */
+const profileIsPublic = false;
 
 /** Deterministic hash from string - same input always gives same output */
 function hashCode(str: string): number {
@@ -17,6 +21,57 @@ function hashCode(str: string): number {
 		hash |= 0;
 	}
 	return Math.abs(hash);
+}
+
+/** ---------------------------------------
+ * DYNAMIC METADATA
+ -----------------------------------------*/
+export async function generateMetadata({
+	params,
+}: {
+	params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+	const { id } = await params;
+	const profileData = await fetchPublicProfile(id);
+
+	if (!profileData) {
+		return {
+			title: 'Profile Not Found | Connect',
+			robots: { index: false, follow: false },
+		};
+	}
+
+	const { profile } = profileData;
+	const title = `${profile.name} | Connect`;
+	const description =
+		profile.bio ||
+		`${profile.name}${profile.position ? ` - ${profile.position}` : ''}. Connect with me on ISCE Connect.`;
+	const fallbackCover = COVER_PHOTOS[hashCode(id) % COVER_PHOTOS.length];
+	const ogImage =
+		profile.coverPhoto?.startsWith('http') ? profile.coverPhoto
+		: profile.profilePhoto?.startsWith('http') ? profile.profilePhoto
+		: fallbackCover;
+
+	return {
+		title,
+		description,
+		robots:
+			profileIsPublic ?
+				{ index: true, follow: true }
+			:	{ index: false, follow: false },
+		openGraph: {
+			title,
+			description,
+			type: 'profile',
+			images: ogImage ? [{ url: ogImage }] : undefined,
+		},
+		twitter: {
+			card: 'summary_large_image',
+			title,
+			description,
+			images: ogImage ? [ogImage] : undefined,
+		},
+	};
 }
 
 /** ---------------------------------------
