@@ -3,7 +3,10 @@ import ShareQrDialog from "@/components/customer/share-qr-dialog";
 import EmailDialog from "@/components/customer/email-dialog";
 import { PhoneIcon } from "@/lib/icons";
 import { fetchPublicUserEvent } from "@/lib/services/events";
-import { fetchPublicProfile } from "@/lib/services/public-profile";
+import {
+  fetchPublicProfileWithLookup,
+  type PublicProfileLookupReason,
+} from "@/lib/services/public-profile";
 import { getPlatformInfo } from "@/lib/connect-social/detect-platform";
 import { ICONS, COVER_PHOTOS } from "@/lib/const";
 import Image from "next/image";
@@ -23,6 +26,59 @@ function hashCode(str: string): number {
   return Math.abs(hash);
 }
 
+function EmptyDeviceOrProfileState({
+  reason,
+}: {
+  reason: PublicProfileLookupReason;
+}) {
+  const isMissingDevice = reason === "device_not_found";
+  const title = isMissingDevice
+    ? "This card does not exist on our system"
+    : "This card has no profile attached yet";
+  const description = isMissingDevice
+    ? "The card/device you tapped is not registered on ISCE Ecosystem."
+    : "This device exists on ISCE Ecosystem, but no public profile has been set up for it yet.";
+
+  return (
+    <main className="min-h-screen flex items-center justify-center bg-black text-white px-5">
+      <div className="w-full max-w-xl rounded-2xl border border-white/15 bg-white/[0.03] backdrop-blur-sm p-6 md:p-8 text-center">
+        <div className="mx-auto mb-4 w-14 h-14 rounded-full border border-white/20 bg-white/10 flex items-center justify-center text-2xl font-semibold">
+          !
+        </div>
+        <h1 className="text-xl md:text-2xl font-semibold">{title}</h1>
+        <p className="text-sm text-white/70 mt-2 leading-relaxed">
+          {description}
+        </p>
+        <p className="text-sm text-white/70 mt-3">
+          You can purchase a new ISCE card at{" "}
+          <a
+            href="https://isce.tech/store"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white underline underline-offset-4">
+            isce.tech/store
+          </a>
+          .
+        </p>
+        <div className="mt-6 flex items-center justify-center gap-3 flex-wrap">
+          <a
+            href="https://isce.tech/store"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-5 py-2.5 bg-white text-black rounded-full text-sm font-medium">
+            Visit Store
+          </a>
+          <Link
+            href="/"
+            className="px-5 py-2.5 bg-white/5 border border-white/25 rounded-full text-sm font-medium">
+            Back to Home
+          </Link>
+        </div>
+      </div>
+    </main>
+  );
+}
+
 /** ---------------------------------------
  * DYNAMIC METADATA
  -----------------------------------------*/
@@ -32,11 +88,15 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const profileData = await fetchPublicProfile(id);
+  const profileLookup = await fetchPublicProfileWithLookup(id);
+  const profileData = profileLookup.data;
 
   if (!profileData) {
     return {
-      title: "Device Not Found | Connect",
+      title:
+        profileLookup.reason === "profile_not_set_up"
+          ? "Profile Not Set Up | Connect"
+          : "Device Not Found | Connect",
       robots: { index: false, follow: false },
     };
   }
@@ -178,32 +238,14 @@ function buildConnectList(data: any) {
  -----------------------------------------*/
 export default async function CustomerProfilePage({ params }: any) {
   const { id } = await params;
-  const profileData = await fetchPublicProfile(id);
+  const profileLookup = await fetchPublicProfileWithLookup(id);
+  const profileData = profileLookup.data;
 
   const userId = profileData?.profile?.userId;
   const events = await fetchPublicUserEvent(userId);
 
   if (!profileData)
-    return (
-      <main className="min-h-screen flex items-center justify-center bg-black text-white">
-        <div className="px-6 text-center max-w-lg space-y-3">
-          <p className="text-lg font-semibold">
-            This device does not exist on our system.
-          </p>
-          <p className="text-sm text-white/70">
-            You can purchase an ISCE Device by visiting{" "}
-            <a
-              href="https://isce.tech/store"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline text-white">
-              isce.tech/store
-            </a>
-            .
-          </p>
-        </div>
-      </main>
-    );
+    return <EmptyDeviceOrProfileState reason={profileLookup.reason} />;
 
   const { profile, contact, device } = profileData;
 
