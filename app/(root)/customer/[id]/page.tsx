@@ -197,8 +197,6 @@ export default async function CustomerProfilePage({ params }: any) {
 		(s: any) => s.platform?.toLowerCase() === 'email' || s.icon === 'email',
 	);
 
-	// console.log("PUBLIC PROFILE USERID:", userId, events);
-
 	const connectItems = buildConnectList(profileData);
 
 	// Deterministic fallback cover based on profile ID

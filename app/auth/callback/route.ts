@@ -63,10 +63,5 @@ export async function GET(req: Request) {
 		maxAge,
 	});
 
-	console.log(
-		'[auth/callback] Token verified, cookie set, redirecting to:',
-		absoluteRedirect,
-	);
-
 	return res;
 }
