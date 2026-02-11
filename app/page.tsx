@@ -11,6 +11,7 @@ import { Testimonials } from '@/components/landing/testimonials';
 import { CtaSection } from '@/components/landing/cta-section';
 import { Footer } from '@/components/landing/footer';
 import { Metadata, Viewport } from 'next';
+import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
 	title: 'Connect | The Future of Networking - ISCE Digital Concept',
@@ -31,8 +32,20 @@ export const viewport: Viewport = {
 	width: 'device-width',
 	initialScale: 1,
 };
+type SearchParams = Promise<{ id: string }>;
 
-export default function HomePage() {
+export default async function HomePage({
+	searchParams,
+}: {
+	children: React.ReactNode;
+	searchParams: SearchParams;
+}) {
+	const { id } = await searchParams;
+
+	if (id) {
+		redirect(`/customer/${id}`);
+	}
+
 	return (
 		<main className='relative'>
 			<Navbar />
