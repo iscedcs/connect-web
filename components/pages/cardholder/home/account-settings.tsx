@@ -4,11 +4,9 @@ import {
   AccountSettingsIcon,
   ContactIcon,
   EditIcon,
-  InviteIcon,
-  NotificationIcon,
   PrivacyIcon,
   SignOutIcon,
-  TermsIcon,
+  TermsIcon
 } from "@/lib/icons";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
