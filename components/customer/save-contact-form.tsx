@@ -4,12 +4,15 @@ import { CheckIcon } from '@/lib/icons';
 import { fetchPublicProfile } from '@/lib/services/public-profile';
 import { saveContactFlow } from '@/lib/services/save-contact';
 import { ArrowLeft } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 export default function SaveContactForm({ profileId }: { profileId: string }) {
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const shouldDownloadVcf = searchParams.get('download') === '1';
+	const hasTriggeredDownloadRef = useRef(false);
 
 	const [email, setEmail] = useState('');
 	const [phone, setPhone] = useState('');
@@ -22,7 +25,29 @@ export default function SaveContactForm({ profileId }: { profileId: string }) {
 	const [agree, setAgree] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [owner, setOwner] = useState<any>(null);
+	const [ownerData, setOwnerData] = useState<any>(null);
 	const [realProfileId, setRealProfileId] = useState<string | null>(null);
+
+	function buildVCard(data: any) {
+		const profile = data?.profile ?? {};
+		const contact = data?.contact?.primary ?? {};
+		const profileUrl =
+			typeof window !== 'undefined'
+				? `${window.location.origin}/customer/${profileId}`
+				: '';
+		const fullName = profile?.name ?? 'Connect User';
+		const email = contact?.email ?? '';
+		const phone = contact?.phone_number ?? '';
+		const title = profile?.position ?? '';
+
+		const lines = ['BEGIN:VCARD', 'VERSION:3.0', `FN:${fullName}`];
+		if (title) lines.push(`TITLE:${title}`);
+		if (email) lines.push(`EMAIL;TYPE=INTERNET:${email}`);
+		if (phone) lines.push(`TEL;TYPE=CELL:${phone}`);
+		if (profileUrl) lines.push(`URL:${profileUrl}`);
+		lines.push('END:VCARD');
+		return lines.join('\n');
+	}
 
 	/** Fetch profile owner name */
 	useEffect(() => {
@@ -31,10 +56,35 @@ export default function SaveContactForm({ profileId }: { profileId: string }) {
 			if (!data?.profile?.id) return;
 
 			setOwner(data.profile);
+			setOwnerData(data);
 			setRealProfileId(data.profile.id);
 		}
 		loadProfile();
 	}, [profileId]);
+
+	useEffect(() => {
+		if (!shouldDownloadVcf || !ownerData || hasTriggeredDownloadRef.current) {
+			return;
+		}
+
+		const vcf = buildVCard(ownerData);
+		const blob = new Blob([vcf], { type: 'text/vcard;charset=utf-8' });
+		const url = window.URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		const safeName = (ownerData?.profile?.name || 'contact')
+			.replace(/[^a-zA-Z0-9-_ ]/g, '')
+			.trim()
+			.replace(/\s+/g, '-');
+
+		a.href = url;
+		a.download = `${safeName || 'contact'}.vcf`;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		window.URL.revokeObjectURL(url);
+
+		hasTriggeredDownloadRef.current = true;
+	}, [ownerData, shouldDownloadVcf]);
 
 	async function submit() {
 		if (!owner && !profileId) return;
@@ -81,8 +131,7 @@ export default function SaveContactForm({ profileId }: { profileId: string }) {
 					</button>
 				</div>
 				<h2 className='text-xl font-extrabold'>
-					{' '}
-					Save {owner?.name ? `${owner.name}'s contact` : 'contact'}
+					Exchange your contact with {owner?.name || 'this contact'}
 				</h2>
 				<input
 					type='email'
