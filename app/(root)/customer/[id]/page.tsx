@@ -26,6 +26,51 @@ function hashCode(str: string): number {
   return Math.abs(hash);
 }
 
+function asBoolean(value: unknown) {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value === 1;
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    return normalized === "true" || normalized === "1" || normalized === "yes";
+  }
+  return false;
+}
+
+function canDisplayEventsFromPermissions(profileData: any) {
+  const permissions = profileData?.permissions ?? profileData?.profile?.permissions;
+  if (!permissions) return false;
+
+  const directValue =
+    permissions.events ??
+    permissions.event ??
+    permissions.showEvents ??
+    permissions.eventsEnabled ??
+    permissions.canViewEvents ??
+    permissions.event_visibility;
+
+  if (typeof directValue !== "undefined") {
+    return asBoolean(directValue);
+  }
+
+  if (Array.isArray(permissions)) {
+    const eventsPermission = permissions.find((p: any) => {
+      const key =
+        p?.key ?? p?.name ?? p?.permission ?? p?.slug ?? p?.type ?? "";
+      return String(key).toLowerCase().includes("event");
+    });
+    if (eventsPermission) {
+      return asBoolean(
+        eventsPermission.enabled ??
+          eventsPermission.value ??
+          eventsPermission.allowed ??
+          eventsPermission.is_enabled,
+      );
+    }
+  }
+
+  return false;
+}
+
 function EmptyDeviceOrProfileState({
   reason,
 }: {
@@ -255,6 +300,18 @@ export default async function CustomerProfilePage({ params }: any) {
   );
 
   const connectItems = buildConnectList(profileData);
+  const canShowEventsTab =
+    canDisplayEventsFromPermissions(profileData) && events.length > 0;
+
+  if (process.env.NODE_ENV !== "production") {
+    console.log("[customer-profile] events permission debug", {
+      deviceId: id,
+      permissions:
+        profileData?.permissions ?? profileData?.profile?.permissions ?? null,
+      eventsCount: events.length,
+      canShowEventsTab,
+    });
+  }
 
   // Deterministic fallback cover based on profile ID
   const fallbackCover = COVER_PHOTOS[hashCode(id) % COVER_PHOTOS.length];
@@ -336,7 +393,12 @@ export default async function CustomerProfilePage({ params }: any) {
       </section>
 
       {/* TABS */}
-      <PublicProfileTabs connectItems={connectItems} events={events!} id={id} />
+      <PublicProfileTabs
+        connectItems={connectItems}
+        events={events!}
+        id={id}
+        canShowEventsTab={canShowEventsTab}
+      />
     </main>
   );
 }

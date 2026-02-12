@@ -7,8 +7,7 @@ import { ToggleIcon } from "@/lib/icons";
 import { Spinner } from "@/components/ui/spinner";
 import { URLS } from "@/lib/const";
 import { toast } from "sonner";
-
-import { uploadFile } from "@/lib/storage";
+import { uploadAsset } from "@/lib/client-upload";
 import { generateChecksum } from "@/lib/spaces/checksum";
 
 export default function FilesModal({
@@ -51,6 +50,13 @@ export default function FilesModal({
 
   const handleSubmit = async () => {
     if (!isEdit && !file) return toast.error("Please select a file.");
+    const maxSize = 10 * 1024 * 1024;
+
+    if (!isEdit && file && file.size > maxSize) {
+      return toast.error(
+        "Upload failed: file is larger than 10MB. Please compress it and try again.",
+      );
+    }
 
     setLoading(true);
 
@@ -62,13 +68,7 @@ export default function FilesModal({
           is_visible: visible,
         };
       } else {
-        const upload = await uploadFile(file!, `profiles/${profileId}/files`);
-
-        if (!upload.success) {
-          toast.error("Upload to Spaces failed");
-          setLoading(false);
-          return;
-        }
+        const upload = await uploadAsset(file!, `profiles/${profileId}/files`);
 
         const checksum = await generateChecksum(file!);
 
@@ -110,9 +110,31 @@ export default function FilesModal({
       toast.success(isEdit ? "File updated!" : "File uploaded!✅");
       onClose();
       onUpdated();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast.error("Upload error occurred");
+      const rawMessage = err?.message || "Upload error occurred";
+      const normalized = String(rawMessage).toLowerCase();
+
+      if (
+        normalized.includes("body exceeded 1 mb") ||
+        normalized.includes("status 413")
+      ) {
+        toast.error(
+          "Upload failed: file payload is too large for this request. Try a smaller file or compress it before uploading.",
+        );
+        return;
+      }
+
+      if (normalized.includes("10mb")) {
+        toast.error(
+          "Upload failed: file is larger than 10MB. Please compress it and try again.",
+        );
+        return;
+      }
+
+      toast.error(
+        `Upload failed: ${rawMessage}. Please check your file size/type and try again.`,
+      );
     } finally {
       setLoading(false);
     }
