@@ -37,7 +37,8 @@ function asBoolean(value: unknown) {
 }
 
 function canDisplayEventsFromPermissions(profileData: any) {
-  const permissions = profileData?.permissions ?? profileData?.profile?.permissions;
+  const permissions =
+    profileData?.permissions ?? profileData?.profile?.permissions;
   if (!permissions) return false;
 
   const directValue =
@@ -303,15 +304,15 @@ export default async function CustomerProfilePage({ params }: any) {
   const canShowEventsTab =
     canDisplayEventsFromPermissions(profileData) && events.length > 0;
 
-  if (process.env.NODE_ENV !== "production") {
-    console.log("[customer-profile] events permission debug", {
-      deviceId: id,
-      permissions:
-        profileData?.permissions ?? profileData?.profile?.permissions ?? null,
-      eventsCount: events.length,
-      canShowEventsTab,
-    });
-  }
+  // if (process.env.NODE_ENV !== "production") {
+  //   console.log("[customer-profile] events permission debug", {
+  //     deviceId: id,
+  //     permissions:
+  //       profileData?.permissions ?? profileData?.profile?.permissions ?? null,
+  //     eventsCount: events.length,
+  //     canShowEventsTab,
+  //   });
+  // }
 
   // Deterministic fallback cover based on profile ID
   const fallbackCover = COVER_PHOTOS[hashCode(id) % COVER_PHOTOS.length];
