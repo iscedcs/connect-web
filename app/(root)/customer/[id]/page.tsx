@@ -368,9 +368,12 @@ export default async function CustomerProfilePage({ params }: any) {
         )}
 
         <div className="px-4 mt-4 flex items-center font-medium gap-3 flex-wrap">
-          <button className="px-5 py-2 bg-white/5 border border-[#868686] rounded-full text-xs">
-            <Link href={`/customer/${id}/save-contact`}>Exchange Contact</Link>
-          </button>
+          <Link
+            href={`/customer/${id}/save-contact?download=1`}
+            className="px-5 py-2 bg-white/5 border border-[#868686] rounded-full text-xs"
+          >
+            Save Contact
+          </Link>
           {/* <button className="px-5 py-2 bg-white/5 border border-[#868686] rounded-full text-xs">
             <Link href="#">Save contact</Link>
           </button> */}
