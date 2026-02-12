@@ -20,10 +20,12 @@ export default function PublicProfileTabs({
 	connectItems,
 	events,
 	id,
+	canShowEventsTab = false,
 }: {
 	connectItems: any[];
 	events: any[];
 	id?: any;
+	canShowEventsTab?: boolean;
 }) {
 	const [activeTab, setActiveTab] = useState<'connect' | 'events'>('connect');
 	const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
@@ -65,6 +67,7 @@ export default function PublicProfileTabs({
 			item.url?.includes('open.spotify.com') ||
 			item.title?.toLowerCase() === 'spotify',
 	);
+	const hasConnectContent = connectItems.length > 0;
 	function resolvePublicUrl(url: string, deviceId: string) {
 		if (!url) return '#';
 
@@ -90,20 +93,36 @@ export default function PublicProfileTabs({
 					Connect
 				</button>
 
-				<button
-					onClick={() => setActiveTab('events')}
-					className={`pb-2 ${
-						activeTab === 'events' ?
-							'font-semibold border-b-2 border-white'
-						:	'text-white/50'
-					}`}
-				>
-					Events
-				</button>
+				{canShowEventsTab && (
+					<button
+						onClick={() => setActiveTab('events')}
+						className={`pb-2 ${
+							activeTab === 'events' ?
+								'font-semibold border-b-2 border-white'
+							:	'text-white/50'
+						}`}
+					>
+						Events
+					</button>
+				)}
 			</section>
 
 			{activeTab === 'connect' && (
 				<section className='mt-6 px-4'>
+					{!hasConnectContent && (
+						<div className='rounded-2xl border border-white/10 bg-[#121212] p-6 text-center'>
+							<div className='mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-white/5'>
+								<DockIcon className='w-5 h-5 text-white/70' />
+							</div>
+							<h3 className='text-lg font-semibold text-white'>
+								Nothing to showcase yet
+							</h3>
+							<p className='mt-2 text-sm text-white/60'>
+								This profile does not have anything to showcase yet.
+							</p>
+						</div>
+					)}
+
 					{socialItems.length > 0 && (
 						<section className='mb-6'>
 							<div className='flex items-center justify-between'>
