@@ -13,6 +13,12 @@ import {
   SocialPlatform,
 } from "@/lib/connect-social/detect-provider";
 
+function normalizeEmailValue(input: string) {
+  const trimmed = input.trim();
+  if (!trimmed) return "";
+  return trimmed.replace(/^mailto:/i, "").trim();
+}
+
 export default function SocialModal({
   open,
   onClose,
@@ -60,11 +66,18 @@ export default function SocialModal({
         : URLS.profile_social.add.replace("{profileId}", profileId);
 
       const method = isEdit ? "PATCH" : "POST";
+      const detectedPlatform = detectSocialPlatform(value);
+      const isEmail = detectedPlatform === "Email";
+      const normalizedValue = isEmail ? normalizeEmailValue(value) : value;
+      const normalizedPlatform = isEmail ? "Email" : platform;
+      const normalizedLabel = isEmail
+        ? label || "Email"
+        : label || autoLabel(detectedPlatform);
 
       const body = {
-        platform,
-        label,
-        value,
+        platform: normalizedPlatform,
+        label: normalizedLabel,
+        value: normalizedValue,
         is_visible: visible,
         order: 1,
       };
@@ -116,6 +129,10 @@ export default function SocialModal({
               placeholder="https://linkedin.com/in/username"
               className="mt-1 bg-neutral-800 text-white border-white/10"
             />
+            <p className="text-[11px] text-white/50 mt-1">
+              Tip: You can paste an email like name@company.com and it will be
+              saved as Email.
+            </p>
           </div>
 
           <div>
