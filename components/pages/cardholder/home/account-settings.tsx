@@ -24,16 +24,23 @@ export default function AccountSettingsList({
   profileId,
 }: {
   isAuthenticated: boolean;
-  profileId: string;
+  profileId?: string | null;
 }) {
   const router = useRouter();
+  const hasProfileId = Boolean(profileId && profileId !== "undefined");
 
   const baseRows: Row[] = [
-    {
-      href: `/settings/account/edit/${profileId}`,
-      label: "Edit profile",
-      Icon: EditIcon,
-    },
+    hasProfileId
+      ? {
+          href: `/settings/account/edit/${profileId}`,
+          label: "Edit profile",
+          Icon: EditIcon,
+        }
+      : {
+          href: "/settings/account",
+          label: "Create profile",
+          Icon: EditIcon,
+        },
     {
       href: "/settings/account",
       label: "Account settings",
@@ -86,17 +93,17 @@ export default function AccountSettingsList({
               <ChevronRight className="w-4 h-4 text-gray-400" />
             </Link>
           ) : (
-            <Link
+            <button
               key={label}
-              href="#"
+              type="button"
               onClick={onClick}
-              className="flex items-center justify-between px-4 py-4 hover:bg-neutral-800 active:bg-neutral-800">
+              className="w-full text-left flex items-center justify-between px-4 py-4 hover:bg-neutral-800 active:bg-neutral-800">
               <div className="flex items-center gap-3">
                 <Icon className="w-5 h-5 text-gray-200" />
                 <span className="text-sm">{label}</span>
               </div>
               <ChevronRight className="w-4 h-4 text-gray-400" />
-            </Link>
+            </button>
           )
         )}
       </div>
