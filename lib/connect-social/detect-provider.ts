@@ -7,6 +7,7 @@ export type SocialPlatform =
   | "TikTok"
   | "GitHub"
   | "YouTube"
+  | "Email"
   | "WhatsApp"
   | "Telegram"
   | "Discord"
@@ -21,6 +22,7 @@ const PLATFORM_PATTERNS: Record<SocialPlatform, RegExp[]> = {
   TikTok: [/tiktok\.com/],
   GitHub: [/github\.com/],
   YouTube: [/youtube\.com/, /youtu\.be/],
+  Email: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, /^mailto:[^\s@]+@[^\s@]+\.[^\s@]+$/],
   WhatsApp: [/wa\.me/, /whatsapp\.com/],
   Telegram: [/t\.me/],
   Discord: [/discord\.gg/],
@@ -57,6 +59,8 @@ export function autoLabel(platform: SocialPlatform): string {
       return "GitHub Profile";
     case "YouTube":
       return "YouTube Channel";
+    case "Email":
+      return "Email";
     case "WhatsApp":
       return "WhatsApp Contact";
     case "Telegram":
