@@ -4,6 +4,7 @@ import MaxWidthWrapper from "@/components/maxwidth-wrapper";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { BellIcon, NotificationIcon } from "@/lib/icons";
+import { getDeterministicAvatarDataUri, getAvatarInitials } from "@/lib/utils";
 import { Mail, BarChart2, Bell } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -30,7 +31,7 @@ export default function ProfileHeader({
   const avatarUrl =
     connectProfile?.profilePhoto ||
     user?.displayPicture ||
-    "/profile-image.png";
+    getDeterministicAvatarDataUri(user?.id || connectProfile?.name, connectProfile?.name);
 
   const name =
     connectProfile?.name ||
@@ -39,13 +40,7 @@ export default function ProfileHeader({
 
   const roleOrBio = connectProfile?.position || "";
 
-  const initials =
-    name
-      .split(" ")
-      .map((s) => s[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase() || "??";
+  const initials = getAvatarInitials(name);
 
   return (
     <div className="flex flex-col w-full backdrop-blur-md bg-black/70  pb-4">
