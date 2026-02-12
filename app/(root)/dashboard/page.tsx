@@ -79,7 +79,7 @@ export default async function DashboardPage() {
 				<section className='p-4'>
 					<AccountSettingsList
 						isAuthenticated={isAuthed}
-						profileId={connectProfile?.id!}
+						profileId={connectProfile?.id}
 					/>
 				</section>
 			</div>

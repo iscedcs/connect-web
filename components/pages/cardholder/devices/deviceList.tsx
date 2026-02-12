@@ -1,10 +1,10 @@
 // components/pages/devices/devices-list.tsx
 "use client";
 
-import { useState } from "react";
-import { DEVICE_TYPE, URLS } from "@/lib/const";
-import { getDeviceName } from "@/lib/utils";
-import { RefreshIcon, DeleteIcon, DisconnectIcon } from "@/lib/icons";
+import { useEffect, useState } from "react";
+import { DEVICE_TYPE } from "@/lib/const";
+import { getDeviceName, normalizeDeviceType } from "@/lib/utils";
+import { RefreshIcon, DisconnectIcon } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { CreditCard, Watch, Tag, Cog, Pencil } from "lucide-react";
 import { DevicesListSkeleton } from "@/components/shared/skeleton/deviceList";
@@ -28,6 +28,20 @@ export default function DevicesList({
 
   const [loading, setLoading] = useState(false);
 
+  // useEffect(() => {
+  //   if (process.env.NODE_ENV === "production") return;
+  //   devices.forEach((device) => {
+  //     console.log("[devices] type debug", {
+  //       id: device.id,
+  //       label: device.label,
+  //       rawType: device.type,
+  //       productId: device.productId,
+  //       normalizedType: normalizeDeviceType(device.type, device.productId),
+  //       resolvedName: getDeviceName(device.type, device.productId),
+  //     });
+  //   });
+  // }, [devices]);
+
   const handleRefresh = async () => {
     setLoading(true);
 
@@ -37,6 +51,7 @@ export default function DevicesList({
       },
     });
     const json = await res.json();
+    // console.log(json);
     setDevices(json?.data ?? []);
     setLoading(false);
   };
@@ -70,12 +85,16 @@ export default function DevicesList({
         <div className="space-y-6">
           {devices.map((device) => {
             const isExpanded = selected === device.id;
+            const normalizedType = normalizeDeviceType(
+              device.type,
+              device.productId,
+            );
             const icon =
-              device.type === DEVICE_TYPE.CARD ? (
+              normalizedType === DEVICE_TYPE.CARD ? (
                 <CreditCard className="h-5 w-5" />
-              ) : device.type === DEVICE_TYPE.WRISTBAND ? (
+              ) : normalizedType === DEVICE_TYPE.WRISTBAND ? (
                 <Watch className="h-5 w-5" />
-              ) : device.type === DEVICE_TYPE.STICKER ? (
+              ) : normalizedType === DEVICE_TYPE.STICKER ? (
                 <Tag className="h-5 w-5" />
               ) : (
                 <Cog className="h-5 w-5" />
@@ -94,7 +113,7 @@ export default function DevicesList({
                     </div>
                     <div>
                       <h2 className="text-base font-medium">
-                        {getDeviceName(device.type)}
+                        {getDeviceName(device.type, device.productId)}
                       </h2>
                       <p className="text-xs text-white/60">
                         Added {device.assignedAt}
