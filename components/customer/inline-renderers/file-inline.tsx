@@ -6,6 +6,9 @@ export function FileInline({ file }: { file: any }) {
   const url = file.url;
   const isImage = /\.(png|jpg|jpeg|webp)$/i.test(url);
   const isPdf = /\.pdf$/i.test(url);
+  const pdfViewerUrl = `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(
+    url,
+  )}`;
 
   return (
     <motion.div
@@ -23,10 +26,22 @@ export function FileInline({ file }: { file: any }) {
       )}
 
       {isPdf && (
-        <iframe
-          src={`${url}#toolbar=0&navpanes=0`}
-          className="w-full h-[420px] bg-black"
-        />
+        <div>
+          <iframe src={pdfViewerUrl} className="w-full h-[420px] bg-black" />
+          <div className="p-3 border-t border-white/10">
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block rounded-lg bg-white text-black font-bold px-4 py-2 text-xs"
+            >
+              Open file
+            </a>
+            <p className="mt-2 text-[11px] text-white/60">
+              If preview is blocked on your device, tap Open file.
+            </p>
+          </div>
+        </div>
       )}
 
       {!isImage && !isPdf && (
