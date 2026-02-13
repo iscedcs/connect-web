@@ -331,6 +331,7 @@ export default async function CustomerProfilePage({ params }: any) {
             height={176}
             width={1440}
             alt="Cover Photo"
+            unoptimized
             className="w-full h-44 md:h-64 object-cover"
           />
         </div>
@@ -341,6 +342,7 @@ export default async function CustomerProfilePage({ params }: any) {
             height={80}
             width={80}
             alt="Profile Photo"
+            unoptimized
             className="w-20 h-20 rounded-full border-4 border-black object-cover overflow-clip shrink-0"
           />
 
