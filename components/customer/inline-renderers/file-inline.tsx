@@ -1,14 +1,21 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
+
+const PdfPreview = dynamic(() => import("./pdf-preview"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full min-h-[420px] bg-[#0f0f0f] flex items-center justify-center p-2">
+      <p className="text-sm text-white/60">Loading PDF preview...</p>
+    </div>
+  ),
+});
 
 export function FileInline({ file }: { file: any }) {
   const url = file.url;
   const isImage = /\.(png|jpg|jpeg|webp)$/i.test(url);
   const isPdf = /\.pdf$/i.test(url);
-  const pdfViewerUrl = `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(
-    url,
-  )}`;
 
   return (
     <motion.div
@@ -27,14 +34,13 @@ export function FileInline({ file }: { file: any }) {
 
       {isPdf && (
         <div>
-          <iframe src={pdfViewerUrl} className="w-full h-[420px] bg-black" />
+          <PdfPreview url={url} />
           <div className="p-3 border-t border-white/10">
             <a
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block rounded-lg bg-white text-black font-bold px-4 py-2 text-xs"
-            >
+              className="inline-block rounded-lg bg-white text-black font-bold px-4 py-2 text-xs">
               Open file
             </a>
             <p className="mt-2 text-[11px] text-white/60">
