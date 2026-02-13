@@ -32,7 +32,7 @@ export default function EmailDialog({ emails }: Props) {
 			<a
 				href={`mailto:${email}`}
 				title='email'
-				className='hover:opacity-80 transition'
+				className='h-9 w-9 rounded-full border border-white/10 bg-white/5 text-white/80 hover:text-white hover:bg-white/10 transition inline-flex items-center justify-center'
 			>
 				<EmailIcon />
 			</a>
@@ -45,7 +45,7 @@ export default function EmailDialog({ emails }: Props) {
 			<DialogTrigger asChild>
 				<button
 					title='emails'
-					className='hover:opacity-80 transition'
+					className='h-9 w-9 rounded-full border border-white/10 bg-white/5 text-white/80 hover:text-white hover:bg-white/10 transition inline-flex items-center justify-center'
 				>
 					<EmailIcon />
 				</button>

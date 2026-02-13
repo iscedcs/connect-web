@@ -388,7 +388,11 @@ export default async function CustomerProfilePage({ params }: any) {
             />
             <EmailDialog emails={emailItems} />
             {contact?.primary?.phone_number && (
-              <a href={`tel:${contact.primary.phone_number}`} title="phone">
+              <a
+                href={`tel:${contact.primary.phone_number}`}
+                title="phone"
+                className="h-9 w-9 rounded-full border border-white/10 bg-white/5 text-white/80 hover:text-white hover:bg-white/10 transition inline-flex items-center justify-center"
+              >
                 <PhoneIcon />
               </a>
             )}
