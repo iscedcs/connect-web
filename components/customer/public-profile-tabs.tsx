@@ -94,6 +94,18 @@ export default function PublicProfileTabs({
       item.url?.includes("open.spotify.com") ||
       item.title?.toLowerCase() === "spotify",
   );
+  const fileCategoryItems = groupedFiles.flatMap((group) => group.files);
+
+  const getItemKey = (item: any) => `${item?.id ?? ""}::${item?.url ?? ""}`;
+  const categorizedItemKeys = new Set(
+    [...socialItems, ...spotifyItems, ...youtubeItems, ...fileCategoryItems].map(
+      getItemKey,
+    ),
+  );
+
+  const otherItems = [...otherSocialItems, ...nonSocialItems].filter(
+    (item) => !categorizedItemKeys.has(getItemKey(item)),
+  );
   const hasConnectContent = connectItems.length > 0;
   function resolvePublicUrl(url: string, deviceId: string) {
     if (!url) return "#";
@@ -382,12 +394,12 @@ export default function PublicProfileTabs({
           )}
 
           {/* Others section - includes non-social items and email/text/website links */}
-          {[...otherSocialItems, ...nonSocialItems].length > 0 && (
+          {otherItems.length > 0 && (
             <div className="bg-[#151515] rounded-[22px]  p-4 pt-1">
               <h3 className="text-2xl font-extrabold text-white mb-3">
                 Others
               </h3>
-              {[...otherSocialItems, ...nonSocialItems].map((item) => (
+              {otherItems.map((item) => (
                 <div key={item.id} className="flex flex-col">
                   <button
                     onClick={() => {
