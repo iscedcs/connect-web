@@ -25,7 +25,7 @@ export default function ProfileClient({
     try {
       const res = await fetch(
         `${
-          process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+          process.env.NEXT_PUBLIC_CONNECT_API_URL
         }${URLS.multi_profile.one.replace("{profileId}", profileId)}`,
         {
           headers: { Authorization: `Bearer ${accessToken}` },
@@ -72,7 +72,7 @@ export default function ProfileClient({
   async function updateProfileFn(payload: any) {
     const res = await fetch(
       `${
-        process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+        process.env.NEXT_PUBLIC_CONNECT_API_URL
       }${URLS.multi_profile.update_one.replace("{profileId}", profileId)}`,
       {
         method: "PATCH",
@@ -91,7 +91,7 @@ export default function ProfileClient({
   async function deleteProfileFn() {
     const res = await fetch(
       `${
-        process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+        process.env.NEXT_PUBLIC_CONNECT_API_URL
       }${URLS.multi_profile.delete_one.replace("{profileId}", profileId)}`,
       {
         method: "PATCH",

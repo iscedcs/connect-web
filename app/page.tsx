@@ -12,6 +12,8 @@ import { CtaSection } from '@/components/landing/cta-section';
 import { Footer } from '@/components/landing/footer';
 import { Metadata, Viewport } from 'next';
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
+import { verifyToken } from '@/lib/verify-jwt';
 
 export const metadata: Metadata = {
 	title: 'Connect | The Future of Networking - ISCE Digital Concept',
@@ -46,9 +48,20 @@ export default async function HomePage({
 		redirect(`/customer/${id}`);
 	}
 
+	// Check if user has a valid session
+	const cookieStore = await cookies();
+	const accessToken = cookieStore.get('accessToken')?.value;
+	let isLoggedIn = false;
+	if (accessToken) {
+		const { valid } = await verifyToken(accessToken);
+		if (valid) {
+			isLoggedIn = true;
+		}
+	}
+
 	return (
-		<main className='relative'>
-			<Navbar />
+		<main className='relative overflow-x-hidden'>
+			<Navbar isLoggedIn={isLoggedIn} />
 			<Hero />
 			<MarqueeBanner />
 			<Features />

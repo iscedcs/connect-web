@@ -27,7 +27,7 @@ export default function ProfileList({
 
   async function refresh() {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL}${URLS.multi_profile.all}`,
+      `${process.env.NEXT_PUBLIC_CONNECT_API_URL}${URLS.multi_profile.all}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,

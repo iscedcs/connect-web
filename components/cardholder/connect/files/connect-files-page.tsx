@@ -40,13 +40,13 @@ export default function FilesPage({ accessToken, profileId, isAuthed }: any) {
       const url =
         selectedType === "all"
           ? `${
-              process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+              process.env.NEXT_PUBLIC_CONNECT_API_URL
             }${URLS.files.all.replace(
               "{profileId}",
               profileId
             )}?include_deleted=true`
           : `${
-              process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+              process.env.NEXT_PUBLIC_CONNECT_API_URL
             }${URLS.files.file_type
               .replace("{profileId}", profileId)
               .replace("{type}", selectedType)}?include_deleted=true`;
@@ -76,7 +76,7 @@ export default function FilesPage({ accessToken, profileId, isAuthed }: any) {
     for (const id of selected) {
       await fetch(
         `${
-          process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+          process.env.NEXT_PUBLIC_CONNECT_API_URL
         }${URLS.files.bulk_delete
           .replace("{profileId}", profileId!)
           .replace("{id}", id)}`,
@@ -94,7 +94,7 @@ export default function FilesPage({ accessToken, profileId, isAuthed }: any) {
   const bulkVisible = async () => {
     await fetch(
       `${
-        process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+        process.env.NEXT_PUBLIC_CONNECT_API_URL
       }${URLS.files.bulk_visible.replace("{profileId}", profileId!)}`,
       { method: "PATCH", headers: { Authorization: `Bearer ${accessToken}` } }
     );
@@ -105,7 +105,7 @@ export default function FilesPage({ accessToken, profileId, isAuthed }: any) {
   const restoreAll = async () => {
     await fetch(
       `${
-        process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+        process.env.NEXT_PUBLIC_CONNECT_API_URL
       }${URLS.files.bulk_restore.replace("{profileId}", profileId!)}`,
       { method: "PATCH", headers: { Authorization: `Bearer ${accessToken}` } }
     );

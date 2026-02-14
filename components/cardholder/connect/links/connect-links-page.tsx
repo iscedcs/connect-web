@@ -67,7 +67,7 @@ export default function LinkPage({
 		try {
 			const res = await fetch(
 				`${
-					process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+					process.env.NEXT_PUBLIC_CONNECT_API_URL
 				}${URLS.links.all.replace(
 					'{profileId}',
 					profileId,
@@ -111,7 +111,7 @@ export default function LinkPage({
 		for (const id of selected) {
 			await fetch(
 				`${
-					process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+					process.env.NEXT_PUBLIC_CONNECT_API_URL
 				}${URLS.links.delete
 					.replace('{profileId}', profileId!)
 					.replace('{id}', id)}`,
@@ -133,7 +133,7 @@ export default function LinkPage({
 
 		await fetch(
 			`${
-				process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+				process.env.NEXT_PUBLIC_CONNECT_API_URL
 			}${URLS.links.all_visible.replace('{profileId}', profileId!)}`,
 			{
 				method: 'PATCH',
@@ -150,7 +150,7 @@ export default function LinkPage({
 	const restoreAll = async () => {
 		await fetch(
 			`${
-				process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+				process.env.NEXT_PUBLIC_CONNECT_API_URL
 			}${URLS.links.restore_all.replace('{profileId}', profileId!)}`,
 			{
 				method: 'PATCH',
@@ -171,7 +171,7 @@ export default function LinkPage({
 
 		await fetch(
 			`${
-				process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+				process.env.NEXT_PUBLIC_CONNECT_API_URL
 			}${URLS.links.reorder.replace('{profileId}', profileId!)}`,
 			{
 				method: 'PATCH',

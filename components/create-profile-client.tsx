@@ -18,7 +18,7 @@ export default function CreateProfileClient({
 
   async function createProfileFn(payload: any) {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL}${URLS.profile.create}`,
+      `${process.env.NEXT_PUBLIC_CONNECT_API_URL}${URLS.profile.create}`,
       {
         method: "POST",
         headers: {

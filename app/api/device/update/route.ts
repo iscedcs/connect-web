@@ -12,7 +12,7 @@ export async function PATCH(req: Request) {
 				{ status: 400 },
 			);
 
-		const BASE_URL = process.env.NEXT_PUBLIC_LIVE_ISCEAUTH_BACKEND_URL;
+		const BASE_URL = process.env.NEXT_PUBLIC_AUTH_API_URL;
 		const target = `${BASE_URL}${URLS.device.update.replace('{id}', id)}`;
 
 		const res = await fetch(target, {

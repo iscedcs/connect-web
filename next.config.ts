@@ -11,13 +11,11 @@ function domain(url?: string) {
 
 const API_DOMAINS = [
 	process.env.NEXT_PUBLIC_URL,
-	process.env.AUTH_BASE_URL,
-	process.env.AUTH_LOGIN_PATH,
-	process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL,
-	process.env.NEXT_PUBLIC_LIVE_ISCEAUTH_BACKEND_URL,
-	process.env.NEXT_PUBLIC_LIVE_EVENTS_BACKEND_URL,
-	process.env.NEXT_PUBLIC_API_URL,
-	process.env.NEXT_PUBLIC_EVENT_LIVE_URL,
+	process.env.NEXT_PUBLIC_AUTH_WEB_URL,
+	process.env.NEXT_PUBLIC_AUTH_API_URL,
+	process.env.NEXT_PUBLIC_CONNECT_API_URL,
+	process.env.NEXT_PUBLIC_EVENTS_API_URL,
+	process.env.NEXT_PUBLIC_EVENTS_WEB_URL,
 ]
 	.map(domain)
 	.filter(Boolean)

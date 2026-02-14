@@ -44,7 +44,7 @@ export default function ProfileCard({
 
     try {
       const url = `${
-        process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+        process.env.NEXT_PUBLIC_CONNECT_API_URL
       }${URLS.multi_profile.set_default_one.replace(
         "{profileId}",
         profile.id
@@ -76,7 +76,7 @@ export default function ProfileCard({
 
     try {
       const url = `${
-        process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+        process.env.NEXT_PUBLIC_CONNECT_API_URL
       }${URLS.multi_profile.delete_one.replace("{profileId}", profile.id)}`;
 
       const res = await fetch(url, {
@@ -103,7 +103,7 @@ export default function ProfileCard({
 
     try {
       const url = `${
-        process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+        process.env.NEXT_PUBLIC_CONNECT_API_URL
       }${URLS.multi_profile.clone_a_profile.replace(
         "{profileId}",
         profile.id

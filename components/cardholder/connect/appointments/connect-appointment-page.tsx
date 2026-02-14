@@ -54,7 +54,7 @@ export default function AppointmentPage({
       for (const id of selected) {
         await fetch(
           `${
-            process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+            process.env.NEXT_PUBLIC_CONNECT_API_URL
           }${URLS.appointments.bulk_delete
             .replace("{profileId}", profileId!)
             .replace("{id}", id)}`,
@@ -77,7 +77,7 @@ export default function AppointmentPage({
       setVisible(true);
       await fetch(
         `${
-          process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+          process.env.NEXT_PUBLIC_CONNECT_API_URL
         }${URLS.appointments.all_visible.replace("{profileId}", profileId!)}`,
         {
           method: "PATCH",
@@ -99,7 +99,7 @@ export default function AppointmentPage({
     try {
       const res = await fetch(
         `${
-          process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+          process.env.NEXT_PUBLIC_CONNECT_API_URL
         }${URLS.appointments.all.replace(
           "{profileId}",
           profileId
@@ -143,7 +143,7 @@ export default function AppointmentPage({
 
       await fetch(
         `${
-          process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+          process.env.NEXT_PUBLIC_CONNECT_API_URL
         }${URLS.appointments.bulk_restore.replace("{profileId}", profileId!)}`,
         { method: "PATCH", headers: { Authorization: `Bearer ${accessToken}` } }
       );

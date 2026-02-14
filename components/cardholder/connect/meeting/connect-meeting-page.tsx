@@ -64,7 +64,7 @@ export default function MeetingPage({
     try {
       const res = await fetch(
         `${
-          process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+          process.env.NEXT_PUBLIC_CONNECT_API_URL
         }${URLS.meetings.all.replace(
           "{profileId}",
           profileId!
@@ -99,7 +99,7 @@ export default function MeetingPage({
     try {
       const res = await fetch(
         `${
-          process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+          process.env.NEXT_PUBLIC_CONNECT_API_URL
         }${URLS.meetings.default
           .replace("{profileId}", profileId!)
           .replace("{id}", id)}`,
@@ -132,7 +132,7 @@ export default function MeetingPage({
     for (const id of selected) {
       await fetch(
         `${
-          process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+          process.env.NEXT_PUBLIC_CONNECT_API_URL
         }${URLS.meetings.delete
           .replace("{profileId}", profileId!)
           .replace("{id}", id)}`,
@@ -147,7 +147,7 @@ export default function MeetingPage({
   const restoreAll = async () => {
     await fetch(
       `${
-        process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+        process.env.NEXT_PUBLIC_CONNECT_API_URL
       }${URLS.meetings.restore_all.replace("{profileId}", profileId!)}`,
       { method: "PATCH", headers: { Authorization: `Bearer ${accessToken}` } }
     );

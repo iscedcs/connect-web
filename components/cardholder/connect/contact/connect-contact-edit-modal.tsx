@@ -40,7 +40,7 @@ export default function EditContactModal({
     try {
       const res = await fetch(
         `${
-          process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+          process.env.NEXT_PUBLIC_CONNECT_API_URL
         }${URLS.profile_contact.update
           .replace("{profileId}", profileId)
           .replace("{id}", contact.id)}`,

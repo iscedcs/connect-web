@@ -68,7 +68,7 @@ export default function SpotifyPage({
     try {
       const res = await fetch(
         `${
-          process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+          process.env.NEXT_PUBLIC_CONNECT_API_URL
         }${URLS.spotify.all.replace(
           "{profileId}",
           profileId
@@ -109,7 +109,7 @@ export default function SpotifyPage({
     for (const id of selected) {
       await fetch(
         `${
-          process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+          process.env.NEXT_PUBLIC_CONNECT_API_URL
         }${URLS.spotify.bulk_delete
           .replace("{profileId}", profileId!)
           .replace("{id}", id)}`,
@@ -127,7 +127,7 @@ export default function SpotifyPage({
   const bulkVisible = async () => {
     await fetch(
       `${
-        process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+        process.env.NEXT_PUBLIC_CONNECT_API_URL
       }${URLS.spotify.bulk_visible.replace("{profileId}", profileId!)}`,
       { method: "PATCH", headers: { Authorization: `Bearer ${accessToken}` } }
     );
@@ -139,7 +139,7 @@ export default function SpotifyPage({
   const restoreAll = async () => {
     await fetch(
       `${
-        process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+        process.env.NEXT_PUBLIC_CONNECT_API_URL
       }${URLS.spotify.bulk_restore.replace("{profileId}", profileId!)}`,
       { method: "PATCH", headers: { Authorization: `Bearer ${accessToken}` } }
     );

@@ -52,13 +52,13 @@ export default function FormsPage({
       const url =
         selectedType === "all"
           ? `${
-              process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+              process.env.NEXT_PUBLIC_CONNECT_API_URL
             }${URLS.forms.all.replace(
               "{profileId}",
               profileId
             )}?include_deleted=true`
           : `${
-              process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+              process.env.NEXT_PUBLIC_CONNECT_API_URL
             }${URLS.forms.all.replace(
               "{profileId}",
               profileId
@@ -94,7 +94,7 @@ export default function FormsPage({
     try {
       const res = await fetch(
         `${
-          process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+          process.env.NEXT_PUBLIC_CONNECT_API_URL
         }${URLS.forms.bulk_delete.replace("{profileId}", profileId!)}`,
         {
           method: "PATCH",
@@ -117,7 +117,7 @@ export default function FormsPage({
     try {
       const res = await fetch(
         `${
-          process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+          process.env.NEXT_PUBLIC_CONNECT_API_URL
         }${URLS.forms.bulk_restore.replace("{profileId}", profileId!)}`,
         { method: "PATCH", headers: { Authorization: `Bearer ${accessToken}` } }
       );
@@ -136,7 +136,7 @@ export default function FormsPage({
     try {
       const res = await fetch(
         `${
-          process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+          process.env.NEXT_PUBLIC_CONNECT_API_URL
         }${URLS.forms.bulk_visible.replace("{profileId}", profileId!)}`,
         { method: "PATCH", headers: { Authorization: `Bearer ${accessToken}` } }
       );

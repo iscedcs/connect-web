@@ -15,7 +15,7 @@ export function CtaSection() {
 			ref={ref}
 			className='relative py-20 md:py-32 px-5 md:px-10'
 		>
-			<div className='max-w-[1000px] mx-auto relative'>
+			<div className='max-w-[1000px] mx-auto relative overflow-hidden'>
 				{/* Glow */}
 				<div className='absolute inset-0 -m-20 bg-[#7B93FF]/5 blur-[100px] rounded-full pointer-events-none' />
 

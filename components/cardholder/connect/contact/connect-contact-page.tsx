@@ -41,7 +41,7 @@ export default function ContactPage({
     try {
       const res = await fetch(
         `${
-          process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+          process.env.NEXT_PUBLIC_CONNECT_API_URL
         }${URLS.profile_contact.all.replace(
           "{profileId}",
           profileId

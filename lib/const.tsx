@@ -53,11 +53,11 @@ export const COVER_PHOTOS = [
  * API CONFIGURATION
  * -----------------------------------------*/
 export const NEXT_PUBLIC_CONNECT_API_ORIGIN =
-	process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL;
+	process.env.NEXT_PUBLIC_CONNECT_API_URL;
 export const NEXT_PUBLIC_EVENT_API_ORIGIN =
-	process.env.NEXT_PUBLIC_LIVE_EVENTS_BACKEND_URL;
-export const AUTH_API = process.env.NEXT_PUBLIC_LIVE_ISCEAUTH_BACKEND_URL;
-export const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+	process.env.NEXT_PUBLIC_EVENTS_API_URL;
+export const AUTH_API = process.env.NEXT_PUBLIC_AUTH_API_URL;
+// baseUrl removed — was dead code (never imported). Use AUTH_API or NEXT_PUBLIC_CONNECT_API_ORIGIN instead.
 export const URLS = {
 	contact: {
 		leave: '/api/contact/leave',

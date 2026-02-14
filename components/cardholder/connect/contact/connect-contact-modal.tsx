@@ -39,7 +39,7 @@ export default function ContactModal({
     try {
       const res = await fetch(
         `${
-          process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+          process.env.NEXT_PUBLIC_CONNECT_API_URL
         }${URLS.profile_contact.add.replace("{profileId}", profileId)}`,
         {
           method: "POST",
