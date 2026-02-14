@@ -11,7 +11,7 @@ const navLinks = [
 	{ label: 'Use Cases', href: '#use-cases' },
 ];
 
-export function Navbar() {
+export function Navbar({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
 	const [scrolled, setScrolled] = useState(false);
 	const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -61,18 +61,28 @@ export function Navbar() {
 					</div>
 
 					<div className='hidden md:flex items-center gap-3'>
-						<a
-							href='/dashboard'
-							className='text-sm text-zinc-400 hover:text-white transition-colors px-4 py-2'
-						>
-							Log in
-						</a>
-						<a
-							href='/dashboard'
-							className='text-sm bg-[#7B93FF] text-[#030014] px-5 py-2.5 rounded-lg hover:bg-[#7B93FF]/90 transition-colors font-medium'
-						>
-							Get Started
-						</a>
+						{isLoggedIn ?
+							<a
+								href='/dashboard'
+								className='text-sm bg-[#7B93FF] text-[#030014] px-5 py-2.5 rounded-lg hover:bg-[#7B93FF]/90 transition-colors font-medium'
+							>
+								Dashboard
+							</a>
+						:	<>
+								<a
+									href='/dashboard'
+									className='text-sm text-zinc-400 hover:text-white transition-colors px-4 py-2'
+								>
+									Log in
+								</a>
+								<a
+									href='/dashboard'
+									className='text-sm bg-[#7B93FF] text-[#030014] px-5 py-2.5 rounded-lg hover:bg-[#7B93FF]/90 transition-colors font-medium'
+								>
+									Get Started
+								</a>
+							</>
+						}
 					</div>
 
 					{/* Mobile Menu Button */}
@@ -119,7 +129,7 @@ export function Navbar() {
 								onClick={() => setMobileOpen(false)}
 								className='mt-4 bg-[#7B93FF] text-[#030014] px-8 py-3 rounded-lg text-lg font-medium'
 							>
-								Get Started
+								{isLoggedIn ? 'Dashboard' : 'Get Started'}
 							</motion.a>
 						</div>
 					</motion.div>

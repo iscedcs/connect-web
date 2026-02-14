@@ -34,7 +34,7 @@ export default function ContactViewModal({
 			try {
 				const res = await http.get(
 					`${
-						process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+						process.env.NEXT_PUBLIC_CONNECT_API_URL
 					}${URLS.profile_contact.recieved_one
 						.replace('{profileId}', profileId)
 						.replace('{id}', contactId)}`,
@@ -59,7 +59,7 @@ export default function ContactViewModal({
 		try {
 			await http.patch(
 				`${
-					process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+					process.env.NEXT_PUBLIC_CONNECT_API_URL
 				}${URLS.profile_contact.delete_recieved
 					.replace('{profileId}', profileId)
 					.replace('{id}', contactId)}`,

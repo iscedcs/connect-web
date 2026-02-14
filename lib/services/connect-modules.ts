@@ -4,7 +4,7 @@ export async function getConnectModules(
   profileId: string,
   accessToken: string
 ) {
-  const base = process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL;
+  const base = process.env.NEXT_PUBLIC_CONNECT_API_URL;
 
   async function fetchList(url: string) {
     try {

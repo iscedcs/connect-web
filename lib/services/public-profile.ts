@@ -2,7 +2,7 @@ import { URLS } from "@/lib/const";
 import { http } from "./http";
 import axios from "axios";
 
-const CONNECT_API = process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL;
+const CONNECT_API = process.env.NEXT_PUBLIC_CONNECT_API_URL;
 
 export type PublicProfileLookupReason =
   | "ok"

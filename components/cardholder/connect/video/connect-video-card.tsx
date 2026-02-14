@@ -64,7 +64,7 @@ export default function VideoCard({
     setLoading(true);
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL}${endpoint}`,
+        `${process.env.NEXT_PUBLIC_CONNECT_API_URL}${endpoint}`,
         {
           method: "PATCH",
           headers: {
@@ -127,7 +127,7 @@ export default function VideoCard({
     try {
       const res = await fetch(
         `${
-          process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+          process.env.NEXT_PUBLIC_CONNECT_API_URL
         }${URLS.videos.delete
           .replace("{profileId}", profileId)
           .replace("{id}", video.id)}`,

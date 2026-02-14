@@ -35,7 +35,7 @@ export default function DeletedProfileList({
 
     try {
       const url = `${
-        process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+        process.env.NEXT_PUBLIC_CONNECT_API_URL
       }${URLS.multi_profile.restore_one.replace("{profileId}", id)}`;
 
       const res = await fetch(url, {

@@ -61,7 +61,7 @@ export default function VideoPage({
 		try {
 			const res = await fetch(
 				`${
-					process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+					process.env.NEXT_PUBLIC_CONNECT_API_URL
 				}${URLS.videos.bulk_delete.replace('{profileId}', profileId!)}`,
 				{
 					method: 'PATCH',
@@ -86,7 +86,7 @@ export default function VideoPage({
 		try {
 			const res = await fetch(
 				`${
-					process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+					process.env.NEXT_PUBLIC_CONNECT_API_URL
 				}${URLS.videos.restore_all.replace('{profileId}', profileId!)}`,
 				{
 					method: 'PATCH',
@@ -110,7 +110,7 @@ export default function VideoPage({
 		try {
 			const res = await fetch(
 				`${
-					process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+					process.env.NEXT_PUBLIC_CONNECT_API_URL
 				}${URLS.videos.all_visible.replace('{profileId}', profileId!)}`,
 				{
 					method: 'PATCH',
@@ -134,7 +134,7 @@ export default function VideoPage({
 		try {
 			const res = await fetch(
 				`${
-					process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+					process.env.NEXT_PUBLIC_CONNECT_API_URL
 				}${URLS.videos.all.replace(
 					'{profileId}',
 					profileId,

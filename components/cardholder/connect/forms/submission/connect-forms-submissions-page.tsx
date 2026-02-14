@@ -20,7 +20,7 @@ export default function FormSubmissionsPage({
   const fetchSubmissions = async () => {
     try {
       const url = `${
-        process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+        process.env.NEXT_PUBLIC_CONNECT_API_URL
       }${URLS.forms.one
         .replace("{profileId}", profileId)
         .replace("{id}", formId)}?include_submissions=true`;
@@ -43,7 +43,7 @@ export default function FormSubmissionsPage({
 
   const deleteSubmission = async (submissionId: string) => {
     const url = `${
-      process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+      process.env.NEXT_PUBLIC_CONNECT_API_URL
     }${URLS.forms.delete_submit
       .replace("{profileId}", profileId)
       .replace("{submissionId}", submissionId)}`;

@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { decodeJwt } from "../verify-jwt";
 
 const NEXT_PUBLIC_CONNECT_API_ORIGIN =
-  process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL!;
+  process.env.NEXT_PUBLIC_CONNECT_API_URL!;
 
 export async function connectFetch(
   path: string,

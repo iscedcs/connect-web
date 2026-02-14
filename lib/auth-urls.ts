@@ -1,6 +1,6 @@
 ///lib/auth-urls.ts
 export function buildAuthLoginUrl(redirectTo: string) {
-	const base = (process.env.AUTH_BASE_URL || '').trim();
+	const base = (process.env.NEXT_PUBLIC_AUTH_WEB_URL || '').trim();
 	const path = process.env.AUTH_LOGIN_PATH || '/sign-in';
 
 	const envAppBase = process.env.NEXT_PUBLIC_URL || '';

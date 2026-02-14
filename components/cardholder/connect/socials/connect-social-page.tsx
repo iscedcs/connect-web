@@ -65,7 +65,7 @@ export default function SocialPage({
     try {
       const res = await fetch(
         `${
-          process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+          process.env.NEXT_PUBLIC_CONNECT_API_URL
         }${URLS.profile_social.all.replace(
           "{profileId}",
           profileId
@@ -102,7 +102,7 @@ export default function SocialPage({
     for (const id of selected) {
       await fetch(
         `${
-          process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+          process.env.NEXT_PUBLIC_CONNECT_API_URL
         }${URLS.profile_social.bulk_delete
           .replace("{profileId}", profileId!)
           .replace("{id}", id)}`,
@@ -117,7 +117,7 @@ export default function SocialPage({
   const bulkVisible = async () => {
     await fetch(
       `${
-        process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+        process.env.NEXT_PUBLIC_CONNECT_API_URL
       }${URLS.profile_social.all_visible.replace("{profileId}", profileId!)}`,
       { method: "PATCH", headers: { Authorization: `Bearer ${accessToken}` } }
     );
@@ -129,7 +129,7 @@ export default function SocialPage({
   const restoreAll = async () => {
     await fetch(
       `${
-        process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL
+        process.env.NEXT_PUBLIC_CONNECT_API_URL
       }${URLS.profile_social.restore_all.replace("{profileId}", profileId!)}`,
       { method: "PATCH", headers: { Authorization: `Bearer ${accessToken}` } }
     );

@@ -1,59 +1,62 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
 export function EventCard({ event }: any) {
-  const date = new Date(event.startDate);
+	const date = new Date(event.startDate);
 
-  const month = date.toLocaleString("en-US", { month: "short" }).toUpperCase();
-  const day = date.getDate();
-  const weekday = date.toLocaleString("en-US", {
-    weekday: "short",
-  });
+	const month = date
+		.toLocaleString('en-US', { month: 'short' })
+		.toUpperCase();
+	const day = date.getDate();
+	const weekday = date.toLocaleString('en-US', {
+		weekday: 'short',
+	});
 
-  return (
-    <Link
-      href={`${process.env.NEXT_PUBLIC_EVENT_LIVE_URL}/event/${event.cleanName}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-start justify-between py-2 ">
-      <div className="flex items-start gap-4">
-        <Image
-          src={event.image}
-          alt={event.title}
-          width={100}
-          height={100}
-          quality={100}
-          className="w-10 h-10 rounded-lg object-cover"
-        />
+	return (
+		<Link
+			href={`${process.env.NEXT_PUBLIC_EVENTS_WEB_URL}/event/${event.cleanName}`}
+			target='_blank'
+			rel='noopener noreferrer'
+			className='flex items-start justify-between py-2 '
+		>
+			<div className='flex items-start gap-4'>
+				<Image
+					src={event.image}
+					alt={event.title}
+					width={100}
+					height={100}
+					quality={100}
+					className='w-10 h-10 rounded-lg object-cover'
+				/>
 
-        <div>
-          <p className="font-normal capitalize">{event.title}</p>
+				<div>
+					<p className='font-normal capitalize'>{event.title}</p>
 
-          <p className="text-[8px] text-white/60 ">
-            {weekday}, {event.time ?? "Time TBA"}·
-            {event.location ?? "Location TBA"}
-          </p>
-        </div>
-      </div>
+					<p className='text-[8px] text-white/60 '>
+						{weekday}, {event.time ?? 'Time TBA'}·
+						{event.location ?? 'Location TBA'}
+					</p>
+				</div>
+			</div>
 
-      <div className="flex flex-col items-center justify-center bg-black border border-[#8A8A8A] rounded-xl w-[50px] py-[3px] relative">
-        {/* TOP HALF */}
-        <div className="w-full flex flex-col items-center pb-[1px]">
-          <span className="text-[10px] text-[#D0D0D0] tracking-wider leading-none">
-            {month}
-          </span>
-        </div>
+			<div className='flex flex-col items-center justify-center bg-black border border-[#8A8A8A] rounded-xl w-[50px] py-[3px] relative'>
+				{/* TOP HALF */}
+				<div className='w-full flex flex-col items-center pb-[1px]'>
+					<span className='text-2.5 text-[#D0D0D0] tracking-wider leading-none'>
+						{month}
+					</span>
+				</div>
 
-        {/* DIVIDER LINE */}
-        <div className="absolute top-[50%] left-0 w-full border-t border-white/10" />
+				{/* DIVIDER LINE */}
+				<div className='absolute top-[50%] left-0 w-full border-t border-white/10' />
 
-        {/* BOTTOM HALF */}
-        <div className="w-full flex flex-col items-center pt-3">
-          <span className="text-[15px] font-semibold text-white leading-none">
-            {day}
-          </span>
-        </div>
-      </div>
-    </Link>
-  );
+				{/* BOTTOM HALF */}
+				<div className='w-full flex flex-col items-center pt-3'>
+					<span className='text-[15px] font-semibold text-white leading-none'>
+						{day}
+					</span>
+				</div>
+			</div>
+		</Link>
+	);
 }

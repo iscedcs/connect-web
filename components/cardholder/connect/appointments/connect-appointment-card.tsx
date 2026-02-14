@@ -66,7 +66,7 @@ export default function AppointmentCard({
     setLoading(true);
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_LIVE_ISCECONNECT_BACKEND_URL}${endpoint}`,
+        `${process.env.NEXT_PUBLIC_CONNECT_API_URL}${endpoint}`,
         {
           method: "PATCH",
           headers: {
