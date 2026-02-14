@@ -6,10 +6,11 @@ import { DEVICE_TYPE } from "@/lib/const";
 import { getDeviceName, normalizeDeviceType } from "@/lib/utils";
 import { RefreshIcon, DisconnectIcon } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
-import { CreditCard, Watch, Tag, Cog, Pencil } from "lucide-react";
+import { CreditCard, Watch, Tag, Cog, Pencil, ArrowLeft, Plus } from "lucide-react";
 import { DevicesListSkeleton } from "@/components/shared/skeleton/deviceList";
 import { toast } from "sonner";
 import UpdateDeviceModal from "@/components/shared/models/updateDeviceModel";
+import Link from "next/link";
 
 type Device = DeviceInterface;
 
@@ -67,11 +68,28 @@ export default function DevicesList({
           onUpdated={handleRefresh}
         />
       )}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-2 text-white/90 hover:text-white"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Link>
+        <div className="flex items-center gap-2">
+          <Button asChild variant="secondary" className="rounded-full px-4">
+            <Link href="/connect">
+              <Plus className="w-4 h-4 mr-1" />
+              Add new device
+            </Link>
+          </Button>
+          <Button onClick={handleRefresh} variant="ghost">
+            <RefreshIcon className="w-4 h-4" /> Refresh
+          </Button>
+        </div>
+      </div>
+
+      <div className="mb-4">
         <h1 className="text-2xl font-semibold">My Devices</h1>
-        <Button onClick={handleRefresh} variant="ghost">
-          <RefreshIcon className="w-4 h-4" /> Refresh
-        </Button>
       </div>
 
       {loading ? (
@@ -79,7 +97,9 @@ export default function DevicesList({
       ) : devices.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20">
           <p className="text-white/70 mb-4">No connected devices found.</p>
-          <Button className="rounded-full px-6 py-2">Connect a device</Button>
+          <Button asChild className="rounded-full px-6 py-2">
+            <Link href="/connect">Connect a device</Link>
+          </Button>
         </div>
       ) : (
         <div className="space-y-6">

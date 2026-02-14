@@ -68,7 +68,7 @@ export default function OtpScreen({
   }, [code, isVerifying, onVerify, onVerified, form]);
 
   return (
-    <div className="min-h-dvh  bg-black text-white flex flex-col">
+    <div className="h-[100svh] bg-black text-white flex flex-col">
       {/* Banner */}
       <div className="w-full bg-white/10 text-xs backdrop-blur">
         <div className="mx-auto max-w-screen-sm px-3 py-2 flex items-center gap-2">

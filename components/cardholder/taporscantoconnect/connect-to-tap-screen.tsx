@@ -47,12 +47,12 @@ export default function ConnectTapScreen({
           setError(error.message);
           setScanStatus("Scan failed - tap to retry");
           setIsScanning(false);
-        }
+        },
       );
     } catch (error) {
       console.error("Failed to start NFC scanning:", error);
       setError(
-        error instanceof Error ? error.message : "Failed to start NFC scanning"
+        error instanceof Error ? error.message : "Failed to start NFC scanning",
       );
       setScanStatus("Unable to start scanning");
       setIsScanning(false);
@@ -89,7 +89,7 @@ export default function ConnectTapScreen({
     } catch (error) {
       console.error("Error processing card data:", error);
       setError(
-        error instanceof Error ? error.message : "Failed to process card data"
+        error instanceof Error ? error.message : "Failed to process card data",
       );
       setScanStatus("Invalid card - try again");
       setIsScanning(false);
@@ -101,7 +101,7 @@ export default function ConnectTapScreen({
     startNFCScanning();
   };
   return (
-    <div className="min-h-screen relative text-white">
+    <div className="h-[100svh] relative text-white flex flex-col">
       {/* gradient bg (replace with your asset if you prefer) */}
       <video
         className="absolute inset-0 w-full h-full object-cover"
@@ -133,8 +133,8 @@ export default function ConnectTapScreen({
       </div>
 
       {/* center content */}
-      <div className="relative mx-auto w-full max-w-screen-sm px-4">
-        <div className="h-[76vh] flex items-center justify-center">
+      <div className="relative mx-auto w-full max-w-screen-sm px-4 flex-1 flex items-center justify-center">
+        <div>
           <div className="text-center">
             <h1
               className={`text-2xl font-bold ${
@@ -155,16 +155,16 @@ export default function ConnectTapScreen({
             )}
           </div>
         </div>
-      </div>
 
-      {/* bottom button */}
-      <div className="relative mx-auto w-full max-w-screen-sm px-4 pb-6">
-        <Button
-          onClick={onScanInstead}
-          disabled={isScanning}
-          className="w-full rounded-2xl bg-white text-black py-6 text-base font-medium shadow-sm active:translate-y-px disabled:opacity-50 disabled:cursor-not-allowed">
-          Scan device instead
-        </Button>
+        {/* bottom button */}
+        <div className="relative mx-auto w-full max-w-screen-sm px-4 pb-6">
+          <Button
+            onClick={onScanInstead}
+            disabled={isScanning}
+            className="w-full rounded-2xl bg-white text-black py-6 text-base font-medium shadow-sm active:translate-y-px disabled:opacity-50 disabled:cursor-not-allowed">
+            Scan device instead
+          </Button>
+        </div>
       </div>
     </div>
   );
