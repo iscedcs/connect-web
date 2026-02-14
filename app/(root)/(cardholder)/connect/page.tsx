@@ -38,7 +38,7 @@ export default function ConnectPage() {
 	// Show loading state while checking NFC capability
 	if (isCheckingNFC) {
 		return (
-			<div className='flex items-center justify-center min-h-screen'>
+			<div className='flex items-center justify-center h-[100svh]'>
 				<div className='text-center'>
 					<p>Checking device capabilities...</p>
 				</div>

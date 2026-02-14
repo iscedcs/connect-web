@@ -12,7 +12,7 @@ export default function ConnectSuccessScreen({
   onContinue?: () => void;
 }) {
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col">
+    <div className="h-[100svh] bg-black text-white flex flex-col">
       <div className="flex-1 flex flex-col items-center justify-start pt-16">
         <div className="w-full rounded-2xl overflow-hidden shadow-md">
           <img
