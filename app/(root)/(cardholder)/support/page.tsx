@@ -12,9 +12,7 @@ export default async function SupportPage() {
 	const authInfo = await getAuthInfo();
 
 	if ('error' in authInfo || authInfo.isExpired) {
-		return (
-			<div className='text-white p-6'>Redirecting to login...</div>
-		);
+		return <div className='text-white p-6'>Redirecting to login...</div>;
 	}
 
 	return (
