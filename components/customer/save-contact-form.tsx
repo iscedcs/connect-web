@@ -2,13 +2,20 @@
 
 import { CheckIcon } from '@/lib/icons';
 import { fetchPublicProfile } from '@/lib/services/public-profile';
+import { fetchPublicProfileBySlug } from '@/lib/services/public-profile';
 import { saveContactFlow } from '@/lib/services/save-contact';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
-export default function SaveContactForm({ profileId }: { profileId: string }) {
+export default function SaveContactForm({
+	profileId,
+	lookupMode = 'device',
+}: {
+	profileId: string;
+	lookupMode?: 'device' | 'slug';
+}) {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const shouldDownloadVcf = searchParams.get('download') === '1';
@@ -32,9 +39,11 @@ export default function SaveContactForm({ profileId }: { profileId: string }) {
 		const profile = data?.profile ?? {};
 		const contact = data?.contact?.primary ?? {};
 		const profileUrl =
-			typeof window !== 'undefined'
-				? `${window.location.origin}/customer/${profileId}`
-				: '';
+			typeof window !== 'undefined' ?
+				lookupMode === 'slug' ?
+					`${window.location.origin}/p/${profileId}`
+				:	`${window.location.origin}/customer/${profileId}`
+			:	'';
 		const fullName = profile?.name ?? 'Connect User';
 		const email = contact?.email ?? '';
 		const phone = contact?.phone_number ?? '';
@@ -52,7 +61,13 @@ export default function SaveContactForm({ profileId }: { profileId: string }) {
 	/** Fetch profile owner name */
 	useEffect(() => {
 		async function loadProfile() {
-			const data = await fetchPublicProfile(profileId);
+			let data: any;
+			if (lookupMode === 'slug') {
+				const result = await fetchPublicProfileBySlug(profileId);
+				data = result.data;
+			} else {
+				data = await fetchPublicProfile(profileId);
+			}
 			if (!data?.profile?.id) return;
 
 			setOwner(data.profile);
@@ -60,10 +75,14 @@ export default function SaveContactForm({ profileId }: { profileId: string }) {
 			setRealProfileId(data.profile.id);
 		}
 		loadProfile();
-	}, [profileId]);
+	}, [profileId, lookupMode]);
 
 	useEffect(() => {
-		if (!shouldDownloadVcf || !ownerData || hasTriggeredDownloadRef.current) {
+		if (
+			!shouldDownloadVcf ||
+			!ownerData ||
+			hasTriggeredDownloadRef.current
+		) {
 			return;
 		}
 

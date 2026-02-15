@@ -15,7 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { AttachmentIcon } from '@/lib/icons';
 import { editProfileSchema, type EditProfileInput } from '@/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, LinkIcon, Check, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -41,6 +41,7 @@ export default function EditProfileForm({
 		mode: 'onChange',
 		defaultValues: {
 			name: '',
+			slug: '',
 			position: '',
 			bio: '',
 			address: '',
@@ -55,6 +56,7 @@ export default function EditProfileForm({
 		if (defaultValues) {
 			form.reset({
 				name: defaultValues.name ?? '',
+				slug: defaultValues.slug ?? '',
 				position: defaultValues.position ?? '',
 				bio: defaultValues.bio ?? '',
 				address: defaultValues.address ?? '',
@@ -64,6 +66,7 @@ export default function EditProfileForm({
 		}
 	}, [
 		defaultValues?.name,
+		defaultValues?.slug,
 		defaultValues?.position,
 		defaultValues?.bio,
 		defaultValues?.address,
@@ -96,7 +99,9 @@ export default function EditProfileForm({
 
 			{/* Title */}
 			<h1 className='text-2xl font-semibold mb-6'>
-				Edit your contactless profile.
+				{mode === 'create' ?
+					'Create your profile.'
+				:	'Edit your contactless profile.'}
 			</h1>
 
 			<Form {...form}>
@@ -127,6 +132,63 @@ export default function EditProfileForm({
 							</FormItem>
 						)}
 					/>
+					{/* Profile Link (Slug) */}
+					<FormField
+						control={form.control}
+						name='slug'
+						render={({ field }) => {
+							const slugValue = field.value ?? '';
+							const hasSlug = slugValue.length >= 3;
+							const slugError = form.formState.errors.slug;
+							return (
+								<FormItem>
+									<p className='text-xs text-white/60'>
+										Profile Link
+									</p>
+									<FormControl>
+										<div className='flex items-center gap-2 pb-3 border-b border-white/10'>
+											<LinkIcon className='h-4 w-4 text-white/40 shrink-0' />
+											<span className='text-white/40 text-sm shrink-0'>
+												connect.isce.app/p/
+											</span>
+											<Input
+												{...field}
+												value={field.value ?? ''}
+												onChange={(e) => {
+													const v = e.target.value
+														.toLowerCase()
+														.replace(
+															/[^a-z0-9-]/g,
+															'',
+														)
+														.replace(/--+/g, '-');
+													field.onChange(v);
+												}}
+												type='text'
+												placeholder='your-name'
+												className='w-full bg-transparent border-none outline-none shadow-none rounded-none text-base placeholder-white/60 px-0'
+												aria-invalid={!!slugError}
+											/>
+											{hasSlug && !slugError && (
+												<Check className='h-4 w-4 text-green-400 shrink-0' />
+											)}
+											{slugError && (
+												<X className='h-4 w-4 text-red-400 shrink-0' />
+											)}
+										</div>
+									</FormControl>
+									{hasSlug && !slugError && (
+										<p className='text-xs text-white/40 mt-1'>
+											Your shareable link:
+											connect.isce.app/p/{slugValue}
+										</p>
+									)}
+									<FormMessage />
+								</FormItem>
+							);
+						}}
+					/>
+
 					<FormField
 						control={form.control}
 						name='position'

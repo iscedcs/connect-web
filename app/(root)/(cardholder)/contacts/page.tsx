@@ -1,44 +1,53 @@
-import { getAuthInfo } from "@/actions/auth";
-import ContactsClient from "@/components/pages/cardholder/contact/contact-client";
-import { fetchReceivedContacts } from "@/lib/services/contact";
-import { getConnectProfile } from "@/lib/services/profile";
+import { getAuthInfo } from '@/actions/auth';
+import ContactsClient from '@/components/pages/cardholder/contact/contact-client';
+import { fetchReceivedContacts } from '@/lib/services/contact';
+import { getConnectProfile } from '@/lib/services/profile';
+import { generateMetadata } from '@/lib/metadata';
+
+export const metadata = generateMetadata({
+	title: 'Contacts',
+	description:
+		'View and manage contacts shared with you through your Connect profile.',
+	keywords: ['contacts', 'received contacts', 'shared contacts'],
+});
 
 export default async function ReceivedContactsPage() {
-  const authInfo = await getAuthInfo();
+	const authInfo = await getAuthInfo();
 
-  if ("error" in authInfo || authInfo.isExpired) {
-    return <div className="text-white p-6">Redirecting to login...</div>;
-  }
+	if ('error' in authInfo || authInfo.isExpired) {
+		return <div className='text-white p-6'>Redirecting to login...</div>;
+	}
 
-  const accessToken = authInfo.accessToken;
-  const profile = await getConnectProfile();
+	const accessToken = authInfo.accessToken;
+	const profile = await getConnectProfile();
 
-  if (!profile?.id) {
-    return (
-      <div className="p-6 text-white/60">No profile found for this account</div>
-    );
-  }
+	if (!profile?.id) {
+		return (
+			<div className='p-6 text-white/60'>
+				No profile found for this account
+			</div>
+		);
+	}
 
-  const data = await fetchReceivedContacts({
-    profileId: profile.id,
-    accessToken,
-    page: 1,
-    limit: 10,
-  });
+	const data = await fetchReceivedContacts({
+		profileId: profile.id,
+		accessToken,
+		page: 1,
+		limit: 10,
+	});
 
-  return (
-    <main className="p-6 space-y-4">
-      <h1 className="text-2xl text-white font-bold">Received Contacts</h1>
+	return (
+		<main className='p-6 space-y-4'>
+			<h1 className='text-2xl text-white font-bold'>Received Contacts</h1>
 
-      {data.contacts.length === 0 ? (
-        <p className="text-white/50">No contacts received yet</p>
-      ) : (
-        <ContactsClient
-          data={data}
-          profileId={profile.id}
-          accessToken={accessToken}
-        />
-      )}
-    </main>
-  );
+			{data.contacts.length === 0 ?
+				<p className='text-white/50'>No contacts received yet</p>
+			:	<ContactsClient
+					data={data}
+					profileId={profile.id}
+					accessToken={accessToken}
+				/>
+			}
+		</main>
+	);
 }
