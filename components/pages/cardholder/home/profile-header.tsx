@@ -138,8 +138,7 @@ export default function ProfileHeader({
 									socials={socialsData}
 									slugMode
 								/>
-							:	<AddSlugDialog />
-							}
+							:	<AddSlugDialog />}
 							<Link href='/analytics'>
 								<Button
 									size='icon'

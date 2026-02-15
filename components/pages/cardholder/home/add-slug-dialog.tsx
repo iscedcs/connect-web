@@ -114,9 +114,10 @@ export default function AddSlugDialog() {
 					{/* Preview */}
 					<div className='rounded-lg bg-white/5 border border-white/10 px-4 py-3 text-sm break-all'>
 						<span className='text-white/50'>
-							{typeof window !== 'undefined'
-								? window.location.origin
-								: ''}/p/
+							{typeof window !== 'undefined' ?
+								window.location.origin
+							:	''}
+							/p/
 						</span>
 						<span className='text-white font-medium'>
 							{slug || 'your-slug'}
@@ -134,8 +135,7 @@ export default function AddSlugDialog() {
 								if (error) setError(validate(v));
 							}}
 							onKeyDown={(e) => {
-								if (e.key === 'Enter' && !saving)
-									handleSave();
+								if (e.key === 'Enter' && !saving) handleSave();
 							}}
 							className='bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-white/20'
 							disabled={saving}

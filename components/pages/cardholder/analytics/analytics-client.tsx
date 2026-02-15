@@ -91,15 +91,16 @@ export default function AnalyticsClient({
 			fetchNotificationStats({ accessToken }),
 			fetchSupportRequestStats({ accessToken }),
 			fetchSocialStats({ accessToken }),
-			defaultProfileId
-				? fetchReceivedContactStats({
-						profileId: defaultProfileId,
-						accessToken,
-					})
-				: Promise.resolve(null),
+			defaultProfileId ?
+				fetchReceivedContactStats({
+					profileId: defaultProfileId,
+					accessToken,
+				})
+			:	Promise.resolve(null),
 		]);
 
-		if (results[0].status === 'fulfilled') setProfileStats(results[0].value);
+		if (results[0].status === 'fulfilled')
+			setProfileStats(results[0].value);
 		if (results[1].status === 'fulfilled') setCardStats(results[1].value);
 		if (results[2].status === 'fulfilled') setNotifStats(results[2].value);
 		if (results[3].status === 'fulfilled')
@@ -307,9 +308,9 @@ export default function AnalyticsClient({
 										key={t.key}
 										onClick={() => changeTab(t.key)}
 										className={`px-3 py-1.5 text-xs rounded-full transition-colors ${
-											tab === t.key
-												? 'bg-white text-black font-medium'
-												: 'bg-white/10 text-white/50 hover:bg-white/15'
+											tab === t.key ?
+												'bg-white text-black font-medium'
+											:	'bg-white/10 text-white/50 hover:bg-white/15'
 										}`}
 									>
 										{t.label}
@@ -621,9 +622,7 @@ function MetricCard({
 				<span className='text-xs text-white/40'>{label}</span>
 			</div>
 			<p className='text-2xl font-bold text-white'>{value}</p>
-			{sub && (
-				<p className='text-[10px] text-white/25 mt-0.5'>{sub}</p>
-			)}
+			{sub && <p className='text-[10px] text-white/25 mt-0.5'>{sub}</p>}
 		</div>
 	);
 }
@@ -637,13 +636,7 @@ function MiniStat({ label, value }: { label: string; value: number }) {
 	);
 }
 
-function PercentBar({
-	percent,
-	color,
-}: {
-	percent: number;
-	color: string;
-}) {
+function PercentBar({ percent, color }: { percent: number; color: string }) {
 	return (
 		<div className='mt-2 h-1 rounded-full bg-white/10 overflow-hidden'>
 			<div

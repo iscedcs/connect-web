@@ -8,10 +8,19 @@ export const metadata = generateMetadata({
 	title: 'Analytics',
 	description:
 		'View your profile analytics — card interactions, contacts, notifications, social links and more.',
-	keywords: ['analytics', 'card', 'taps', 'scans', 'interactions', 'contacts'],
+	keywords: [
+		'analytics',
+		'card',
+		'taps',
+		'scans',
+		'interactions',
+		'contacts',
+	],
 });
 
-async function getDefaultProfileId(accessToken: string): Promise<string | undefined> {
+async function getDefaultProfileId(
+	accessToken: string,
+): Promise<string | undefined> {
 	try {
 		const base =
 			process.env.CONNECT_API_URL ||
