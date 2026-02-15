@@ -23,6 +23,7 @@ export const protectedRoutes = [
 	'/devices',
 	'/otp',
 	'/profile',
+	'/profiles',
 	'/device',
 	'/settings',
 	'/wallet',

@@ -126,7 +126,6 @@ export default function HomeClientSection() {
 			/>
 			<AccountSettingsList
 				isAuthenticated
-				profileId=''
 			/>
 		</>
 	);

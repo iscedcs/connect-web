@@ -26,8 +26,8 @@ const SETTINGS_SECTIONS = [
 		heading: 'Profile',
 		items: [
 			{
-				href: '/settings/account',
-				label: 'Account & Profiles',
+				href: '/profiles',
+				label: 'Profiles',
 				description:
 					'Manage your profiles, create new ones, or set a default',
 				Icon: User,

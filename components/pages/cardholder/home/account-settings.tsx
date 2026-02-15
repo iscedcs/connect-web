@@ -3,12 +3,11 @@
 import {
   AccountSettingsIcon,
   ContactIcon,
-  EditIcon,
   PrivacyIcon,
   SignOutIcon,
   TermsIcon
 } from "@/lib/icons";
-import { ChevronRight, Bell, BarChart3, Settings2 } from "lucide-react";
+import { ChevronRight, Settings2, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -21,40 +20,16 @@ type Row = {
 
 export default function AccountSettingsList({
   isAuthenticated,
-  profileId,
 }: {
   isAuthenticated: boolean;
-  profileId?: string | null;
 }) {
   const router = useRouter();
-  const hasProfileId = Boolean(profileId && profileId !== "undefined");
 
   const baseRows: Row[] = [
-    hasProfileId
-      ? {
-          href: `/settings/account/edit/${profileId}`,
-          label: "Edit profile",
-          Icon: EditIcon,
-        }
-      : {
-          href: "/settings/account",
-          label: "Create profile",
-          Icon: EditIcon,
-        },
     {
-      href: "/settings/account",
-      label: "Account settings",
-      Icon: AccountSettingsIcon,
-    },
-    {
-      href: "/notifications",
-      label: "Notifications",
-      Icon: Bell,
-    },
-    {
-      href: "/analytics",
-      label: "Card analytics",
-      Icon: BarChart3,
+      href: "/profiles",
+      label: "View all profiles",
+      Icon: Users,
     },
     {
       href: "/settings/connect-config",

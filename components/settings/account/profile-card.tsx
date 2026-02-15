@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { URLS } from "@/lib/const";
-import { Copy, MoreHorizontal, Pencil, Star, Trash2 } from "lucide-react";
+import { Copy, Eye, MoreHorizontal, Pencil, Star, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -19,6 +19,7 @@ interface Profile {
   name: string;
   position: string;
   profilePhoto?: string | null;
+  slug?: string | null;
   is_default: boolean;
 }
 
@@ -118,7 +119,7 @@ export default function ProfileCard({
 
       if (res.ok) {
         toast.success("Profile cloned successfully");
-        window.location.href = "/settings/account";
+        window.location.href = "/profiles";
       } else {
         toast.error(json.message);
       }
@@ -178,6 +179,14 @@ export default function ProfileCard({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              {profile.slug && (
+                <DropdownMenuItem
+                  onClick={() => router.push(`/profiles/${profile.slug}/preview`)}
+                >
+                  <Eye className="h-4 w-4" />
+                  Preview profile
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={handleClone} disabled={isCloning}>
                 <Copy className="h-4 w-4" />
                 {isCloning ? "Cloning..." : "Clone profile"}

@@ -13,6 +13,7 @@ interface Profile {
   name: string;
   position: string;
   profilePhoto?: string | null;
+  slug?: string | null;
   is_default: boolean;
 }
 
