@@ -2,11 +2,12 @@
 
 import MaxWidthWrapper from '@/components/maxwidth-wrapper';
 import ShareQrDialog from '@/components/customer/share-qr-dialog';
+import AddSlugDialog from './add-slug-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { BellIcon } from '@/lib/icons';
 import { getDeterministicAvatarDataUri, getAvatarInitials } from '@/lib/utils';
-import { BarChart2, LinkIcon } from 'lucide-react';
+import { BarChart2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -137,15 +138,7 @@ export default function ProfileHeader({
 									socials={socialsData}
 									slugMode
 								/>
-							:	<Link href='/settings'>
-									<Button
-										size='icon'
-										className='h-9 w-9 rounded-full border border-white/10 bg-white/5 text-white/80 hover:text-white hover:bg-white/10'
-										title='Create your profile link to share'
-									>
-										<LinkIcon className='h-4 w-4' />
-									</Button>
-								</Link>
+							:	<AddSlugDialog />
 							}
 							<Link href='/analytics'>
 								<Button
