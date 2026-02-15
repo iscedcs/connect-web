@@ -28,4 +28,6 @@ export const protectedRoutes = [
 	'/settings',
 	'/wallet',
 	'/wearables',
+	'/notifications',
+	'/analytics',
 ];

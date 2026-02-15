@@ -1,4 +1,5 @@
-import LegalLayout from '@/components/legal/legal-layout';
+import { getAuthInfo } from '@/actions/auth';
+import SupportClient from '@/components/pages/cardholder/support/support-client';
 import { generateMetadata } from '@/lib/metadata';
 
 export const metadata = generateMetadata({
@@ -7,25 +8,19 @@ export const metadata = generateMetadata({
 	keywords: ['support', 'help', 'contact'],
 });
 
-export default function SupportPage() {
+export default async function SupportPage() {
+	const authInfo = await getAuthInfo();
+
+	if ('error' in authInfo || authInfo.isExpired) {
+		return (
+			<div className='text-white p-6'>Redirecting to login...</div>
+		);
+	}
+
 	return (
-		<LegalLayout title='Contact Support'>
-			<p>
-				{` Need help with your account, profile, or devices? Our support team is
-        here to help.`}
-			</p>
-
-			<ul>
-				<li>
-					Email: <strong>support@isce.tech</strong>
-				</li>
-				<li>{`Response time: within 24–48 hours`}</li>
-			</ul>
-
-			<p className='text-sm text-white/60 mt-6'>
-				Please include your registered email or phone number when
-				contacting support.
-			</p>
-		</LegalLayout>
+		<main className='p-6 space-y-4'>
+			<h1 className='text-2xl text-white font-bold'>Support</h1>
+			<SupportClient accessToken={authInfo.accessToken} />
+		</main>
 	);
 }

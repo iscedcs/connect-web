@@ -100,7 +100,7 @@ export const URLS = {
 		all: '/api/support-request/all',
 		one: '/api/support-request/one/{id}',
 		update: '/api/support-request/update/{id}',
-		delete: '/api/support-request/update/{id}',
+		delete: '/api/support-request/delete/{id}',
 		search: '/api/support-request/search',
 		recent: '/api/support-request/recent',
 		stats: '/api/support-request/stats',
@@ -267,6 +267,11 @@ export const URLS = {
 		bulk_visible: '/api/profiles/{profileId}/forms/visibility/all',
 	},
 
+	connect_config: {
+		get: '/api/profiles/{profileId}/connect/config',
+		update: '/api/profiles/{profileId}/connect/config/update',
+		reorder: '/api/profiles/{profileId}/connect/config/reorder-modules',
+	},
 	wallet: {
 		add: '/api/profiles/{profileId}/wallets/add',
 		all: '/api/profiles/{profileId}/wallets/all',
