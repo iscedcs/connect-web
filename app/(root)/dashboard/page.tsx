@@ -51,6 +51,7 @@ export default async function DashboardPage() {
 					<ProfileHeader
 						connectProfile={connectProfile}
 						user={authInfo.user}
+						profileId={connectProfile?.id}
 						contactData={
 							connectModules?.contact?.contacts?.[0] ?
 								{

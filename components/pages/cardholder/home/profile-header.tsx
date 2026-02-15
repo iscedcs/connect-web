@@ -22,6 +22,7 @@ type ProfileHeaderProfile = {
 interface ProfileHeaderProps {
 	connectProfile?: ProfileHeaderProfile | null;
 	user?: UserInfo | null;
+	profileId?: string | null;
 	contactData?: {
 		primary?: { email?: string; phone_number?: string };
 	};
@@ -32,6 +33,7 @@ interface ProfileHeaderProps {
 export default function ProfileHeader({
 	user,
 	connectProfile,
+	profileId,
 	contactData,
 	linksData,
 	socialsData,
