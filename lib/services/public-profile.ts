@@ -88,3 +88,38 @@ export async function fetchPublicProfileWithLookup(
 		return { data: null, reason: 'unknown', message };
 	}
 }
+
+/** ---------------------------------------
+ * FETCH PUBLIC PROFILE BY SLUG
+ -----------------------------------------*/
+export async function fetchPublicProfileBySlug(
+	slug: string,
+): Promise<PublicProfileLookupResult> {
+	try {
+		const url = `${CONNECT_API}${URLS.profile.public_by_slug.replace(
+			'{slug}',
+			slug,
+		)}`;
+
+		const res = await axios.get(url, { timeout: 10000 });
+		const data = res.data?.data ?? null;
+
+		if (data) {
+			return { data, reason: 'ok' };
+		}
+
+		return { data: null, reason: 'profile_not_set_up' };
+	} catch (err) {
+		const axiosErr = axios.isAxiosError(err) ? err : null;
+		const message =
+			axiosErr?.response?.data?.message ||
+			axiosErr?.message ||
+			'Network or server error';
+
+		if (axiosErr?.response?.status === 404) {
+			return { data: null, reason: 'profile_not_set_up', message };
+		}
+
+		return { data: null, reason: 'unknown', message };
+	}
+}

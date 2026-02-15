@@ -48,6 +48,20 @@ export default async function DashboardPage() {
 					<ProfileHeader
 						connectProfile={connectProfile}
 						user={authInfo.user}
+						contactData={
+							connectModules?.contact?.contacts?.[0] ?
+								{
+									primary: {
+										email: undefined,
+										phone_number:
+											connectModules.contact.contacts[0]
+												?.phone_number,
+									},
+								}
+							:	undefined
+						}
+						linksData={connectModules?.links?.links}
+						socialsData={connectModules?.socials?.socials}
 					/>
 				</div>{' '}
 			</section>

@@ -71,6 +71,7 @@ export const URLS = {
 		delete: '/api/profile/delete',
 		stats: '/api/profile/stats',
 		public: '/api/profile/public/{deviceId}',
+		public_by_slug: '/api/profile/slug/{slug}',
 	},
 	social: {
 		add: '/api/social/add',

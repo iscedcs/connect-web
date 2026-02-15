@@ -39,6 +39,8 @@ type Props = {
 	};
 	links?: ShareLink[];
 	socials?: ShareLink[];
+	/** When true, uses /p/{slug} URL pattern instead of /customer/{deviceId} */
+	slugMode?: boolean;
 };
 
 function toSafeText(value?: string) {
@@ -89,6 +91,7 @@ export default function ShareQrDialog({
 	contact,
 	links,
 	socials,
+	slugMode,
 }: Props) {
 	const [open, setOpen] = useState(false);
 	const [offlineQr, setOfflineQr] = useState<string | null>(null);
@@ -111,7 +114,10 @@ export default function ShareQrDialog({
 		process.env.NEXT_PUBLIC_URL ||
 		(typeof window !== 'undefined' ? window.location.origin : '');
 
-	const profileUrl = `${baseUrl}/customer/${profileId}`;
+	const profileUrl =
+		slugMode ?
+			`${baseUrl}/p/${profileId}`
+		:	`${baseUrl}/customer/${profileId}`;
 	const shareText =
 		profile?.name ?
 			`Check out ${profile.name}'s profile`
