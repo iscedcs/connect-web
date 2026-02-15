@@ -1,37 +1,37 @@
-import "server-only";
-import { cookies } from "next/headers";
-import { decodeJwt } from "../verify-jwt";
+import 'server-only';
+import { cookies } from 'next/headers';
+import { decodeJwt } from '../verify-jwt';
 
 const NEXT_PUBLIC_CONNECT_API_ORIGIN =
-  process.env.NEXT_PUBLIC_CONNECT_API_URL!;
+	process.env.CONNECT_API_URL || process.env.NEXT_PUBLIC_CONNECT_API_URL!;
 
 export async function connectFetch(
-  path: string,
-  init: RequestInit = {}
+	path: string,
+	init: RequestInit = {},
 ): Promise<Response> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("accessToken")?.value;
+	const cookieStore = await cookies();
+	const token = cookieStore.get('accessToken')?.value;
 
-  if (!token) {
-    return new Response(JSON.stringify({ message: "Not authenticated" }), {
-      status: 401,
-      headers: { "content-type": "application/json" },
-    });
-  }
+	if (!token) {
+		return new Response(JSON.stringify({ message: 'Not authenticated' }), {
+			status: 401,
+			headers: { 'content-type': 'application/json' },
+		});
+	}
 
-  const url = `${NEXT_PUBLIC_CONNECT_API_ORIGIN}${path}`;
-  const headers = new Headers(init.headers as any);
-  if (init.body && !headers.has("content-type")) {
-    headers.set("content-type", "application/json");
-  }
-  headers.set("authorization", `Bearer ${token}`);
+	const url = `${NEXT_PUBLIC_CONNECT_API_ORIGIN}${path}`;
+	const headers = new Headers(init.headers as any);
+	if (init.body && !headers.has('content-type')) {
+		headers.set('content-type', 'application/json');
+	}
+	headers.set('authorization', `Bearer ${token}`);
 
-  return fetch(url, {
-    ...init,
-    headers,
-    credentials: "omit",
-    cache: "no-store",
-  });
+	return fetch(url, {
+		...init,
+		headers,
+		credentials: 'omit',
+		cache: 'no-store',
+	});
 }
 
 // tiny helper to decode JWT payload; use jose if you need signature verification

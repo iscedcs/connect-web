@@ -2,8 +2,10 @@ import { URLS } from '@/lib/const';
 import { http } from './http';
 import { generatePassword } from '../utils';
 
-const CONNECT_API = process.env.NEXT_PUBLIC_CONNECT_API_URL;
-const AUTH_API = process.env.NEXT_PUBLIC_AUTH_API_URL;
+const CONNECT_API =
+	process.env.CONNECT_API_URL || process.env.NEXT_PUBLIC_CONNECT_API_URL;
+const AUTH_API =
+	process.env.AUTH_API_URL || process.env.NEXT_PUBLIC_AUTH_API_URL;
 
 export async function saveContactFlow({
 	profileId,

@@ -1,7 +1,8 @@
 import { http } from '@/lib/services/http';
 import { URLS } from '@/lib/const';
 
-const BASE = process.env.NEXT_PUBLIC_CONNECT_API_URL;
+const BASE =
+	process.env.CONNECT_API_URL || process.env.NEXT_PUBLIC_CONNECT_API_URL;
 
 export async function fetchReceivedContacts({
 	profileId,

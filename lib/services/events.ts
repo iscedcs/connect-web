@@ -6,7 +6,8 @@ import { URLS } from '@/lib/const';
 export async function fetchPublicUserEvent(userId: string) {
 	if (!userId) return [];
 
-	const baseUrl = process.env.NEXT_PUBLIC_EVENTS_API_URL;
+	const baseUrl =
+		process.env.EVENTS_API_URL || process.env.NEXT_PUBLIC_EVENTS_API_URL;
 	const path = URLS.events.public_user_events.replace('{userId}', userId);
 	const url = `${baseUrl}${path}`;
 	try {

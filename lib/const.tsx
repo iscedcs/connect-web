@@ -52,11 +52,13 @@ export const COVER_PHOTOS = [
 /** ---------------------------------------
  * API CONFIGURATION
  * -----------------------------------------*/
+// Server-side: prefer internal Docker URLs; client-side: falls back to NEXT_PUBLIC_
 export const NEXT_PUBLIC_CONNECT_API_ORIGIN =
-	process.env.NEXT_PUBLIC_CONNECT_API_URL;
+	process.env.CONNECT_API_URL || process.env.NEXT_PUBLIC_CONNECT_API_URL;
 export const NEXT_PUBLIC_EVENT_API_ORIGIN =
-	process.env.NEXT_PUBLIC_EVENTS_API_URL;
-export const AUTH_API = process.env.NEXT_PUBLIC_AUTH_API_URL;
+	process.env.EVENTS_API_URL || process.env.NEXT_PUBLIC_EVENTS_API_URL;
+export const AUTH_API =
+	process.env.AUTH_API_URL || process.env.NEXT_PUBLIC_AUTH_API_URL;
 // baseUrl removed — was dead code (never imported). Use AUTH_API or NEXT_PUBLIC_CONNECT_API_ORIGIN instead.
 export const URLS = {
 	contact: {
