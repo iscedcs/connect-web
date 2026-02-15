@@ -9,8 +9,6 @@ import PromoBanner from '@/components/pages/cardholder/home/promo-banner';
 import { getConnectModules } from '@/lib/services/connect-modules';
 import { getUserDevices } from '@/lib/services/device';
 import { getConnectProfile } from '@/lib/services/profile';
-import { fetchProfileStats } from '@/lib/services/profile-stats';
-import ProfileStatsCard from '@/components/pages/cardholder/home/profile-stats-card';
 import { generateMetadata } from '@/lib/metadata';
 
 export const metadata = generateMetadata({
@@ -36,13 +34,9 @@ export default async function DashboardPage() {
 	const hasDevices = userDevices.length > 0;
 
 	let connectModules = null;
-	let profileStats = null;
 
 	if (connectProfile?.id && accessToken) {
-		[connectModules, profileStats] = await Promise.all([
-			getConnectModules(connectProfile.id, accessToken),
-			fetchProfileStats(accessToken),
-		]);
+		connectModules = await getConnectModules(connectProfile.id, accessToken);
 	}
 	return (
 		<main className='relative bg-black text-white min-h-screen overflow-x-hidden'>
@@ -74,11 +68,6 @@ export default async function DashboardPage() {
 			</section> */}
 
 			<div className='pt-80  space-y-10'>
-				{profileStats && (
-					<section className='p-4'>
-						<ProfileStatsCard stats={profileStats} />
-					</section>
-				)}
 				<section className='p-4 space-y-5'>
 					<PromoBanner />
 					<EventCard />
