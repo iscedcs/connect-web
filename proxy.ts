@@ -52,10 +52,11 @@ export async function proxy(req: NextRequest) {
 	// Build a clean redirect URL (strip any stale "token" param so it
 	// never leaks into the auth redirect chain)
 	function getCleanRedirectUrl() {
+		const publicOrigin = process.env.NEXT_PUBLIC_URL || req.nextUrl.origin;
 		const url = new URL(req.nextUrl.toString());
 		url.searchParams.delete('token');
 		url.searchParams.delete('code');
-		return url.origin + url.pathname + (url.search || '');
+		return publicOrigin + url.pathname + (url.search || '');
 	}
 
 	const token = req.cookies.get('accessToken')?.value;
