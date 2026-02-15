@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { BellIcon } from '@/lib/icons';
 import { getDeterministicAvatarDataUri, getAvatarInitials } from '@/lib/utils';
-import { Mail, BarChart2, LinkIcon } from 'lucide-react';
+import { BarChart2, LinkIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -147,24 +147,24 @@ export default function ProfileHeader({
 									</Button>
 								</Link>
 							}
-							<Button
-								size='icon'
-								className='rounded-full bg-transparent hover:bg-transparent cursor-pointer'
-							>
-								<Mail className='w-10 h-10' />
-							</Button>
-							<Button
-								size='icon'
-								className='rounded-full bg-transparent hover:bg-transparent cursor-pointer'
-							>
-								<BarChart2 className='w-10 h-10' />
-							</Button>
-							<Button
-								size='icon'
-								className='rounded-full bg-transparent hover:bg-transparent cursor-pointer'
-							>
-								<BellIcon className='w-10 h-10' />
-							</Button>
+							<Link href='/analytics'>
+								<Button
+									size='icon'
+									className='rounded-full bg-transparent hover:bg-transparent cursor-pointer'
+									title='Card Analytics'
+								>
+									<BarChart2 className='w-10 h-10' />
+								</Button>
+							</Link>
+							<Link href='/notifications'>
+								<Button
+									size='icon'
+									className='rounded-full bg-transparent hover:bg-transparent cursor-pointer'
+									title='Notifications'
+								>
+									<BellIcon className='w-10 h-10' />
+								</Button>
+							</Link>
 						</div>
 					</div>
 				</div>
