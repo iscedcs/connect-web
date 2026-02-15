@@ -118,6 +118,7 @@ export default function ShareQrDialog({
 		slugMode ?
 			`${baseUrl}/p/${profileId}`
 		:	`${baseUrl}/customer/${profileId}`;
+	const qrProfileUrl = `${profileUrl}${profileUrl.includes('?') ? '&' : '?'}scan=1`;
 	const shareText =
 		profile?.name ?
 			`Check out ${profile.name}'s profile`
@@ -183,7 +184,7 @@ export default function ShareQrDialog({
 			try {
 				const [offlineDataUrl, onlineDataUrl] = await Promise.all([
 					QRCode.toDataURL(offlinePayload, { width: 240, margin: 1 }),
-					QRCode.toDataURL(profileUrl, { width: 240, margin: 1 }),
+					QRCode.toDataURL(qrProfileUrl, { width: 240, margin: 1 }),
 				]);
 
 				if (!cancelled) {
@@ -203,7 +204,7 @@ export default function ShareQrDialog({
 		return () => {
 			cancelled = true;
 		};
-	}, [offlinePayload, open, profileUrl]);
+	}, [offlinePayload, open, qrProfileUrl]);
 
 	useEffect(() => {
 		if (!emblaApi) return;

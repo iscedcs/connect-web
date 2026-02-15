@@ -1,6 +1,7 @@
 import PublicProfileTabs from '@/components/customer/public-profile-tabs';
 import ShareQrDialog from '@/components/customer/share-qr-dialog';
 import EmailDialog from '@/components/customer/email-dialog';
+import ScanRecorder from '@/components/customer/scan-recorder';
 import { PhoneIcon } from '@/lib/icons';
 import { fetchPublicUserEvent } from '@/lib/services/events';
 import {
@@ -289,8 +290,16 @@ function buildConnectList(data: any) {
 /** ---------------------------------------
  * MAIN PAGE
  -----------------------------------------*/
-export default async function CustomerProfilePage({ params }: any) {
+export default async function CustomerProfilePage({
+	params,
+	searchParams,
+}: {
+	params: Promise<{ id: string }>;
+	searchParams: Promise<{ scan?: string }>;
+}) {
 	const { id } = await params;
+	const { scan } = await searchParams;
+	const isScan = scan === '1';
 	const profileLookup = await fetchPublicProfileWithLookup(id);
 	const profileData = profileLookup.data;
 
@@ -326,6 +335,7 @@ export default async function CustomerProfilePage({ params }: any) {
 
 	return (
 		<main className='min-h-screen bg-black text-white pb-16'>
+			{isScan && <ScanRecorder deviceId={id} />}
 			<section>
 				<div className='w-full h-44 md:h-64 relative'>
 					<div className='w-full h-44 md:h-64 bg-linear-180 from-black/0 via-black/30 to-black/100 absolute top-0 left-0 '></div>

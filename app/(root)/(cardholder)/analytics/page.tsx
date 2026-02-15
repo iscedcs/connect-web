@@ -1,13 +1,29 @@
 import { getAuthInfo } from '@/actions/auth';
 import AnalyticsClient from '@/components/pages/cardholder/analytics/analytics-client';
 import { generateMetadata } from '@/lib/metadata';
+import { http } from '@/lib/services/http';
+import { URLS } from '@/lib/const';
 
 export const metadata = generateMetadata({
-	title: 'Card Analytics',
+	title: 'Analytics',
 	description:
-		'View your NFC tap and QR scan analytics — see how people interact with your card.',
-	keywords: ['analytics', 'card', 'taps', 'scans', 'interactions'],
+		'View your profile analytics — card interactions, contacts, notifications, social links and more.',
+	keywords: ['analytics', 'card', 'taps', 'scans', 'interactions', 'contacts'],
 });
+
+async function getDefaultProfileId(accessToken: string): Promise<string | undefined> {
+	try {
+		const base =
+			process.env.CONNECT_API_URL ||
+			process.env.NEXT_PUBLIC_CONNECT_API_URL;
+		const res = await http.get(`${base}${URLS.multi_profile.get_default}`, {
+			headers: { Authorization: `Bearer ${accessToken}` },
+		});
+		return res.data?.data?.id ?? undefined;
+	} catch {
+		return undefined;
+	}
+}
 
 export default async function AnalyticsPage() {
 	const authInfo = await getAuthInfo();
@@ -16,10 +32,15 @@ export default async function AnalyticsPage() {
 		return <div className='text-white p-6'>Redirecting to login...</div>;
 	}
 
+	const defaultProfileId = await getDefaultProfileId(authInfo.accessToken);
+
 	return (
 		<main className='p-6 space-y-4'>
-			<h1 className='text-2xl text-white font-bold'>Card Analytics</h1>
-			<AnalyticsClient accessToken={authInfo.accessToken} />
+			<h1 className='text-2xl text-white font-bold'>Analytics</h1>
+			<AnalyticsClient
+				accessToken={authInfo.accessToken}
+				defaultProfileId={defaultProfileId}
+			/>
 		</main>
 	);
 }

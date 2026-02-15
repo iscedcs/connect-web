@@ -1,6 +1,7 @@
 import PublicProfileTabs from '@/components/customer/public-profile-tabs';
 import ShareQrDialog from '@/components/customer/share-qr-dialog';
 import EmailDialog from '@/components/customer/email-dialog';
+import ScanRecorder from '@/components/customer/scan-recorder';
 import { PhoneIcon } from '@/lib/icons';
 import { fetchPublicUserEvent } from '@/lib/services/events';
 import { fetchPublicProfileBySlug } from '@/lib/services/public-profile';
@@ -191,10 +192,14 @@ function buildConnectList(data: any) {
 /** MAIN PAGE */
 export default async function SlugProfilePage({
 	params,
+	searchParams,
 }: {
 	params: Promise<{ slug: string }>;
+	searchParams: Promise<{ scan?: string }>;
 }) {
 	const { slug } = await params;
+	const { scan } = await searchParams;
+	const isScan = scan === '1';
 	const profileLookup = await fetchPublicProfileBySlug(slug);
 	const profileData = profileLookup.data;
 
@@ -217,6 +222,7 @@ export default async function SlugProfilePage({
 
 	return (
 		<main className='min-h-screen bg-black text-white pb-16'>
+			{isScan && <ScanRecorder slug={slug} />}
 			<section>
 				<div className='w-full h-44 md:h-64 relative'>
 					<div className='w-full h-44 md:h-64 bg-linear-180 from-black/0 via-black/30 to-black/100 absolute top-0 left-0 '></div>

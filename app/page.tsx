@@ -35,7 +35,7 @@ export const viewport: Viewport = {
 	width: 'device-width',
 	initialScale: 1,
 };
-type SearchParams = Promise<{ id?: string; type?: string }>;
+type SearchParams = Promise<{ id?: string; type?: string; scan?: string }>;
 
 export default async function HomePage({
 	searchParams,
@@ -43,7 +43,7 @@ export default async function HomePage({
 	children: React.ReactNode;
 	searchParams: SearchParams;
 }) {
-	const { id, type } = await searchParams;
+	const { id, type, scan } = await searchParams;
 
 	if (id) {
 		// Record card interaction before redirecting
@@ -62,7 +62,7 @@ export default async function HomePage({
 						deviceId: id,
 						deviceType: type || null,
 						referrer: referrer,
-						method: 'TAP',
+						method: scan === '1' ? 'SCAN' : 'TAP',
 					}),
 				}).catch(() => {});
 			}

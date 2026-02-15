@@ -4,6 +4,7 @@ export async function GET(request: NextRequest) {
 	const searchParams = request.nextUrl.searchParams;
 	const id = searchParams.get('id');
 	const deviceType = searchParams.get('type');
+	const scan = searchParams.get('scan');
 
 	if (!id) {
 		return NextResponse.redirect(new URL('/', request.url));
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
 					deviceId: id,
 					deviceType: deviceType || null,
 					referrer: referrer,
-					method: 'TAP',
+					method: scan === '1' ? 'SCAN' : 'TAP',
 				}),
 			}).catch(() => {});
 		}
