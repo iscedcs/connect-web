@@ -5,8 +5,12 @@ const CSRF_COOKIE_NAME = 'csrf_token';
 const CSRF_HEADER_NAME = 'x-csrf-token';
 const SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS'];
 
-/** Paths exempt from CSRF validation (callbacks, auth token exchange) */
-const EXEMPT_PATHS = ['/auth/callback', '/api/auth/refresh'];
+/** Paths exempt from CSRF validation (callbacks, auth token exchange, public endpoints) */
+const EXEMPT_PATHS = [
+	'/auth/callback',
+	'/api/auth/refresh',
+	'/api/connect/card-interactions/record',
+];
 
 /**
  * Sets or refreshes the CSRF token cookie on the response.

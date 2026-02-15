@@ -20,15 +20,11 @@ export default function ScanRecorder({
 		if (!deviceId && !slug) return;
 		recorded.current = true;
 
-		const connectApi = process.env.NEXT_PUBLIC_CONNECT_API_URL;
-
-		if (!connectApi) return;
-
 		const body: Record<string, string> = { method: 'SCAN' };
 		if (deviceId) body.deviceId = deviceId;
 		if (slug) body.slug = slug;
 
-		fetch(`${connectApi}/api/card-interactions/record`, {
+		fetch('/api/connect/card-interactions/record', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(body),
