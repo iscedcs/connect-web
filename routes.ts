@@ -19,7 +19,6 @@ export const publicRoutes = [
 export const protectedRoutes = [
 	'/dashboard',
 	'/bvn',
-	'/home',
 	'/connect',
 	'/devices',
 	'/otp',

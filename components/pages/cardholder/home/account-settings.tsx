@@ -8,7 +8,7 @@ import {
   SignOutIcon,
   TermsIcon
 } from "@/lib/icons";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Bell, BarChart3, Settings2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -46,12 +46,21 @@ export default function AccountSettingsList({
       label: "Account settings",
       Icon: AccountSettingsIcon,
     },
-    // {
-    //   href: "/notifications",
-    //   label: "Notification settings",
-    //   Icon: NotificationIcon,
-    // },
-    // { href: "/invite", label: "Invite a friend", Icon: InviteIcon },
+    {
+      href: "/notifications",
+      label: "Notifications",
+      Icon: Bell,
+    },
+    {
+      href: "/analytics",
+      label: "Card analytics",
+      Icon: BarChart3,
+    },
+    {
+      href: "/settings/connect-config",
+      label: "Profile configuration",
+      Icon: Settings2,
+    },
     { href: "/support", label: "Contact support", Icon: ContactIcon },
     { href: "/terms", label: "Terms of service", Icon: TermsIcon },
     { href: "/privacy", label: "Privacy policy", Icon: PrivacyIcon },
