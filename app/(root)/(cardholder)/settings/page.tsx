@@ -16,7 +16,8 @@ import {
 
 export const metadata = generateMetadata({
 	title: 'Settings',
-	description: 'Manage your Connect account settings, profile, and preferences.',
+	description:
+		'Manage your Connect account settings, profile, and preferences.',
 	keywords: ['settings', 'account', 'preferences'],
 });
 
@@ -27,7 +28,8 @@ const SETTINGS_SECTIONS = [
 			{
 				href: '/settings/account',
 				label: 'Account & Profiles',
-				description: 'Manage your profiles, create new ones, or set a default',
+				description:
+					'Manage your profiles, create new ones, or set a default',
 				Icon: User,
 			},
 			{
@@ -44,7 +46,8 @@ const SETTINGS_SECTIONS = [
 			{
 				href: '/notifications',
 				label: 'Notifications',
-				description: 'View card interactions and contact sharing alerts',
+				description:
+					'View card interactions and contact sharing alerts',
 				Icon: Bell,
 			},
 			{

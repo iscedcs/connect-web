@@ -36,7 +36,10 @@ export default async function DashboardPage() {
 	let connectModules = null;
 
 	if (connectProfile?.id && accessToken) {
-		connectModules = await getConnectModules(connectProfile.id, accessToken);
+		connectModules = await getConnectModules(
+			connectProfile.id,
+			accessToken,
+		);
 	}
 	return (
 		<main className='relative bg-black text-white min-h-screen overflow-x-hidden'>
