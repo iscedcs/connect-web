@@ -13,6 +13,7 @@ import { Footer } from '@/components/landing/footer';
 import { Metadata, Viewport } from 'next';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
+import { headers } from 'next/headers';
 import { verifyToken } from '@/lib/verify-jwt';
 
 export const metadata: Metadata = {
@@ -34,7 +35,7 @@ export const viewport: Viewport = {
 	width: 'device-width',
 	initialScale: 1,
 };
-type SearchParams = Promise<{ id: string }>;
+type SearchParams = Promise<{ id?: string; type?: string }>;
 
 export default async function HomePage({
 	searchParams,
@@ -42,9 +43,31 @@ export default async function HomePage({
 	children: React.ReactNode;
 	searchParams: SearchParams;
 }) {
-	const { id } = await searchParams;
+	const { id, type } = await searchParams;
 
 	if (id) {
+		// Record card interaction before redirecting
+		try {
+			const headersList = await headers();
+			const referrer = headersList.get('referer') || null;
+			const connectApi =
+				process.env.CONNECT_API_URL ||
+				process.env.NEXT_PUBLIC_CONNECT_API_URL;
+
+			if (connectApi) {
+				fetch(`${connectApi}/api/card-interactions/record`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						deviceId: id,
+						deviceType: type || null,
+						referrer: referrer,
+						method: 'TAP',
+					}),
+				}).catch(() => {});
+			}
+		} catch {}
+
 		redirect(`/customer/${id}`);
 	}
 

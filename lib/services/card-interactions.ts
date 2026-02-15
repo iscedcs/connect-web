@@ -11,6 +11,8 @@ export interface CardInteraction {
 	userId: string;
 	deviceId: string;
 	method: ScanType;
+	deviceType?: string | null;
+	referrer?: string | null;
 	createdAt: string;
 	updatedAt: string;
 }

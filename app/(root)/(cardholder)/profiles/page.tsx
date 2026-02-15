@@ -39,7 +39,10 @@ export default async function ProfilesPage() {
 			</p>
 
 			<div className='mt-8'>
-				<ProfileList profiles={profiles} accessToken={accessToken} />
+				<ProfileList
+					profiles={profiles}
+					accessToken={accessToken}
+				/>
 			</div>
 		</main>
 	);

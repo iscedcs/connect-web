@@ -124,9 +124,7 @@ export default function HomeClientSection() {
 				]}
 				enabled
 			/>
-			<AccountSettingsList
-				isAuthenticated
-			/>
+			<AccountSettingsList isAuthenticated />
 		</>
 	);
 }

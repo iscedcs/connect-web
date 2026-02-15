@@ -92,9 +92,7 @@ export default async function DashboardPage() {
 				</section>
 
 				<section className='p-4'>
-					<AccountSettingsList
-						isAuthenticated={isAuthed}
-					/>
+					<AccountSettingsList isAuthenticated={isAuthed} />
 				</section>
 			</div>
 		</main>

@@ -157,8 +157,7 @@ export default async function ProfilePreviewPage({
 	const events = await fetchPublicUserEvent(userId);
 
 	const emailItems = (profileData.socials || []).filter(
-		(s: any) =>
-			s.platform?.toLowerCase() === 'email' || s.icon === 'email',
+		(s: any) => s.platform?.toLowerCase() === 'email' || s.icon === 'email',
 	);
 
 	const connectItems = buildConnectList(profileData);
@@ -171,9 +170,7 @@ export default async function ProfilePreviewPage({
 			<div className='sticky top-0 z-50 bg-amber-500/90 backdrop-blur-sm text-black px-4 py-2.5 flex items-center justify-between gap-3'>
 				<div className='flex items-center gap-2'>
 					<Eye className='h-4 w-4 shrink-0' />
-					<span className='text-xs font-semibold'>
-						Preview mode
-					</span>
+					<span className='text-xs font-semibold'>Preview mode</span>
 				</div>
 				<div className='flex items-center gap-2'>
 					<Link
@@ -200,9 +197,9 @@ export default async function ProfilePreviewPage({
 					<div className='w-full h-44 md:h-64 bg-linear-180 from-black/0 via-black/30 to-black/100 absolute top-0 left-0' />
 					<Image
 						src={
-							profile.coverPhoto?.startsWith('http')
-								? profile.coverPhoto
-								: fallbackCover
+							profile.coverPhoto?.startsWith('http') ?
+								profile.coverPhoto
+							:	fallbackCover
 						}
 						height={176}
 						width={1440}
