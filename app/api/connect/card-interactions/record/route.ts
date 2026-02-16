@@ -7,10 +7,7 @@ import { NEXT_PUBLIC_CONNECT_API_ORIGIN, URLS } from '@/lib/const';
 export async function POST(req: Request) {
 	const base = NEXT_PUBLIC_CONNECT_API_ORIGIN;
 	if (!base) {
-		return Response.json(
-			{ error: 'API not configured' },
-			{ status: 500 },
-		);
+		return Response.json({ error: 'API not configured' }, { status: 500 });
 	}
 
 	const payload = await req.json().catch(() => ({}));
@@ -30,7 +27,8 @@ export async function POST(req: Request) {
 	return new Response(body, {
 		status: res.status,
 		headers: {
-			'content-type': res.headers.get('content-type') ?? 'application/json',
+			'content-type':
+				res.headers.get('content-type') ?? 'application/json',
 		},
 	});
 }

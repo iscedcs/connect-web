@@ -8,6 +8,7 @@ import ProfileHeader from '@/components/pages/cardholder/home/profile-header';
 import PromoBanner from '@/components/pages/cardholder/home/promo-banner';
 import { getConnectModules } from '@/lib/services/connect-modules';
 import { getUserDevices } from '@/lib/services/device';
+import { fetchPublicUserEvent } from '@/lib/services/events';
 import { getConnectProfile } from '@/lib/services/profile';
 import { generateMetadata } from '@/lib/metadata';
 
@@ -28,8 +29,12 @@ export default async function DashboardPage() {
 	const userId = isAuthed ? authInfo.user.id : null;
 
 	let userDevices: DeviceInterface[] = [];
+	let userEvents: any[] = [];
 	if (userId && accessToken) {
-		userDevices = await getUserDevices(userId, accessToken);
+		[userDevices, userEvents] = await Promise.all([
+			getUserDevices(userId, accessToken),
+			fetchPublicUserEvent(userId),
+		]);
 	}
 	const hasDevices = userDevices.length > 0;
 
@@ -73,7 +78,7 @@ export default async function DashboardPage() {
 			<div className='pt-80  space-y-10'>
 				<section className='p-4 space-y-5'>
 					<PromoBanner />
-					<EventCard />
+					<EventCard events={userEvents} />
 				</section>
 				<section className='p-4 space-y-10'>
 					{hasDevices ?
