@@ -21,11 +21,14 @@ export default function PublicProfileTabs({
 	events,
 	id,
 	canShowEventsTab = false,
+	basePath = '/customer',
 }: {
 	connectItems: any[];
 	events: any[];
 	id?: any;
 	canShowEventsTab?: boolean;
+	/** Route prefix — '/customer' for device-based, '/p' for slug-based */
+	basePath?: '/customer' | '/p';
 }) {
 	const [activeTab, setActiveTab] = useState<'connect' | 'events'>('connect');
 	const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
@@ -118,7 +121,7 @@ export default function PublicProfileTabs({
 
 		// Public forms from backend: /forms/{id}
 		if (url.startsWith('/forms/')) {
-			return `/customer/${deviceId}${url}`;
+			return `${basePath}/${deviceId}${url}`;
 		}
 
 		return url;
@@ -176,7 +179,7 @@ export default function PublicProfileTabs({
 									Socials
 								</h3>
 								<Link
-									href={`/customer/${id}/socials`}
+									href={`${basePath}/${id}/socials`}
 									className='text-sm text-white/60'
 								>
 									View all
@@ -241,7 +244,7 @@ export default function PublicProfileTabs({
 								</h3>
 
 								<Link
-									href={`/customer/${id}/spotify`}
+									href={`${basePath}/${id}/spotify`}
 									className='text-sm text-white/60 hover:text-white transition'
 								>
 									View all
@@ -309,7 +312,7 @@ export default function PublicProfileTabs({
 								</h3>
 
 								<Link
-									href={`/customer/${id}/youtube`}
+									href={`${basePath}/${id}/youtube`}
 									className='text-sm text-white/60 hover:text-white transition'
 								>
 									View all
@@ -411,7 +414,7 @@ export default function PublicProfileTabs({
 									Files
 								</h3>
 								<Link
-									href={`/customer/${id}/files`}
+									href={`${basePath}/${id}/files`}
 									className='text-sm text-white/60'
 								>
 									View all

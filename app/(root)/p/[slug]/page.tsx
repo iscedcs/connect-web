@@ -311,6 +311,7 @@ export default async function SlugProfilePage({
 				events={events!}
 				id={slug}
 				canShowEventsTab={canShowEventsTab}
+				basePath='/p'
 			/>
 		</main>
 	);

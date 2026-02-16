@@ -1,11 +1,15 @@
-import { fetchPublicProfileUnified } from '@/lib/services/public-profile';
+import { fetchPublicProfileBySlug } from '@/lib/services/public-profile';
 import SocialsMotion from '@/components/customer/socials/socials-motion';
 import { LeftIcon } from '@/lib/icons';
 import Link from 'next/link';
 
-export default async function PublicSocialsPage({ params }: any) {
-	const { id } = await params;
-	const profileLookup = await fetchPublicProfileUnified(id);
+export default async function SlugPublicSocialsPage({
+	params,
+}: {
+	params: Promise<{ slug: string }>;
+}) {
+	const { slug } = await params;
+	const profileLookup = await fetchPublicProfileBySlug(slug);
 
 	if (!profileLookup.data) {
 		return (
@@ -19,10 +23,9 @@ export default async function PublicSocialsPage({ params }: any) {
 
 	return (
 		<main className='min-h-screen bg-black text-white px-4 pt-6 pb-20'>
-			{/* Header */}
 			<div className='mb-6'>
 				<Link
-					href={`/customer/${id}`}
+					href={`/p/${slug}`}
 					className='text-white/50 text-sm'
 				>
 					<LeftIcon />
@@ -34,7 +37,6 @@ export default async function PublicSocialsPage({ params }: any) {
 				</p>
 			</div>
 
-			{/* Grid */}
 			<SocialsMotion socials={socials} />
 		</main>
 	);

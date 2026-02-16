@@ -1,11 +1,15 @@
-import { fetchPublicProfileUnified } from '@/lib/services/public-profile';
+import { fetchPublicProfileBySlug } from '@/lib/services/public-profile';
 import { fetchPublicForm } from '@/lib/services/forms';
 import PublicFormClient from '@/components/customer/forms/public-form-client';
 
-export default async function PublicFormPage({ params }: any) {
-	const { id, formId } = await params;
+export default async function SlugPublicFormPage({
+	params,
+}: {
+	params: Promise<{ slug: string; formId: string }>;
+}) {
+	const { slug, formId } = await params;
 
-	const profileLookup = await fetchPublicProfileUnified(id);
+	const profileLookup = await fetchPublicProfileBySlug(slug);
 	if (!profileLookup.data)
 		return <div className='p-6 text-white'>Profile not found</div>;
 

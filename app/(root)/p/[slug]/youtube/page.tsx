@@ -1,5 +1,5 @@
 import { LeftIcon, RightIcon } from '@/lib/icons';
-import { fetchPublicProfileUnified } from '@/lib/services/public-profile';
+import { fetchPublicProfileBySlug } from '@/lib/services/public-profile';
 import Link from 'next/link';
 import { InlineRenderer } from '@/components/customer/inline-renderers/inline-renderer';
 
@@ -25,9 +25,13 @@ function isYouTubeVideoUrl(url?: string) {
 	}
 }
 
-export default async function PublicYouTubePage({ params }: any) {
-	const { id } = await params;
-	const profileLookup = await fetchPublicProfileUnified(id);
+export default async function SlugPublicYouTubePage({
+	params,
+}: {
+	params: Promise<{ slug: string }>;
+}) {
+	const { slug } = await params;
+	const profileLookup = await fetchPublicProfileBySlug(slug);
 
 	if (!profileLookup.data) {
 		return (
@@ -82,7 +86,7 @@ export default async function PublicYouTubePage({ params }: any) {
 		<main className='min-h-screen bg-black text-white px-4 pt-6 pb-20'>
 			<div className='mb-6'>
 				<Link
-					href={`/customer/${id}`}
+					href={`/p/${slug}`}
 					className='text-white/50 text-sm'
 				>
 					<LeftIcon />

@@ -123,3 +123,46 @@ export async function fetchPublicProfileBySlug(
 		return { data: null, reason: 'unknown', message };
 	}
 }
+
+/** ---------------------------------------
+ * UUID v4 detection — device IDs are UUIDs, slugs are not
+ -----------------------------------------*/
+const UUID_RE =
+	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function looksLikeDeviceId(identifier: string): boolean {
+	return UUID_RE.test(identifier);
+}
+
+/** ---------------------------------------
+ * UNIFIED LOOKUP — resolves both device IDs and slugs
+ *
+ * 1. If the identifier looks like a UUID → try device lookup first, fall back to slug.
+ * 2. Otherwise → try slug first, fall back to device lookup.
+ -----------------------------------------*/
+export async function fetchPublicProfileUnified(
+	identifier: string,
+): Promise<PublicProfileLookupResult> {
+	if (looksLikeDeviceId(identifier)) {
+		const deviceResult = await fetchPublicProfileWithLookup(identifier);
+		if (deviceResult.data) return deviceResult;
+
+		// Device lookup failed — maybe someone stored a UUID-like slug (unlikely but safe)
+		const slugResult = await fetchPublicProfileBySlug(identifier);
+		if (slugResult.data) return slugResult;
+
+		// Return the original device error for proper messaging
+		return deviceResult;
+	}
+
+	// Non-UUID identifier — try slug first
+	const slugResult = await fetchPublicProfileBySlug(identifier);
+	if (slugResult.data) return slugResult;
+
+	// Slug failed — try device lookup as last resort
+	const deviceResult = await fetchPublicProfileWithLookup(identifier);
+	if (deviceResult.data) return deviceResult;
+
+	// Return slug error since that was the primary intent
+	return slugResult;
+}

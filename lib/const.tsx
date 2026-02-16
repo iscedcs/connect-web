@@ -300,6 +300,12 @@ export const URLS = {
 		user: '/device/user/{userId}',
 		update: '/device/update/{id}',
 	},
+	device_profile: {
+		bindings: '/api/device-bindings',
+		link: '/api/profiles/{profileId}/devices/link',
+		unlink: '/api/profiles/{profileId}/devices/unlink/{deviceId}',
+		profile_devices: '/api/profiles/{profileId}/devices/all',
+	},
 	events: {
 		all: '/events/all',
 		event_for_user: '/events/events',

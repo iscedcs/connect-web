@@ -5,7 +5,7 @@ import ScanRecorder from '@/components/customer/scan-recorder';
 import { PhoneIcon } from '@/lib/icons';
 import { fetchPublicUserEvent } from '@/lib/services/events';
 import {
-	fetchPublicProfileWithLookup,
+	fetchPublicProfileUnified,
 	type PublicProfileLookupReason,
 } from '@/lib/services/public-profile';
 import { getPlatformInfo } from '@/lib/connect-social/detect-platform';
@@ -142,7 +142,7 @@ export async function generateMetadata({
 	params: Promise<{ id: string }>;
 }): Promise<Metadata> {
 	const { id } = await params;
-	const profileLookup = await fetchPublicProfileWithLookup(id);
+	const profileLookup = await fetchPublicProfileUnified(id);
 	const profileData = profileLookup.data;
 
 	if (!profileData) {
@@ -300,7 +300,7 @@ export default async function CustomerProfilePage({
 	const { id } = await params;
 	const { scan } = await searchParams;
 	const isScan = scan === '1';
-	const profileLookup = await fetchPublicProfileWithLookup(id);
+	const profileLookup = await fetchPublicProfileUnified(id);
 	const profileData = profileLookup.data;
 
 	const userId = profileData?.profile?.userId;

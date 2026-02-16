@@ -12,6 +12,7 @@ import {
 	FileText,
 	Shield,
 	ChevronRight,
+	Smartphone,
 } from 'lucide-react';
 
 export const metadata = generateMetadata({
@@ -31,6 +32,13 @@ const SETTINGS_SECTIONS = [
 				description:
 					'Manage your profiles, create new ones, or set a default',
 				Icon: User,
+			},
+			{
+				href: '/devices',
+				label: 'Devices',
+				description:
+					'Manage NFC cards, wristbands, and link them to profiles',
+				Icon: Smartphone,
 			},
 			{
 				href: '/settings/connect-config',

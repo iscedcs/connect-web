@@ -1,11 +1,15 @@
 import FilesMotionGrid from '@/components/customer/files/files-motion-grid';
 import { LeftIcon } from '@/lib/icons';
-import { fetchPublicProfileUnified } from '@/lib/services/public-profile';
+import { fetchPublicProfileBySlug } from '@/lib/services/public-profile';
 import Link from 'next/link';
 
-export default async function PublicFilesPage({ params }: any) {
-	const { id } = await params;
-	const profileLookup = await fetchPublicProfileUnified(id);
+export default async function SlugPublicFilesPage({
+	params,
+}: {
+	params: Promise<{ slug: string }>;
+}) {
+	const { slug } = await params;
+	const profileLookup = await fetchPublicProfileBySlug(slug);
 
 	if (!profileLookup.data) {
 		return (
@@ -19,10 +23,9 @@ export default async function PublicFilesPage({ params }: any) {
 
 	return (
 		<main className='min-h-screen bg-black text-white px-4 pt-6 pb-20'>
-			{/* Header */}
 			<div className='mb-6'>
 				<Link
-					href={`/customer/${id}`}
+					href={`/p/${slug}`}
 					className='text-white/50 text-sm'
 				>
 					<LeftIcon />
@@ -34,7 +37,6 @@ export default async function PublicFilesPage({ params }: any) {
 				</p>
 			</div>
 
-			{/* List */}
 			<FilesMotionGrid files={files} />
 		</main>
 	);
