@@ -2,9 +2,11 @@ import PublicProfileTabs from '@/components/customer/public-profile-tabs';
 import ShareQrDialog from '@/components/customer/share-qr-dialog';
 import EmailDialog from '@/components/customer/email-dialog';
 import ScanRecorder from '@/components/customer/scan-recorder';
+import SendMoneyButton from '@/components/customer/send-money-button';
 import { PhoneIcon } from '@/lib/icons';
 import { fetchPublicUserEvent } from '@/lib/services/events';
 import { fetchPublicProfileBySlug } from '@/lib/services/public-profile';
+import { checkCanReceiveMoney } from '@/lib/services/wallet';
 import { getPlatformInfo } from '@/lib/connect-social/detect-platform';
 import { ICONS, COVER_PHOTOS } from '@/lib/const';
 import Image from 'next/image';
@@ -208,7 +210,10 @@ export default async function SlugProfilePage({
 	const { profile, contact } = profileData;
 
 	const userId = profile?.userId;
-	const events = await fetchPublicUserEvent(userId);
+	const [events, canReceiveMoney] = await Promise.all([
+		fetchPublicUserEvent(userId),
+		checkCanReceiveMoney(userId ?? ''),
+	]);
 
 	// Extract emails from socials
 	const emailItems = (profileData.socials || []).filter(
@@ -282,6 +287,14 @@ export default async function SlugProfilePage({
 					>
 						Save Contact
 					</Link>
+					{canReceiveMoney && userId && (
+						<SendMoneyButton
+							recipientUserId={userId}
+							recipientName={profile.name}
+							recipientPhoto={profile.profilePhoto}
+							recipientPosition={profile.position}
+						/>
+					)}
 
 					<div className='flex items-center gap-2 text-xl ml-auto'>
 						<ShareQrDialog

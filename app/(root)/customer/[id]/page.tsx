@@ -2,8 +2,10 @@ import PublicProfileTabs from '@/components/customer/public-profile-tabs';
 import ShareQrDialog from '@/components/customer/share-qr-dialog';
 import EmailDialog from '@/components/customer/email-dialog';
 import ScanRecorder from '@/components/customer/scan-recorder';
+import SendMoneyButton from '@/components/customer/send-money-button';
 import { PhoneIcon } from '@/lib/icons';
 import { fetchPublicUserEvent } from '@/lib/services/events';
+import { checkCanReceiveMoney } from '@/lib/services/wallet';
 import {
 	fetchPublicProfileUnified,
 	type PublicProfileLookupReason,
@@ -304,7 +306,10 @@ export default async function CustomerProfilePage({
 	const profileData = profileLookup.data;
 
 	const userId = profileData?.profile?.userId;
-	const events = await fetchPublicUserEvent(userId);
+	const [events, canReceiveMoney] = await Promise.all([
+		fetchPublicUserEvent(userId),
+		checkCanReceiveMoney(userId ?? ''),
+	]);
 
 	if (!profileData)
 		return <EmptyDeviceOrProfileState reason={profileLookup.reason} />;
@@ -395,6 +400,14 @@ export default async function CustomerProfilePage({
 					>
 						Save Contact
 					</Link>
+					{canReceiveMoney && userId && (
+						<SendMoneyButton
+							recipientUserId={userId}
+							recipientName={profile.name}
+							recipientPhoto={profile.profilePhoto}
+							recipientPosition={profile.position}
+						/>
+					)}
 					{/* <button className="px-5 py-2 bg-white/5 border border-[#868686] rounded-full text-xs">
             <Link href="#">Save contact</Link>
           </button> */}
