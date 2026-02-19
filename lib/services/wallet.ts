@@ -104,3 +104,49 @@ export async function submitBvnKyc(
 		return { success: false, message: 'Network error. Please try again.' };
 	}
 }
+
+/** Wallet status info returned by getWalletStatus */
+export interface WalletStatusInfo {
+	hasWallet: boolean;
+	kycStatus:
+		| 'UNVERIFIED'
+		| 'BVN_SUBMITTED'
+		| 'BVN_VERIFIED'
+		| 'REJECTED'
+		| null;
+	virtualAccountNumber: string | null;
+	virtualAccountBank: string | null;
+	balance: number | null;
+	currency: string | null;
+}
+
+/**
+ * Get the user's NGN wallet status including KYC status and virtual account info.
+ * Returns null if no wallet exists or on any error.
+ */
+export async function getWalletStatus(
+	accessToken: string,
+): Promise<WalletStatusInfo | null> {
+	const wallets = await getMyWallets(accessToken);
+	const ngnWallet = wallets.find((w: any) => w.currency === 'NGN');
+
+	if (!ngnWallet) {
+		return {
+			hasWallet: false,
+			kycStatus: null,
+			virtualAccountNumber: null,
+			virtualAccountBank: null,
+			balance: null,
+			currency: null,
+		};
+	}
+
+	return {
+		hasWallet: true,
+		kycStatus: ngnWallet.kycStatus ?? 'UNVERIFIED',
+		virtualAccountNumber: ngnWallet.virtualAccountNumber ?? null,
+		virtualAccountBank: ngnWallet.virtualAccountBank ?? null,
+		balance: ngnWallet.balance ? parseFloat(ngnWallet.balance) : 0,
+		currency: ngnWallet.currency ?? 'NGN',
+	};
+}
