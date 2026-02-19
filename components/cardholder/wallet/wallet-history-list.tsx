@@ -80,7 +80,7 @@ export default function WalletHistoryList({
 							</div>
 							<div
 								className={cn(
-									'text-xs sm:text-sm',
+									'text-xs sm:text-sm shrink-0 whitespace-nowrap ml-2',
 									t.amount.startsWith('-') ?
 										'text-red-300'
 									:	'text-green-300',

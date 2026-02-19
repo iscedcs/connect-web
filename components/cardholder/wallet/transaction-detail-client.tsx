@@ -2,11 +2,11 @@
 
 import { useRouter } from 'next/navigation';
 import {
-    ArrowLeft,
-    CheckCircle2,
-    Clock,
-    XCircle,
-    AlertTriangle,
+	ArrowLeft,
+	CheckCircle2,
+	Clock,
+	XCircle,
+	AlertTriangle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { WalletTransactionDetail } from '@/lib/services/wallet';
@@ -134,7 +134,7 @@ export default function TransactionDetailClient({
 			{/* Header */}
 			<div className='flex items-center gap-3 px-4 pt-6 pb-2'>
 				<button
-                title='back'
+					title='back'
 					onClick={() => router.back()}
 					className='text-white'
 				>
@@ -224,28 +224,6 @@ export default function TransactionDetailClient({
 					value={formatNaira(tx.balanceAfter)}
 				/>
 			</div>
-
-			{/* Metadata (if any useful data) */}
-			{tx.metadata && Object.keys(tx.metadata).length > 0 && (
-				<div className='mx-4 mt-4 rounded-2xl bg-neutral-900 px-4 py-1 mb-6'>
-					<p className='text-sm text-white/50 py-3 border-b border-white/5'>
-						Additional Info
-					</p>
-					{Object.entries(tx.metadata).map(([key, val]) => (
-						<DetailRow
-							key={key}
-							label={key
-								.replace(/_/g, ' ')
-								.replace(/\b\w/g, (c) => c.toUpperCase())}
-							value={
-								typeof val === 'object' ?
-									JSON.stringify(val)
-								:	String(val)
-							}
-						/>
-					))}
-				</div>
-			)}
 
 			<div className='h-8' />
 		</div>
