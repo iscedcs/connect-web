@@ -29,7 +29,7 @@ export default function BvnActivationClient() {
 					setWalletStatus(status);
 					if (status === 'BVN_VERIFIED') {
 						toast.success('Your wallet is already activated!');
-						router.push('/settings');
+						router.push('/wallet');
 						return;
 					}
 				}
@@ -58,7 +58,7 @@ export default function BvnActivationClient() {
 				toast.success(
 					'Wallet activated! Your virtual account is ready.',
 				);
-				setTimeout(() => router.push('/settings'), 1500);
+				setTimeout(() => router.push('/wallet'), 1500);
 			} else if (status === 'REJECTED') {
 				toast.error(
 					'Verification was rejected. Please try again with correct details.',
@@ -118,7 +118,7 @@ export default function BvnActivationClient() {
 				setWalletStatus('BVN_SUBMITTED');
 			}
 
-			router.push('/settings');
+			router.push('/wallet');
 		} catch {
 			toast.error('Something went wrong. Please check your connection.');
 		}
@@ -160,10 +160,10 @@ export default function BvnActivationClient() {
 					{rechecking ? 'Checking...' : 'Check Status'}
 				</button>
 				<button
-					onClick={() => router.push('/settings')}
+					onClick={() => router.push('/wallet')}
 					className='text-white/40 text-sm hover:text-white/60 transition-colors'
 				>
-					Back to Settings
+					Back to Wallet
 				</button>
 			</div>
 		);
@@ -182,7 +182,7 @@ export default function BvnActivationClient() {
 				</div>
 				<BvnScreen
 					onContinue={handleContinue}
-					backHref='/settings'
+					backHref='/wallet'
 				/>
 			</div>
 		);
@@ -192,7 +192,7 @@ export default function BvnActivationClient() {
 	return (
 		<BvnScreen
 			onContinue={handleContinue}
-			backHref='/settings'
+			backHref='/wallet'
 		/>
 	);
 }

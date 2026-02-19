@@ -194,6 +194,7 @@ export interface WalletStatusInfo {
 	virtualAccountBank: string | null;
 	balance: number | null;
 	currency: string | null;
+	hasPin: boolean;
 }
 
 /**
@@ -215,6 +216,7 @@ export async function getWalletStatus(
 			virtualAccountBank: null,
 			balance: null,
 			currency: null,
+			hasPin: false,
 		};
 	}
 
@@ -226,6 +228,7 @@ export async function getWalletStatus(
 		virtualAccountBank: ngnWallet.virtualAccountBank ?? null,
 		balance: ngnWallet.balance ? parseFloat(ngnWallet.balance) : 0,
 		currency: ngnWallet.currency ?? 'NGN',
+		hasPin: !!ngnWallet.hasPin,
 	};
 }
 
@@ -463,6 +466,138 @@ export async function transferToUser(
 				json?.message ??
 				(res.ok ? 'Transfer completed' : 'Transfer failed'),
 			data: json?.data,
+		};
+	} catch {
+		return { success: false, message: 'Network error. Please try again.' };
+	}
+}
+
+// ─── PIN Management ─────────────────────────────────────────────────
+
+/** Set an initial wallet PIN. */
+export async function setWalletPin(
+	accessToken: string,
+	walletId: string,
+	pin: string,
+): Promise<{ success: boolean; message: string }> {
+	if (!WALLET_API_URL || !accessToken)
+		return { success: false, message: 'Service unavailable' };
+	try {
+		const res = await fetch(
+			`${WALLET_API_URL}/api/wallets/${walletId}/set-pin`,
+			{
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ pin }),
+				cache: 'no-store',
+			},
+		);
+		const json = await res.json();
+		return {
+			success: res.ok && json?.success,
+			message:
+				json?.message ?? (res.ok ? 'PIN set' : 'Failed to set PIN'),
+		};
+	} catch {
+		return { success: false, message: 'Network error. Please try again.' };
+	}
+}
+
+// ─── Payment Methods ────────────────────────────────────────────────
+
+/** Add a payment method (bank account) to a wallet. */
+export async function addPaymentMethod(
+	accessToken: string,
+	walletId: string,
+	data: {
+		type: 'BANK_ACCOUNT' | 'CARD' | 'DEDICATED_ACCOUNT';
+		accountNumber?: string;
+		accountName?: string;
+		bankName?: string;
+		bankCode?: string;
+		label?: string;
+	},
+): Promise<{ success: boolean; message: string }> {
+	if (!WALLET_API_URL || !accessToken)
+		return { success: false, message: 'Service unavailable' };
+	try {
+		const res = await fetch(
+			`${WALLET_API_URL}/api/wallets/${walletId}/payment-methods`,
+			{
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(data),
+				cache: 'no-store',
+			},
+		);
+		const json = await res.json();
+		return {
+			success: res.ok && json?.success,
+			message:
+				json?.message ??
+				(res.ok ?
+					'Payment method added'
+				:	'Failed to add payment method'),
+		};
+	} catch {
+		return { success: false, message: 'Network error. Please try again.' };
+	}
+}
+
+// ─── User Tag (isce-auth) ───────────────────────────────────────────
+
+/**
+ * Get the current user's profile from isce-auth (includes username/tag).
+ */
+export async function getAuthUserProfile(
+	accessToken: string,
+): Promise<{ username: string | null } | null> {
+	if (!AUTH_API_URL || !accessToken) return null;
+	try {
+		const res = await fetch(`${AUTH_API_URL}/user/me`, {
+			headers: { Authorization: `Bearer ${accessToken}` },
+			cache: 'no-store',
+		});
+		if (!res.ok) return null;
+		const json = await res.json();
+		const user = json?.data ?? json;
+		return { username: user?.username ?? null };
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Set or update the authenticated user's tag (username) via isce-auth.
+ */
+export async function setUserTag(
+	accessToken: string,
+	username: string,
+): Promise<{ success: boolean; message: string }> {
+	if (!AUTH_API_URL || !accessToken)
+		return { success: false, message: 'Service unavailable' };
+	try {
+		const res = await fetch(`${AUTH_API_URL}/user`, {
+			method: 'PATCH',
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ username }),
+			cache: 'no-store',
+		});
+		const json = await res.json();
+		return {
+			success: res.ok,
+			message:
+				json?.message ??
+				(res.ok ? 'Tag set successfully' : 'Failed to set tag'),
 		};
 	} catch {
 		return { success: false, message: 'Network error. Please try again.' };

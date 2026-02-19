@@ -10,6 +10,9 @@ import {
 	getMyWallets,
 	createDefaultWallet,
 	submitBvnKyc,
+	resolveAccountNumber,
+	addPaymentMethod,
+	listBanks,
 } from '@/lib/services/wallet';
 
 export async function POST(req: NextRequest) {
@@ -107,6 +110,32 @@ export async function POST(req: NextRequest) {
 		phone,
 		dob,
 	});
+
+	// Save the bank account as a payment method for future withdrawals
+	if (result.success) {
+		try {
+			// Resolve account name and bank name
+			const resolved = await resolveAccountNumber(
+				accessToken,
+				accountNumber,
+				bankCode,
+			);
+			const banks = await listBanks();
+			const bankInfo = banks.find((b) => b.code === bankCode);
+
+			await addPaymentMethod(accessToken, ngnWallet.id, {
+				type: 'BANK_ACCOUNT',
+				accountNumber,
+				accountName:
+					resolved?.accountName ?? `${firstName} ${lastName}`,
+				bankName: bankInfo?.name ?? '',
+				bankCode,
+				label: bankInfo?.name ?? 'Bank Account',
+			});
+		} catch {
+			// Non-blocking — don't fail the KYC flow if payment method save fails
+		}
+	}
 
 	return NextResponse.json(result, { status: result.success ? 200 : 500 });
 }
