@@ -82,7 +82,8 @@ const SETTINGS_SECTIONS = [
 			{
 				href: '/settings/account/tag',
 				label: 'ISCE Tag (@handle)',
-				description: 'Set your unique @tag so others can find and pay you',
+				description:
+					'Set your unique @tag so others can find and pay you',
 				Icon: AtSign,
 			},
 		],
@@ -191,7 +192,8 @@ export default async function SettingsPage() {
 									Manage on ISCE Wallet
 								</p>
 								<p className='text-xs text-white/40 truncate'>
-									View balance, transactions, and full wallet management
+									View balance, transactions, and full wallet
+									management
 								</p>
 							</div>
 							<ExternalLink className='h-4 w-4 text-white/20 shrink-0' />

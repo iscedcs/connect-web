@@ -29,9 +29,7 @@ export async function checkCanReceiveMoney(userId: string): Promise<boolean> {
 }
 
 /** List the authenticated user’s wallets from wallet-nest. */
-export async function getMyWallets(
-	accessToken: string,
-): Promise<any[]> {
+export async function getMyWallets(accessToken: string): Promise<any[]> {
 	if (!WALLET_API_URL || !accessToken) return [];
 	try {
 		const res = await fetch(`${WALLET_API_URL}/api/wallets`, {
