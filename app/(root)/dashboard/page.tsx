@@ -11,6 +11,7 @@ import { getUserDevices } from '@/lib/services/device';
 import { fetchPublicUserEvent } from '@/lib/services/events';
 import { getConnectProfile } from '@/lib/services/profile';
 import { generateMetadata } from '@/lib/metadata';
+import WalletCard from '@/components/pages/cardholder/home/contact-wallet';
 
 export const metadata = generateMetadata({
 	title: 'Dashboard',
@@ -84,7 +85,7 @@ export default async function DashboardPage() {
 					{hasDevices ?
 						<DevicesConnectedCard devices={userDevices} />
 					:	<DevicesCard />}
-					{/* <WalletCard /> */}
+					<WalletCard />
 				</section>
 				<section className='p-4 space-y-10'>
 					{accessToken && connectProfile?.id && (

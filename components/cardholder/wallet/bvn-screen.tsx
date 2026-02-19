@@ -89,7 +89,6 @@ export default function BvnScreen({
                     {/* underline-only input */}
                     <input
                       inputMode="numeric"
-                      pattern="[0-9]*"
                       autoComplete="one-time-code"
                       value={displayBVN}
                       onChange={(e) => handleInput(e.target.value)}

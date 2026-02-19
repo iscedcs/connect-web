@@ -1,7 +1,7 @@
 'use client';
 
 import { ContactIcon, PrivacyIcon, SignOutIcon, TermsIcon } from '@/lib/icons';
-import { ChevronRight, Settings2, Users } from 'lucide-react';
+import { ChevronRight, Settings2, Users, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -24,6 +24,11 @@ export default function AccountSettingsList({
 			href: '/profiles',
 			label: 'View all profiles',
 			Icon: Users,
+		},
+		{
+			href: '/bvn',
+			label: 'Wallet activation',
+			Icon: Wallet,
 		},
 		{
 			href: '/settings/connect-config',
