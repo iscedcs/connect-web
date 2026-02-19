@@ -13,6 +13,9 @@ import {
 	Shield,
 	ChevronRight,
 	Smartphone,
+	Wallet,
+	AtSign,
+	ExternalLink,
 } from 'lucide-react';
 
 export const metadata = generateMetadata({
@@ -63,6 +66,24 @@ const SETTINGS_SECTIONS = [
 				label: 'Card Analytics',
 				description: 'NFC tap and QR scan statistics',
 				Icon: BarChart3,
+			},
+		],
+	},
+	{
+		heading: 'Payments & Wallet',
+		items: [
+			{
+				href: '/bvn',
+				label: 'Activate Wallet Payments',
+				description:
+					'Verify your BVN to receive money on your Connect profile',
+				Icon: Wallet,
+			},
+			{
+				href: '/settings/account/tag',
+				label: 'ISCE Tag (@handle)',
+				description: 'Set your unique @tag so others can find and pay you',
+				Icon: AtSign,
 			},
 		],
 	},
@@ -150,6 +171,33 @@ export default async function SettingsPage() {
 						</div>
 					</section>
 				))}
+
+				{process.env.NEXT_PUBLIC_WALLET_WEB_URL && (
+					<section>
+						<h2 className='text-xs font-semibold uppercase tracking-wider text-white/40 mb-2 px-1'>
+							ISCE Wallet App
+						</h2>
+						<a
+							href={process.env.NEXT_PUBLIC_WALLET_WEB_URL}
+							target='_blank'
+							rel='noopener noreferrer'
+							className='flex items-center gap-3 px-4 py-3.5 rounded-xl border border-white/5 hover:bg-white/5 transition'
+						>
+							<div className='h-9 w-9 rounded-full bg-white/[0.06] flex items-center justify-center shrink-0'>
+								<Wallet className='h-4 w-4 text-white/60' />
+							</div>
+							<div className='flex-1 min-w-0'>
+								<p className='text-sm font-medium'>
+									Manage on ISCE Wallet
+								</p>
+								<p className='text-xs text-white/40 truncate'>
+									View balance, transactions, and full wallet management
+								</p>
+							</div>
+							<ExternalLink className='h-4 w-4 text-white/20 shrink-0' />
+						</a>
+					</section>
+				)}
 			</div>
 		</main>
 	);

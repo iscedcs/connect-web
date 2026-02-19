@@ -27,3 +27,82 @@ export async function checkCanReceiveMoney(userId: string): Promise<boolean> {
 		return false;
 	}
 }
+
+/** List the authenticated user’s wallets from wallet-nest. */
+export async function getMyWallets(
+	accessToken: string,
+): Promise<any[]> {
+	if (!WALLET_API_URL || !accessToken) return [];
+	try {
+		const res = await fetch(`${WALLET_API_URL}/api/wallets`, {
+			headers: { Authorization: `Bearer ${accessToken}` },
+			cache: 'no-store',
+		});
+		if (!res.ok) return [];
+		const json = await res.json();
+		return json?.data?.wallets ?? [];
+	} catch {
+		return [];
+	}
+}
+
+/** Create a default NGN wallet for the authenticated user. */
+export async function createDefaultWallet(
+	accessToken: string,
+): Promise<any | null> {
+	if (!WALLET_API_URL || !accessToken) return null;
+	try {
+		const res = await fetch(`${WALLET_API_URL}/api/wallets`, {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ currency: 'NGN' }),
+		});
+		if (!res.ok) return null;
+		const json = await res.json();
+		return json?.data?.wallet ?? null;
+	} catch {
+		return null;
+	}
+}
+
+/** Submit BVN to wallet-nest KYC endpoint. */
+export async function submitBvnKyc(
+	accessToken: string,
+	walletId: string,
+	params: {
+		bvn: string;
+		firstName: string;
+		lastName: string;
+		email: string;
+		phone?: string;
+		dob?: string;
+	},
+): Promise<{ success: boolean; message: string; data?: any }> {
+	if (!WALLET_API_URL || !accessToken)
+		return { success: false, message: 'Service unavailable' };
+	try {
+		const res = await fetch(
+			`${WALLET_API_URL}/api/wallets/${walletId}/kyc/submit-bvn`,
+			{
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(params),
+				cache: 'no-store',
+			},
+		);
+		const json = await res.json();
+		return {
+			success: res.ok && json?.success,
+			message: json?.message ?? (res.ok ? 'BVN submitted' : 'Failed'),
+			data: json?.data,
+		};
+	} catch {
+		return { success: false, message: 'Network error. Please try again.' };
+	}
+}
