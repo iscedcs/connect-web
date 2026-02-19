@@ -145,6 +145,13 @@ export default function WalletCard() {
 					</div>
 					<div className='h-px bg-[#868686] mx-4' />
 					<Link
+						href='/bvn'
+						className='block w-full py-4 text-sm hover:bg-neutral-800 text-center text-emerald-400 transition'
+					>
+						Check verification status
+					</Link>
+					<div className='h-px bg-[#868686] mx-4' />
+					<Link
 						href='/terms'
 						className='block w-full py-4 text-sm hover:bg-neutral-800 text-center transition'
 					>

@@ -181,6 +181,7 @@ export async function recheckKycStatus(accessToken: string): Promise<{
 /** Wallet status info returned by getWalletStatus */
 export interface WalletStatusInfo {
 	hasWallet: boolean;
+	walletId: string | null;
 	kycStatus:
 		| 'UNVERIFIED'
 		| 'BVN_SUBMITTED'
@@ -206,6 +207,7 @@ export async function getWalletStatus(
 	if (!ngnWallet) {
 		return {
 			hasWallet: false,
+			walletId: null,
 			kycStatus: null,
 			virtualAccountNumber: null,
 			virtualAccountBank: null,
@@ -216,10 +218,59 @@ export async function getWalletStatus(
 
 	return {
 		hasWallet: true,
+		walletId: ngnWallet.id ?? null,
 		kycStatus: ngnWallet.kycStatus ?? 'UNVERIFIED',
 		virtualAccountNumber: ngnWallet.virtualAccountNumber ?? null,
 		virtualAccountBank: ngnWallet.virtualAccountBank ?? null,
 		balance: ngnWallet.balance ? parseFloat(ngnWallet.balance) : 0,
 		currency: ngnWallet.currency ?? 'NGN',
 	};
+}
+
+/** Transaction record from wallet-nest */
+export interface WalletTransaction {
+	id: string;
+	reference: string;
+	type: string;
+	flow: 'CREDIT' | 'DEBIT';
+	amount: string;
+	fee: string;
+	balanceBefore: string;
+	balanceAfter: string;
+	status: string;
+	description: string | null;
+	sourceModule: string;
+	sourceReference: string | null;
+	createdAt: string;
+	updatedAt: string;
+}
+
+/** Fetch paginated transactions for a wallet from wallet-nest. */
+export async function getTransactions(
+	accessToken: string,
+	walletId: string,
+	query?: { page?: number; perPage?: number },
+): Promise<{
+	transactions: WalletTransaction[];
+	pagination: { page: number; perPage: number; total: number; pages: number };
+} | null> {
+	if (!WALLET_API_URL || !accessToken || !walletId) return null;
+	try {
+		const params = new URLSearchParams();
+		if (query?.page) params.set('page', String(query.page));
+		if (query?.perPage) params.set('perPage', String(query.perPage));
+
+		const qs = params.toString();
+		const url = `${WALLET_API_URL}/api/wallets/${walletId}/transactions${qs ? `?${qs}` : ''}`;
+
+		const res = await fetch(url, {
+			headers: { Authorization: `Bearer ${accessToken}` },
+			cache: 'no-store',
+		});
+		if (!res.ok) return null;
+		const json = await res.json();
+		return json?.data ?? null;
+	} catch {
+		return null;
+	}
 }
