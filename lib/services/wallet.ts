@@ -30,6 +30,73 @@ export async function checkCanReceiveMoney(userId: string): Promise<boolean> {
 	}
 }
 
+/** Public wallet profile returned for the "Send money" modal on a public Connect profile */
+export interface PublicWalletProfile {
+	canReceive: boolean;
+	accountNumber: string | null;
+	bankName: string | null;
+	accountName: string | null;
+	txLimit: number | null;
+	isceTag: string | null;
+}
+
+/**
+ * Fetch the public wallet profile for a user — used on the Connect public profile page.
+ * Combines the virtual account details from wallet-nest with the ISCE tag from isce-auth.
+ * Returns null on any error so the send-money button is simply hidden.
+ */
+export async function getPublicWalletProfile(
+	userId: string,
+): Promise<PublicWalletProfile | null> {
+	if (!WALLET_API_URL || !userId) return null;
+
+	try {
+		const [walletRes, userRes] = await Promise.allSettled([
+			fetch(`${WALLET_API_URL}/api/wallets/public-account/${userId}`, {
+				next: { revalidate: 300 },
+			}),
+			AUTH_API_URL ?
+				fetch(`${AUTH_API_URL}/user/one/${userId}`, {
+					next: { revalidate: 300 },
+				})
+			:	Promise.resolve(null),
+		]);
+
+		const walletFetch =
+			walletRes.status === 'fulfilled' ? walletRes.value : null;
+		if (!walletFetch?.ok) return null;
+
+		const walletJson = await walletFetch.json();
+		if (!walletJson?.success || !walletJson?.data?.canReceive) return null;
+
+		let isceTag: string | null = null;
+		if (userRes.status === 'fulfilled' && userRes.value) {
+			try {
+				const userFetch = userRes.value as Response;
+				if (userFetch.ok) {
+					const userJson = await userFetch.json();
+					const username =
+						userJson?.data?.username ?? userJson?.username ?? null;
+					isceTag = username ? `@${username}` : null;
+				}
+			} catch {
+				// non-fatal — ISCE tag simply won't be shown
+			}
+		}
+
+		return {
+			canReceive: true,
+			accountNumber: walletJson.data.accountNumber ?? null,
+			bankName: walletJson.data.bankName ?? null,
+			accountName: walletJson.data.accountName ?? null,
+			txLimit: walletJson.data.txLimit ?? null,
+			isceTag,
+		};
+	} catch {
+		return null;
+	}
+}
+
 /** List the authenticated user’s wallets from wallet-nest. */
 export async function getMyWallets(accessToken: string): Promise<any[]> {
 	if (!WALLET_API_URL || !accessToken) return [];

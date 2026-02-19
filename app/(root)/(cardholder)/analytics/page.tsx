@@ -3,6 +3,7 @@ import AnalyticsClient from '@/components/pages/cardholder/analytics/analytics-c
 import { generateMetadata } from '@/lib/metadata';
 import { http } from '@/lib/services/http';
 import { URLS } from '@/lib/const';
+import SubpageHeader from '@/components/shared/subpage-header';
 
 export const metadata = generateMetadata({
 	title: 'Analytics',
@@ -44,12 +45,17 @@ export default async function AnalyticsPage() {
 	const defaultProfileId = await getDefaultProfileId(authInfo.accessToken);
 
 	return (
-		<main className='p-6 space-y-4'>
-			<h1 className='text-2xl text-white font-bold'>Analytics</h1>
-			<AnalyticsClient
-				accessToken={authInfo.accessToken}
-				defaultProfileId={defaultProfileId}
+		<main className='min-h-screen bg-black text-white'>
+			<SubpageHeader
+				title='Card Analytics'
+				backHref='/dashboard'
 			/>
+			<div className='p-6 space-y-4'>
+				<AnalyticsClient
+					accessToken={authInfo.accessToken}
+					defaultProfileId={defaultProfileId}
+				/>
+			</div>
 		</main>
 	);
 }

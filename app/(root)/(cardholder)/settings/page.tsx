@@ -3,6 +3,7 @@ import { getConnectProfile } from '@/lib/services/profile';
 import { generateMetadata } from '@/lib/metadata';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import SubpageHeader from '@/components/shared/subpage-header';
 import {
 	User,
 	Bell,
@@ -123,9 +124,11 @@ export default async function SettingsPage() {
 
 	return (
 		<main className='min-h-screen bg-black text-white'>
+			<SubpageHeader
+				title='Settings'
+				backHref='/dashboard'
+			/>
 			<div className='max-w-md mx-auto p-4 space-y-6'>
-				<h1 className='text-2xl font-bold'>Settings</h1>
-
 				{!hasProfile && (
 					<Link
 						href='/settings/account/create'

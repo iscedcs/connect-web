@@ -51,7 +51,7 @@ export default async function ConnectConfigPage() {
 			<div className='max-w-md mx-auto p-4'>
 				<div className='flex items-center gap-3 mb-6'>
 					<Link
-						href='/settings/account'
+						href='/settings'
 						className='p-2 rounded-full hover:bg-white/10 transition'
 					>
 						<ChevronLeft className='h-5 w-5' />

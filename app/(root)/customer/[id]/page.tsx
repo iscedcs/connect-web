@@ -5,7 +5,7 @@ import ScanRecorder from '@/components/customer/scan-recorder';
 import SendMoneyButton from '@/components/customer/send-money-button';
 import { PhoneIcon } from '@/lib/icons';
 import { fetchPublicUserEvent } from '@/lib/services/events';
-import { checkCanReceiveMoney } from '@/lib/services/wallet';
+import { getPublicWalletProfile } from '@/lib/services/wallet';
 import {
 	fetchPublicProfileUnified,
 	type PublicProfileLookupReason,
@@ -306,9 +306,9 @@ export default async function CustomerProfilePage({
 	const profileData = profileLookup.data;
 
 	const userId = profileData?.profile?.userId;
-	const [events, canReceiveMoney] = await Promise.all([
+	const [events, walletProfile] = await Promise.all([
 		fetchPublicUserEvent(userId),
-		checkCanReceiveMoney(userId ?? ''),
+		getPublicWalletProfile(userId ?? ''),
 	]);
 
 	if (!profileData)
@@ -400,12 +400,13 @@ export default async function CustomerProfilePage({
 					>
 						Save Contact
 					</Link>
-					{canReceiveMoney && userId && (
+					{walletProfile?.canReceive && userId && (
 						<SendMoneyButton
 							recipientUserId={userId}
 							recipientName={profile.name}
 							recipientPhoto={profile.profilePhoto}
 							recipientPosition={profile.position}
+							wallet={walletProfile}
 						/>
 					)}
 					{/* <button className="px-5 py-2 bg-white/5 border border-[#868686] rounded-full text-xs">

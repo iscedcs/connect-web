@@ -3,6 +3,7 @@ import ContactsClient from '@/components/pages/cardholder/contact/contact-client
 import { fetchReceivedContacts } from '@/lib/services/contact';
 import { getConnectProfile } from '@/lib/services/profile';
 import { generateMetadata } from '@/lib/metadata';
+import SubpageHeader from '@/components/shared/subpage-header';
 
 export const metadata = generateMetadata({
 	title: 'Contacts',
@@ -37,17 +38,21 @@ export default async function ReceivedContactsPage() {
 	});
 
 	return (
-		<main className='p-6 space-y-4'>
-			<h1 className='text-2xl text-white font-bold'>Received Contacts</h1>
-
-			{data.contacts.length === 0 ?
-				<p className='text-white/50'>No contacts received yet</p>
-			:	<ContactsClient
-					data={data}
-					profileId={profile.id}
-					accessToken={accessToken}
-				/>
-			}
+		<main className='min-h-screen bg-black text-white'>
+			<SubpageHeader
+				title='Contacts'
+				backHref='/dashboard'
+			/>
+			<div className='p-6 space-y-4'>
+				{data.contacts.length === 0 ?
+					<p className='text-white/50'>No contacts received yet</p>
+				:	<ContactsClient
+						data={data}
+						profileId={profile.id}
+						accessToken={accessToken}
+					/>
+				}
+			</div>
 		</main>
 	);
 }

@@ -1,6 +1,7 @@
 import { getAuthInfo } from '@/actions/auth';
 import NotificationsClient from '@/components/pages/cardholder/notification/notifications-client';
 import { generateMetadata } from '@/lib/metadata';
+import SubpageHeader from '@/components/shared/subpage-header';
 
 export const metadata = generateMetadata({
 	title: 'Notifications',
@@ -17,9 +18,14 @@ export default async function NotificationsPage() {
 	}
 
 	return (
-		<main className='p-6 space-y-4'>
-			<h1 className='text-2xl text-white font-bold'>Notifications</h1>
-			<NotificationsClient accessToken={authInfo.accessToken} />
+		<main className='min-h-screen bg-black text-white'>
+			<SubpageHeader
+				title='Notifications'
+				backHref='/dashboard'
+			/>
+			<div className='p-6 space-y-4'>
+				<NotificationsClient accessToken={authInfo.accessToken} />
+			</div>
 		</main>
 	);
 }

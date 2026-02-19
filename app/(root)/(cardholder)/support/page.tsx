@@ -1,6 +1,7 @@
 import { getAuthInfo } from '@/actions/auth';
 import SupportClient from '@/components/pages/cardholder/support/support-client';
 import { generateMetadata } from '@/lib/metadata';
+import SubpageHeader from '@/components/shared/subpage-header';
 
 export const metadata = generateMetadata({
 	title: 'Support',
@@ -16,9 +17,14 @@ export default async function SupportPage() {
 	}
 
 	return (
-		<main className='p-6 space-y-4'>
-			<h1 className='text-2xl text-white font-bold'>Support</h1>
-			<SupportClient accessToken={authInfo.accessToken} />
+		<main className='min-h-screen bg-black text-white'>
+			<SubpageHeader
+				title='Support'
+				backHref='/settings'
+			/>
+			<div className='p-6 space-y-4'>
+				<SupportClient accessToken={authInfo.accessToken} />
+			</div>
 		</main>
 	);
 }

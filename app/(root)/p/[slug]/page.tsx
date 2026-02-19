@@ -6,7 +6,7 @@ import SendMoneyButton from '@/components/customer/send-money-button';
 import { PhoneIcon } from '@/lib/icons';
 import { fetchPublicUserEvent } from '@/lib/services/events';
 import { fetchPublicProfileBySlug } from '@/lib/services/public-profile';
-import { checkCanReceiveMoney } from '@/lib/services/wallet';
+import { getPublicWalletProfile } from '@/lib/services/wallet';
 import { getPlatformInfo } from '@/lib/connect-social/detect-platform';
 import { ICONS, COVER_PHOTOS } from '@/lib/const';
 import Image from 'next/image';
@@ -210,9 +210,9 @@ export default async function SlugProfilePage({
 	const { profile, contact } = profileData;
 
 	const userId = profile?.userId;
-	const [events, canReceiveMoney] = await Promise.all([
+	const [events, walletProfile] = await Promise.all([
 		fetchPublicUserEvent(userId),
-		checkCanReceiveMoney(userId ?? ''),
+		getPublicWalletProfile(userId ?? ''),
 	]);
 
 	// Extract emails from socials
@@ -287,12 +287,13 @@ export default async function SlugProfilePage({
 					>
 						Save Contact
 					</Link>
-					{canReceiveMoney && userId && (
+					{walletProfile?.canReceive && userId && (
 						<SendMoneyButton
 							recipientUserId={userId}
 							recipientName={profile.name}
 							recipientPhoto={profile.profilePhoto}
 							recipientPosition={profile.position}
+							wallet={walletProfile}
 						/>
 					)}
 
