@@ -1,9 +1,11 @@
 /**
- * Wallet service — server-side calls to wallet-nest.
+ * Wallet service — server-side calls to wallet-nest and isce-auth.
  */
 
 const WALLET_API_URL =
 	process.env.WALLET_API_URL || process.env.NEXT_PUBLIC_WALLET_API_URL || '';
+
+const AUTH_API_URL = process.env.AUTH_API_URL || '';
 
 /**
  * Check if a user has completed wallet onboarding (KYC level ONE+, active virtual account).
@@ -272,5 +274,164 @@ export async function getTransactions(
 		return json?.data ?? null;
 	} catch {
 		return null;
+	}
+}
+
+// ─── Recipient lookup ───────────────────────────────────────────────
+
+/** Recipient info returned by the lookup functions */
+export interface RecipientInfo {
+	userId: string;
+	firstName: string;
+	lastName: string;
+	displayPicture: string | null;
+	isceTag: string | null;
+}
+
+/**
+ * Look up a user by their ISCE Tag (username).
+ * Calls isce-auth's public `GET /user/tag/:tag` endpoint.
+ */
+export async function lookupByTag(tag: string): Promise<RecipientInfo | null> {
+	if (!AUTH_API_URL || !tag) return null;
+	try {
+		const normalized = tag.startsWith('@') ? tag.slice(1) : tag;
+		const res = await fetch(
+			`${AUTH_API_URL}/user/tag/${encodeURIComponent(normalized)}`,
+			{
+				cache: 'no-store',
+			},
+		);
+		if (!res.ok) return null;
+		const json = await res.json();
+		if (!json?.success || !json?.data) return null;
+		return {
+			userId: json.data.id,
+			firstName: json.data.firstName,
+			lastName: json.data.lastName,
+			displayPicture: json.data.displayPicture ?? null,
+			isceTag: json.data.isceTag ?? null,
+		};
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Look up a wallet owner by their DVA (dedicated virtual account) number.
+ * Calls wallet-nest's public `GET /api/wallets/lookup-dva/:accountNumber` then
+ * resolves the userId to user details via isce-auth.
+ */
+export async function lookupByDva(
+	accountNumber: string,
+	accessToken?: string,
+): Promise<(RecipientInfo & { accountName: string | null }) | null> {
+	if (!WALLET_API_URL || !accountNumber) return null;
+	try {
+		const res = await fetch(
+			`${WALLET_API_URL}/api/wallets/lookup-dva/${encodeURIComponent(accountNumber)}`,
+			{ cache: 'no-store' },
+		);
+		if (!res.ok) return null;
+		const json = await res.json();
+		if (!json?.success || !json?.data?.userId) return null;
+
+		// Resolve user details from isce-auth
+		const userRes = await fetch(
+			`${AUTH_API_URL}/user/one/${json.data.userId}`,
+			{
+				cache: 'no-store',
+				headers:
+					accessToken ?
+						{ Authorization: `Bearer ${accessToken}` }
+					:	{},
+			},
+		);
+		let firstName = json.data.accountName?.split(' ')[0] ?? 'Unknown';
+		let lastName =
+			json.data.accountName?.split(' ').slice(1).join(' ') ?? '';
+		let displayPicture: string | null = null;
+		let isceTag: string | null = null;
+
+		if (userRes.ok) {
+			const userJson = await userRes.json();
+			if (userJson?.success && userJson?.data) {
+				firstName = userJson.data.firstName ?? firstName;
+				lastName = userJson.data.lastName ?? lastName;
+				displayPicture = userJson.data.displayPicture ?? null;
+				isceTag =
+					userJson.data.username ?
+						`@${userJson.data.username}`
+					:	null;
+			}
+		}
+
+		return {
+			userId: json.data.userId,
+			firstName,
+			lastName,
+			displayPicture,
+			isceTag,
+			accountName: json.data.accountName ?? null,
+		};
+	} catch {
+		return null;
+	}
+}
+
+// ─── Transfers ──────────────────────────────────────────────────────
+
+export interface TransferResult {
+	success: boolean;
+	message: string;
+	data?: {
+		transfer: {
+			id: string;
+			reference: string;
+			amount: string;
+			status: string;
+		};
+	};
+}
+
+/**
+ * Send money to another ISCE user by their userId.
+ * Calls wallet-nest's `POST /api/wallets/:walletId/transfers/to-user`.
+ */
+export async function transferToUser(
+	accessToken: string,
+	walletId: string,
+	params: {
+		receiverUserId: string;
+		amount: number;
+		pin: string;
+		description?: string;
+	},
+): Promise<TransferResult> {
+	if (!WALLET_API_URL || !accessToken)
+		return { success: false, message: 'Service unavailable' };
+	try {
+		const res = await fetch(
+			`${WALLET_API_URL}/api/wallets/${walletId}/transfers/to-user`,
+			{
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(params),
+				cache: 'no-store',
+			},
+		);
+		const json = await res.json();
+		return {
+			success: res.ok && json?.success,
+			message:
+				json?.message ??
+				(res.ok ? 'Transfer completed' : 'Transfer failed'),
+			data: json?.data,
+		};
+	} catch {
+		return { success: false, message: 'Network error. Please try again.' };
 	}
 }
