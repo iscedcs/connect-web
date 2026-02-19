@@ -151,6 +151,33 @@ export async function submitBvnKyc(
 	}
 }
 
+/**
+ * Poll wallet-nest to recheck KYC status from Paystack.
+ * If verification completed, the backend upgrades the wallet + creates DVA.
+ */
+export async function recheckKycStatus(accessToken: string): Promise<{
+	success: boolean;
+	data?: {
+		kycStatus: string;
+		kycLevel?: string;
+		virtualAccountNumber?: string | null;
+		virtualAccountBank?: string | null;
+	};
+}> {
+	if (!WALLET_API_URL || !accessToken) return { success: false };
+	try {
+		const res = await fetch(`${WALLET_API_URL}/api/wallets/kyc-status`, {
+			headers: { Authorization: `Bearer ${accessToken}` },
+			cache: 'no-store',
+		});
+		if (!res.ok) return { success: false };
+		const json = await res.json();
+		return json;
+	} catch {
+		return { success: false };
+	}
+}
+
 /** Wallet status info returned by getWalletStatus */
 export interface WalletStatusInfo {
 	hasWallet: boolean;
