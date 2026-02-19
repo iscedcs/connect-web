@@ -539,6 +539,67 @@ export async function transferToUser(
 	}
 }
 
+/**
+ * Get the authenticated user's KYC verification bank account
+ * (the account submitted during BVN verification — the only withdrawal destination).
+ */
+export async function getMyKycBankAccount(accessToken: string): Promise<{
+	accountNumber: string;
+	bankCode: string;
+	accountName: string | null;
+} | null> {
+	if (!WALLET_API_URL || !accessToken) return null;
+	try {
+		const res = await fetch(`${WALLET_API_URL}/api/wallets/kyc-account`, {
+			headers: { Authorization: `Bearer ${accessToken}` },
+			cache: 'no-store',
+		});
+		if (!res.ok) return null;
+		const json = await res.json();
+		if (!json?.success || !json?.data) return null;
+		return json.data;
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Withdraw to the KYC-verified bank account.
+ * Calls wallet-nest POST /api/wallets/:walletId/transactions/withdraw-to-kyc
+ */
+export async function withdrawToKycAccount(
+	accessToken: string,
+	walletId: string,
+	params: { amount: number; pin: string; description?: string },
+): Promise<{ success: boolean; message: string; data?: any }> {
+	if (!WALLET_API_URL || !accessToken)
+		return { success: false, message: 'Service unavailable' };
+	try {
+		const res = await fetch(
+			`${WALLET_API_URL}/api/wallets/${walletId}/transactions/withdraw-to-kyc`,
+			{
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(params),
+				cache: 'no-store',
+			},
+		);
+		const json = await res.json();
+		return {
+			success: res.ok && json?.success,
+			message:
+				json?.message ??
+				(res.ok ? 'Withdrawal initiated' : 'Withdrawal failed'),
+			data: json?.data,
+		};
+	} catch {
+		return { success: false, message: 'Network error. Please try again.' };
+	}
+}
+
 // ─── PIN Management ─────────────────────────────────────────────────
 
 /** Set an initial wallet PIN. */

@@ -17,6 +17,10 @@ export default function WalletEmptyState({
 				onSend={
 					headerProps.onSend ?? (() => router.push('/wallet/send'))
 				}
+				onWithdraw={
+					headerProps.onWithdraw ??
+					(() => router.push('/wallet/withdraw'))
+				}
 			/>
 
 			<div className='px-4'>

@@ -9,7 +9,7 @@ import {
 	SendIcon,
 } from '@/lib/icons';
 import { cn } from '@/lib/utils';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowDownToLine, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
 export default function WalletHeader({
@@ -22,6 +22,7 @@ export default function WalletHeader({
 	onTopUp,
 	onSend,
 	onTransactions,
+	onWithdraw,
 	className,
 }: {
 	backHref?: string;
@@ -33,6 +34,7 @@ export default function WalletHeader({
 	onTopUp?: () => void;
 	onSend?: () => void;
 	onTransactions?: () => void;
+	onWithdraw?: () => void;
 	className?: string;
 }) {
 	return (
@@ -102,7 +104,7 @@ export default function WalletHeader({
 
 			{/* actions */}
 			<div className='mt-5 '>
-				<div className='mx-auto max-w-[320px] grid grid-cols-3 place-items-center gap-2'>
+				<div className='mx-auto max-w-[360px] grid grid-cols-4 place-items-center gap-2'>
 					<Button
 						onClick={onTopUp}
 						className='w-14 h-14 rounded-full bg-white text-black flex items-center justify-center shadow'
@@ -119,10 +121,17 @@ export default function WalletHeader({
 					</Button>
 					<Button
 						onClick={onTransactions}
-						className='w-14 h-14 rounded-full bg-white text-black flex items-center justify-center shadow ml-auto'
+						className='w-14 h-14 rounded-full bg-white text-black flex items-center justify-center shadow'
 						aria-label='Transactions'
 					>
 						<ScanIcon className='w-24 h-24' />
+					</Button>
+					<Button
+						onClick={onWithdraw}
+						className='w-14 h-14 rounded-full bg-white text-black flex items-center justify-center shadow'
+						aria-label='Withdraw'
+					>
+						<ArrowDownToLine className='w-6 h-6' />
 					</Button>
 				</div>
 			</div>

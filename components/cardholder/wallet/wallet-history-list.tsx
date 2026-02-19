@@ -29,6 +29,10 @@ export default function WalletHistoryList({
 				onSend={
 					headerProps.onSend ?? (() => router.push('/wallet/send'))
 				}
+				onWithdraw={
+					headerProps.onWithdraw ??
+					(() => router.push('/wallet/withdraw'))
+				}
 			/>
 
 			<div className='px-4 mt-5'>
