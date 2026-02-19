@@ -71,7 +71,7 @@ export default function BvnScreen({
 	// Account resolution
 	const [resolvedName, setResolvedName] = useState<string | null>(null);
 	const [resolving, setResolving] = useState(false);
-	const resolveTimerRef = useRef<ReturnType<typeof setTimeout>>();
+	const resolveTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
 	// Fetch banks on mount
 	useEffect(() => {
@@ -93,6 +93,7 @@ export default function BvnScreen({
 		function handleClick(e: MouseEvent) {
 			if (
 				dropdownRef.current &&
+				!dropdownRef.current.contains(e.target as Node)
 			) {
 				setShowBankDropdown(false);
 			}
@@ -103,6 +104,7 @@ export default function BvnScreen({
 
 	const resolveAccount = useCallback(
 		async (acctNum: string, bCode: string) => {
+			if (acctNum.length !== 10 || !bCode) {
 				setResolvedName(null);
 				return;
 			}
@@ -166,11 +168,12 @@ export default function BvnScreen({
 		}
 	};
 
-	const filteredBanks = bankSearch
-		? banks.filter((b) =>
+	const filteredBanks =
+		bankSearch ?
+			banks.filter((b) =>
 				b.name.toLowerCase().includes(bankSearch.toLowerCase()),
 			)
-		: banks;
+		:	banks;
 
 	const accountNumber = form.watch('accountNumber');
 	const bankCode = form.watch('bankCode');
@@ -203,11 +206,14 @@ export default function BvnScreen({
 					>
 						<ScanLine className='w-5 h-5' />
 					</button>
-					<h1 className='text-2xl font-semibold'>Verify Your Identity</h1>
+					<h1 className='text-2xl font-semibold'>
+						Verify Your Identity
+					</h1>
 				</div>
 
 				<p className='text-white/60 text-sm mb-6'>
-					We need your BVN and bank account details to activate your wallet.
+					We need your BVN and bank account details to activate your
+					wallet.
 				</p>
 
 				<Form {...form}>
@@ -235,7 +241,9 @@ export default function BvnScreen({
 											inputMode='numeric'
 											autoComplete='one-time-code'
 											value={displayBVN}
-											onChange={(e) => handleBvnInput(e.target.value)}
+											onChange={(e) =>
+												handleBvnInput(e.target.value)
+											}
 											placeholder='0192-3848-233'
 											className={cn(
 												'w-full bg-transparent text-base outline-none',
@@ -258,9 +266,17 @@ export default function BvnScreen({
 									<FormLabel className='text-white/70 text-sm'>
 										Bank
 									</FormLabel>
-									<div className='relative' ref={dropdownRef}>
+									<div
+										className='relative'
+										ref={dropdownRef}
+									>
 										<button
 											type='button'
+											onClick={() =>
+												setShowBankDropdown(
+													!showBankDropdown,
+												)
+											}
 											className={cn(
 												'w-full flex items-center justify-between',
 												'bg-transparent text-base outline-none',
@@ -269,20 +285,22 @@ export default function BvnScreen({
 											)}
 										>
 											<span className='truncate'>
-												{banksLoading
-													? 'Loading banks...'
-													: selectedBankName || 'Select your bank'}
+												{banksLoading ?
+													'Loading banks...'
+												:	selectedBankName ||
+													'Select your bank'
+												}
 											</span>
-											{banksLoading ? (
+											{banksLoading ?
 												<Loader2 className='w-4 h-4 animate-spin shrink-0' />
-											) : (
-												<ChevronDown
+											:	<ChevronDown
 													className={cn(
 														'w-4 h-4 transition-transform shrink-0',
-														showBankDropdown && 'rotate-180',
+														showBankDropdown &&
+															'rotate-180',
 													)}
 												/>
-											)}
+											}
 										</button>
 
 										{showBankDropdown && (
@@ -291,32 +309,48 @@ export default function BvnScreen({
 													<input
 														type='text'
 														value={bankSearch}
-														onChange={(e) => setBankSearch(e.target.value)}
+														onChange={(e) =>
+															setBankSearch(
+																e.target.value,
+															)
+														}
 														placeholder='Search banks...'
 														className='w-full bg-zinc-800 text-sm text-white rounded-md px-3 py-2 outline-none placeholder-white/40'
 														autoFocus
 													/>
 												</div>
 												<div className='overflow-y-auto max-h-48'>
-													{filteredBanks.length === 0 ? (
+													{(
+														filteredBanks.length ===
+														0
+													) ?
 														<div className='px-3 py-4 text-sm text-white/40 text-center'>
 															No banks found
 														</div>
-													) : (
-														filteredBanks.map((bank) => (
-															<button
-																key={bank.code}
-																type='button'
-																onClick={() => handleBankSelect(bank)}
-																className={cn(
-																	'w-full text-left px-3 py-2.5 text-sm hover:bg-white/10 transition-colors',
-																	bankCode === bank.code && 'bg-white/5 text-white font-medium',
-																)}
-															>
-																{bank.name}
-															</button>
-														))
-													)}
+													:	filteredBanks.map(
+															(bank) => (
+																<button
+																	key={
+																		bank.code
+																	}
+																	type='button'
+																	onClick={() =>
+																		handleBankSelect(
+																			bank,
+																		)
+																	}
+																	className={cn(
+																		'w-full text-left px-3 py-2.5 text-sm hover:bg-white/10 transition-colors',
+																		bankCode ===
+																			bank.code &&
+																			'bg-white/5 text-white font-medium',
+																	)}
+																>
+																	{bank.name}
+																</button>
+															),
+														)
+													}
 												</div>
 											</div>
 										)}
@@ -339,7 +373,11 @@ export default function BvnScreen({
 										<input
 											inputMode='numeric'
 											value={accountNumber}
-											onChange={(e) => handleAccountInput(e.target.value)}
+											onChange={(e) =>
+												handleAccountInput(
+													e.target.value,
+												)
+											}
 											placeholder='0123456789'
 											className={cn(
 												'w-full bg-transparent text-base outline-none',
@@ -357,6 +395,7 @@ export default function BvnScreen({
 											<span>Verifying account...</span>
 										</div>
 									)}
+									{resolvedName && !resolving && (
 										<div className='flex items-center gap-2 mt-2 text-sm text-green-400'>
 											<CheckCircle2 className='w-3.5 h-3.5' />
 											<span>{resolvedName}</span>
@@ -374,19 +413,17 @@ export default function BvnScreen({
 								type='submit'
 								className={cn(
 									'w-full rounded-2xl py-3 text-base font-medium shadow-sm',
-									isValid
-										? 'bg-white text-black'
-										: 'bg-white/30 text-black/60',
+									isValid ?
+										'bg-white text-black'
+									:	'bg-white/30 text-black/60',
 								)}
 							>
-								{form.formState.isSubmitting ? (
+								{form.formState.isSubmitting ?
 									<>
 										<Loader2 className='w-4 h-4 mr-2 animate-spin' />
 										Submitting...
 									</>
-								) : (
-									'Continue'
-								)}
+								:	'Continue'}
 							</Button>
 						</div>
 					</form>
