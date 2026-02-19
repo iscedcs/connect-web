@@ -12,12 +12,20 @@ import { csrfFetch } from '@/lib/csrf-client';
 export default function BvnActivationClient() {
 	const router = useRouter();
 
-	const handleContinue = async (bvn: string) => {
+	const handleContinue = async (data: {
+		bvn: string;
+		accountNumber: string;
+		bankCode: string;
+	}) => {
 		try {
 			const res = await csrfFetch('/api/wallet/kyc', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ bvn }),
+				body: JSON.stringify({
+					bvn: data.bvn,
+					accountNumber: data.accountNumber,
+					bankCode: data.bankCode,
+				}),
 			});
 
 			const json = await res.json();
@@ -44,5 +52,10 @@ export default function BvnActivationClient() {
 		}
 	};
 
-	return <BvnScreen onContinue={handleContinue} backHref='/settings' />;
+	return (
+		<BvnScreen
+			onContinue={handleContinue}
+			backHref='/settings'
+		/>
+	);
 }

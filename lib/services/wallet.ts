@@ -66,12 +66,58 @@ export async function createDefaultWallet(
 	}
 }
 
-/** Submit BVN to wallet-nest KYC endpoint. */
+/** List Nigerian banks from wallet-nest (Paystack). */
+export async function listBanks(): Promise<
+	{ name: string; code: string; slug: string }[]
+> {
+	if (!WALLET_API_URL) return [];
+	try {
+		const res = await fetch(`${WALLET_API_URL}/api/wallets/banks`, {
+			next: { revalidate: 3600 }, // cache 1 hour — bank list rarely changes
+		});
+		if (!res.ok) return [];
+		const json = await res.json();
+		return json?.data ?? [];
+	} catch {
+		return [];
+	}
+}
+
+/** Resolve a bank account number to the account holder name. */
+export async function resolveAccountNumber(
+	accessToken: string,
+	accountNumber: string,
+	bankCode: string,
+): Promise<{ accountName: string; accountNumber: string } | null> {
+	if (!WALLET_API_URL || !accessToken) return null;
+	try {
+		const params = new URLSearchParams({
+			account_number: accountNumber,
+			bank_code: bankCode,
+		});
+		const res = await fetch(
+			`${WALLET_API_URL}/api/wallets/resolve-account?${params}`,
+			{
+				headers: { Authorization: `Bearer ${accessToken}` },
+				cache: 'no-store',
+			},
+		);
+		if (!res.ok) return null;
+		const json = await res.json();
+		return json?.data ?? null;
+	} catch {
+		return null;
+	}
+}
+
+/** Submit BVN + bank account to wallet-nest KYC endpoint. */
 export async function submitBvnKyc(
 	accessToken: string,
 	walletId: string,
 	params: {
 		bvn: string;
+		accountNumber: string;
+		bankCode: string;
 		firstName: string;
 		lastName: string;
 		email: string;

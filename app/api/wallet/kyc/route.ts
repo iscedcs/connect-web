@@ -33,11 +33,33 @@ export async function POST(req: NextRequest) {
 	}
 
 	const body = await req.json().catch(() => ({}));
-	const { bvn, dob } = body as { bvn?: string; dob?: string };
+	const { bvn, accountNumber, bankCode, dob } = body as {
+		bvn?: string;
+		accountNumber?: string;
+		bankCode?: string;
+		dob?: string;
+	};
 
 	if (!bvn || !/^\d{11}$/.test(bvn)) {
 		return NextResponse.json(
 			{ success: false, message: 'A valid 11-digit BVN is required' },
+			{ status: 400 },
+		);
+	}
+
+	if (!accountNumber || !/^\d{10}$/.test(accountNumber)) {
+		return NextResponse.json(
+			{
+				success: false,
+				message: 'A valid 10-digit account number is required',
+			},
+			{ status: 400 },
+		);
+	}
+
+	if (!bankCode || bankCode.trim().length === 0) {
+		return NextResponse.json(
+			{ success: false, message: 'Bank code is required' },
 			{ status: 400 },
 		);
 	}
@@ -56,7 +78,10 @@ export async function POST(req: NextRequest) {
 		ngnWallet = await createDefaultWallet(accessToken);
 		if (!ngnWallet) {
 			return NextResponse.json(
-				{ success: false, message: 'Failed to create wallet. Please try again.' },
+				{
+					success: false,
+					message: 'Failed to create wallet. Please try again.',
+				},
 				{ status: 500 },
 			);
 		}
@@ -66,13 +91,16 @@ export async function POST(req: NextRequest) {
 	if (ngnWallet.kycStatus === 'BVN_VERIFIED') {
 		return NextResponse.json({
 			success: true,
-			message: 'Your wallet is already verified and ready to receive payments.',
+			message:
+				'Your wallet is already verified and ready to receive payments.',
 			data: { kycStatus: 'BVN_VERIFIED' },
 		});
 	}
 
 	const result = await submitBvnKyc(accessToken, ngnWallet.id, {
 		bvn,
+		accountNumber,
+		bankCode,
 		firstName,
 		lastName,
 		email,
