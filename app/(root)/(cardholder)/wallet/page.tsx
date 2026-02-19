@@ -64,7 +64,7 @@ export default async function WalletPage() {
 	const txData =
 		walletStatus.walletId ?
 			await getTransactions(accessToken, walletStatus.walletId, {
-				perPage: 50,
+				perPage: 10,
 			})
 		:	null;
 

@@ -279,6 +279,39 @@ export async function getTransactions(
 
 // ─── Recipient lookup ───────────────────────────────────────────────
 
+/** Full transaction detail from wallet-nest (single transaction endpoint) */
+export interface WalletTransactionDetail extends WalletTransaction {
+	balanceBefore: string;
+	balanceAfter: string;
+	sourceModule: string;
+	sourceReference: string | null;
+	updatedAt: string;
+	metadata: Record<string, any> | null;
+}
+
+/** Fetch a single transaction by reference from wallet-nest. */
+export async function getTransactionByReference(
+	accessToken: string,
+	walletId: string,
+	reference: string,
+): Promise<WalletTransactionDetail | null> {
+	if (!WALLET_API_URL || !accessToken || !walletId || !reference) return null;
+	try {
+		const url = `${WALLET_API_URL}/api/wallets/${walletId}/transactions/${encodeURIComponent(reference)}`;
+		const res = await fetch(url, {
+			headers: { Authorization: `Bearer ${accessToken}` },
+			cache: 'no-store',
+		});
+		if (!res.ok) return null;
+		const json = await res.json();
+		return json?.data?.transaction ?? null;
+	} catch {
+		return null;
+	}
+}
+
+// ─── Recipient lookup (continued) ──────────────────────────────────
+
 /** Recipient info returned by the lookup functions */
 export interface RecipientInfo {
 	userId: string;

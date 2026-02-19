@@ -17,11 +17,9 @@ export type WalletTxn = {
 
 export default function WalletHistoryList({
 	items,
-	onShowMore,
 	...headerProps
 }: {
 	items: WalletTxn[];
-	onShowMore?: () => void;
 } & React.ComponentProps<typeof WalletHeader>) {
 	const router = useRouter();
 	return (
@@ -37,12 +35,12 @@ export default function WalletHistoryList({
 				{/* header row */}
 				<div className='flex items-baseline justify-between'>
 					<h3 className='text-lg font-medium'>History</h3>
-					<button
-						onClick={onShowMore}
+					<Link
+						href='/wallet/transactions'
 						className='text-xs text-white/70'
 					>
-						Show more
-					</button>
+						View all
+					</Link>
 				</div>
 
 				{/* list */}
@@ -61,10 +59,15 @@ export default function WalletHistoryList({
 											alt=''
 											className='w-full h-full object-cover'
 										/>
-									:	<span className='text-sm'>🏦</span>}
+									:	<span className='text-xs sm:text-sm'>
+											🏦
+										</span>
+									}
 								</span>
-								<div>
-									<p className='text-sm'>{t.title}</p>
+								<div className='min-w-0'>
+									<p className='text-xs sm:text-sm line-clamp-1'>
+										{t.title}
+									</p>
 									<p className='text-[11px] text-white/60'>
 										{t.date}{' '}
 										<span className='ml-2'>{t.time}</span>
@@ -73,7 +76,7 @@ export default function WalletHistoryList({
 							</div>
 							<div
 								className={cn(
-									'text-sm',
+									'text-xs sm:text-sm',
 									t.amount.startsWith('-') ?
 										'text-red-300'
 									:	'text-green-300',
