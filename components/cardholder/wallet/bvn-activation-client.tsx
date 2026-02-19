@@ -64,6 +64,13 @@ export default function BvnActivationClient() {
 					'Verification was rejected. Please try again with correct details.',
 				);
 				setWalletStatus('REJECTED');
+			} else if (status === 'UNVERIFIED') {
+				// Stale customer record was cleared — let user re-submit
+				toast.info(
+					json?.data?.message ||
+						'Please submit your BVN again to start verification.',
+				);
+				setWalletStatus('UNVERIFIED');
 			} else {
 				toast.info(
 					'Still processing. Paystack is verifying your identity — check back shortly.',
