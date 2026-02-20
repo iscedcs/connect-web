@@ -18,6 +18,7 @@ export default function BvnActivationClient() {
 	const router = useRouter();
 	const [walletStatus, setWalletStatus] = useState<string | null>(null);
 	const [rejectionReason, setRejectionReason] = useState<string | null>(null);
+	const [showRetryForm, setShowRetryForm] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [rechecking, setRechecking] = useState(false);
 
@@ -91,7 +92,9 @@ export default function BvnActivationClient() {
 
 	const handleContinue = async (data: BvnFormData) => {
 		const isRetry =
-			walletStatus === 'REJECTED' || walletStatus === 'UNVERIFIED';
+			showRetryForm ||
+			walletStatus === 'REJECTED' ||
+			walletStatus === 'UNVERIFIED';
 		const endpoint = isRetry ? '/api/wallet/kyc-retry' : '/api/wallet/kyc';
 		try {
 			const res = await csrfFetch(endpoint, {
@@ -138,8 +141,38 @@ export default function BvnActivationClient() {
 		);
 	}
 
-	// BVN already submitted — show recheck UI
+	// BVN already submitted — show recheck UI or retry form
 	if (walletStatus === 'BVN_SUBMITTED') {
+		if (showRetryForm) {
+			return (
+				<div className='flex flex-col min-h-screen'>
+					<div className='flex flex-col gap-1 px-6 py-4 bg-yellow-500/10 border-b border-yellow-500/20'>
+						<div className='flex items-center justify-between'>
+							<div className='flex items-center gap-3'>
+								<RefreshCw className='w-5 h-5 text-yellow-400 flex-shrink-0' />
+								<p className='text-yellow-300 text-sm font-medium'>
+									Enter your corrected details to restart verification.
+								</p>
+							</div>
+							<button
+								onClick={() => setShowRetryForm(false)}
+								className='text-yellow-400/70 text-xs hover:text-yellow-300 transition-colors ml-4 flex-shrink-0'
+							>
+								Cancel
+							</button>
+						</div>
+						<p className='text-yellow-400/70 text-xs ml-8'>
+							The previous pending submission will be replaced.
+						</p>
+					</div>
+					<BvnScreen
+						onContinue={handleContinue}
+						backHref='#'
+					/>
+				</div>
+			);
+		}
+
 		return (
 			<div className='flex flex-col items-center justify-center min-h-screen px-6 text-center gap-6'>
 				<div className='w-16 h-16 rounded-full bg-yellow-500/10 flex items-center justify-center'>
@@ -163,6 +196,12 @@ export default function BvnActivationClient() {
 						<Loader2 className='w-4 h-4 animate-spin' />
 					:	<RefreshCw className='w-4 h-4' />}
 					{rechecking ? 'Checking...' : 'Check Status'}
+				</button>
+				<button
+					onClick={() => setShowRetryForm(true)}
+					className='text-yellow-400/70 text-sm hover:text-yellow-300 transition-colors underline underline-offset-2'
+				>
+					Use different information
 				</button>
 				<button
 					onClick={() => router.push('/wallet')}
