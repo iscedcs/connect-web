@@ -17,6 +17,7 @@ type BvnFormData = { bvn: string; accountNumber: string; bankCode: string };
 export default function BvnActivationClient() {
 	const router = useRouter();
 	const [walletStatus, setWalletStatus] = useState<string | null>(null);
+	const [rejectionReason, setRejectionReason] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [rechecking, setRechecking] = useState(false);
 
@@ -29,6 +30,9 @@ export default function BvnActivationClient() {
 					const json = await res.json();
 					const status = json?.data?.kycStatus ?? null;
 					setWalletStatus(status);
+					if (json?.data?.kycRejectionReason) {
+						setRejectionReason(json.data.kycRejectionReason);
+					}
 					if (status === 'BVN_VERIFIED') {
 						toast.success('Your wallet is already activated!');
 						router.push('/wallet');
@@ -174,12 +178,18 @@ export default function BvnActivationClient() {
 	if (walletStatus === 'REJECTED') {
 		return (
 			<div className='flex flex-col min-h-screen'>
-				<div className='flex items-center gap-3 px-6 py-4 bg-red-500/10 border-b border-red-500/20'>
-					<XCircle className='w-5 h-5 text-red-400 flex-shrink-0' />
-					<p className='text-red-300 text-sm'>
-						Your previous verification was rejected. Enter your
-						corrected details below to try again.
-					</p>
+				<div className='flex flex-col gap-1 px-6 py-4 bg-red-500/10 border-b border-red-500/20'>
+					<div className='flex items-center gap-3'>
+						<XCircle className='w-5 h-5 text-red-400 flex-shrink-0' />
+						<p className='text-red-300 text-sm font-medium'>
+							Verification rejected. Please try again with corrected details.
+						</p>
+					</div>
+					{rejectionReason && (
+						<p className='text-red-400/80 text-xs ml-8'>
+							Reason: {rejectionReason}
+						</p>
+					)}
 				</div>
 				<BvnScreen
 					onContinue={handleContinue}

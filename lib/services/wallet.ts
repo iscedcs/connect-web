@@ -299,6 +299,7 @@ export interface WalletStatusInfo {
 		| 'BVN_VERIFIED'
 		| 'REJECTED'
 		| null;
+	kycRejectionReason: string | null;
 	virtualAccountNumber: string | null;
 	virtualAccountBank: string | null;
 	balance: number | null;
@@ -321,6 +322,7 @@ export async function getWalletStatus(
 			hasWallet: false,
 			walletId: null,
 			kycStatus: null,
+			kycRejectionReason: null,
 			virtualAccountNumber: null,
 			virtualAccountBank: null,
 			balance: null,
@@ -333,6 +335,7 @@ export async function getWalletStatus(
 		hasWallet: true,
 		walletId: ngnWallet.id ?? null,
 		kycStatus: ngnWallet.kycStatus ?? 'UNVERIFIED',
+		kycRejectionReason: ngnWallet.kycRejectionReason ?? null,
 		virtualAccountNumber: ngnWallet.virtualAccountNumber ?? null,
 		virtualAccountBank: ngnWallet.virtualAccountBank ?? null,
 		balance: ngnWallet.balance ? parseFloat(ngnWallet.balance) : 0,
