@@ -70,13 +70,13 @@ export function Navbar({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
 							</a>
 						:	<>
 								<a
-									href='/dashboard'
+									href={`${process.env.NEXT_PUBLIC_AUTH_WEB_URL}/sign-in`}
 									className='text-sm text-zinc-400 hover:text-white transition-colors px-4 py-2'
 								>
 									Log in
 								</a>
 								<a
-									href='/dashboard'
+									href={`${process.env.NEXT_PUBLIC_AUTH_WEB_URL}/sign-up`}
 									className='text-sm bg-[#7B93FF] text-[#030014] px-5 py-2.5 rounded-lg hover:bg-[#7B93FF]/90 transition-colors font-medium'
 								>
 									Get Started
@@ -122,7 +122,7 @@ export function Navbar({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
 								</motion.a>
 							))}
 							<motion.a
-								href='/dashboard'
+								href={isLoggedIn ? '/dashboard' : `${process.env.NEXT_PUBLIC_AUTH_WEB_URL}/sign-up`}
 								initial={{ opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ delay: 0.4 }}

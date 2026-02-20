@@ -63,7 +63,7 @@ export function CtaSection() {
 
 						<div className='mt-8 md:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4'>
 							<a
-								href='/dashboard'
+								href={`${process.env.NEXT_PUBLIC_AUTH_WEB_URL}/sign-up`}
 								className='group w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#7B93FF] text-[#030014] px-8 py-4 rounded-xl text-sm md:text-base font-medium hover:bg-[#7B93FF]/90 transition-all duration-200'
 							>
 								Create Your Profile Free
