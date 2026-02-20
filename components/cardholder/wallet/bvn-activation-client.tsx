@@ -7,6 +7,8 @@ import BvnScreen from './bvn-screen';
 import { csrfFetch } from '@/lib/csrf-client';
 import { Loader2, RefreshCw, XCircle } from 'lucide-react';
 
+type BvnFormData = { bvn: string; accountNumber: string; bankCode: string };
+
 /**
  * Client wrapper around BvnScreen that wires up the real API call.
  * Checks wallet status on mount — if BVN_SUBMITTED, shows a recheck UI
@@ -83,13 +85,12 @@ export default function BvnActivationClient() {
 		}
 	};
 
-	const handleContinue = async (data: {
-		bvn: string;
-		accountNumber: string;
-		bankCode: string;
-	}) => {
+	const handleContinue = async (data: BvnFormData) => {
+		const isRetry =
+			walletStatus === 'REJECTED' || walletStatus === 'UNVERIFIED';
+		const endpoint = isRetry ? '/api/wallet/kyc-retry' : '/api/wallet/kyc';
 		try {
-			const res = await csrfFetch('/api/wallet/kyc', {
+			const res = await csrfFetch(endpoint, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -169,15 +170,15 @@ export default function BvnActivationClient() {
 		);
 	}
 
-	// REJECTED — show retry message + form
+	// REJECTED — show retry banner + form
 	if (walletStatus === 'REJECTED') {
 		return (
 			<div className='flex flex-col min-h-screen'>
 				<div className='flex items-center gap-3 px-6 py-4 bg-red-500/10 border-b border-red-500/20'>
 					<XCircle className='w-5 h-5 text-red-400 flex-shrink-0' />
 					<p className='text-red-300 text-sm'>
-						Your previous verification was rejected. Please try
-						again with correct details.
+						Your previous verification was rejected. Enter your
+						corrected details below to try again.
 					</p>
 				</div>
 				<BvnScreen

@@ -221,6 +221,48 @@ export async function submitBvnKyc(
 }
 
 /**
+ * Retry KYC with corrected/new information.
+ * Calls wallet-nest's POST /wallets/:id/kyc/retry.
+ * Only allowed when kycStatus is REJECTED or UNVERIFIED.
+ */
+export async function retryBvnKyc(
+	accessToken: string,
+	walletId: string,
+	params: {
+		bvn: string;
+		accountNumber: string;
+		bankCode: string;
+		firstName?: string;
+		lastName?: string;
+	},
+): Promise<{ success: boolean; message: string; data?: any }> {
+	if (!WALLET_API_URL || !accessToken)
+		return { success: false, message: 'Service unavailable' };
+	try {
+		const res = await fetch(
+			`${WALLET_API_URL}/api/wallets/${walletId}/kyc/retry`,
+			{
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(params),
+				cache: 'no-store',
+			},
+		);
+		const json = await res.json();
+		return {
+			success: res.ok && json?.success,
+			message: json?.message ?? (res.ok ? 'BVN re-submitted' : 'Failed'),
+			data: json?.data,
+		};
+	} catch {
+		return { success: false, message: 'Network error. Please try again.' };
+	}
+}
+
+/**
  * Poll wallet-nest to recheck KYC status from Paystack.
  * If verification completed, the backend upgrades the wallet + creates DVA.
  */
