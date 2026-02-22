@@ -1,4 +1,4 @@
-import { URLS } from '@/lib/const';
+import { BASE_URLS, URLS } from '@/lib/const';
 
 /**
  * Public proxy for recording card interactions (no auth required).
