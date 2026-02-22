@@ -6,6 +6,8 @@ import {
 import ArtisanDirectoryClient from '@/components/customer/artisan-directory-client';
 import type { Metadata } from 'next';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
 	title: 'Artisan Directory — ISCE Connect',
 	description:

@@ -14,20 +14,29 @@ import Link from 'next/link';
 const CONNECT_API = process.env.NEXT_PUBLIC_CONNECT_API_URL!;
 
 interface Props {
-	initialData: DirectoryResponse;
-	featured: ArtisanDirectoryCard[];
-	categories: ArtisanCategory[];
+	initialData: DirectoryResponse | null;
+	featured: ArtisanDirectoryCard[] | null;
+	categories: ArtisanCategory[] | null;
 }
 
 export default function ArtisanDirectoryClient({
 	initialData,
-	featured,
-	categories,
+	featured: featuredProp,
+	categories: categoriesProp,
 }: Props) {
-	const [artisans, setArtisans] = useState(initialData.artisans);
-	const [total, setTotal] = useState(initialData.total);
-	const [page, setPage] = useState(initialData.page);
-	const [totalPages, setTotalPages] = useState(initialData.totalPages);
+	const safeInitial = initialData ?? {
+		artisans: [],
+		total: 0,
+		page: 1,
+		totalPages: 1,
+	};
+	const featured = featuredProp ?? [];
+	const categories = categoriesProp ?? [];
+
+	const [artisans, setArtisans] = useState(safeInitial.artisans);
+	const [total, setTotal] = useState(safeInitial.total);
+	const [page, setPage] = useState(safeInitial.page);
+	const [totalPages, setTotalPages] = useState(safeInitial.totalPages);
 	const [search, setSearch] = useState('');
 	const [selectedCategory, setSelectedCategory] = useState('');
 	const [loading, setLoading] = useState(false);
