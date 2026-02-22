@@ -1,4 +1,4 @@
-import { NEXT_PUBLIC_CONNECT_API_ORIGIN, URLS } from '@/lib/const';
+import { URLS } from '@/lib/const';
 import { getBearerAndUserId } from '../_lib/auth';
 
 export async function GET() {
@@ -7,7 +7,7 @@ export async function GET() {
 
 	const { token } = got;
 
-	const base = NEXT_PUBLIC_CONNECT_API_ORIGIN!;
+	const base = BASE_URLS.CONNECT_API!;
 	const upstream = `${base}${URLS.device_profile.bindings}`;
 
 	const res = await fetch(upstream, {

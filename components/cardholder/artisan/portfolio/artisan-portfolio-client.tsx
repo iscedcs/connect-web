@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { PortfolioItem } from '@/lib/types/artisan';
-import { NEXT_PUBLIC_CONNECT_API_ORIGIN, URLS } from '@/lib/const';
+import { URLS } from '@/lib/const';
 import { uploadAsset } from '@/lib/client-upload';
 import {
 	ArrowLeft,
@@ -120,7 +120,7 @@ export default function ArtisanPortfolioClient({
 					})
 				:	buildUrl(URLS.artisan.add_portfolio, { profileId });
 
-			const res = await fetch(`${NEXT_PUBLIC_CONNECT_API_ORIGIN}${url}`, {
+			const res = await fetch(`${BASE_URLS.CONNECT_API}${url}`, {
 				method: isEdit ? 'PATCH' : 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -156,7 +156,7 @@ export default function ArtisanPortfolioClient({
 				profileId,
 				itemId,
 			});
-			const res = await fetch(`${NEXT_PUBLIC_CONNECT_API_ORIGIN}${url}`, {
+			const res = await fetch(`${BASE_URLS.CONNECT_API}${url}`, {
 				method: 'DELETE',
 				headers: {
 					Authorization: `Bearer ${accessToken}`,

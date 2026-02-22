@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import type { Booking, BookingStatus } from '@/lib/types/artisan';
-import { NEXT_PUBLIC_CONNECT_API_ORIGIN, URLS } from '@/lib/const';
+import { URLS } from '@/lib/const';
 import {
 	ArrowLeft,
 	Loader2,
@@ -118,7 +118,7 @@ export default function ArtisanBookingsClient({
 				profileId,
 				bookingId,
 			});
-			const res = await fetch(`${NEXT_PUBLIC_CONNECT_API_ORIGIN}${url}`, {
+			const res = await fetch(`${BASE_URLS.CONNECT_API}${url}`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

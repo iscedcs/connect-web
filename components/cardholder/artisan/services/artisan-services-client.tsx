@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import type { ArtisanService } from '@/lib/types/artisan';
-import { NEXT_PUBLIC_CONNECT_API_ORIGIN, URLS } from '@/lib/const';
+import { URLS } from '@/lib/const';
 import {
 	ArrowLeft,
 	Loader2,
@@ -97,7 +97,7 @@ export default function ArtisanServicesClient({
 					})
 				:	buildUrl(URLS.artisan.create_service, { profileId });
 
-			const res = await fetch(`${NEXT_PUBLIC_CONNECT_API_ORIGIN}${url}`, {
+			const res = await fetch(`${BASE_URLS.CONNECT_API}${url}`, {
 				method: isEdit ? 'PATCH' : 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -133,7 +133,7 @@ export default function ArtisanServicesClient({
 				profileId,
 				serviceId,
 			});
-			const res = await fetch(`${NEXT_PUBLIC_CONNECT_API_ORIGIN}${url}`, {
+			const res = await fetch(`${BASE_URLS.CONNECT_API}${url}`, {
 				method: 'DELETE',
 				headers: {
 					Authorization: `Bearer ${accessToken}`,

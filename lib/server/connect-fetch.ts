@@ -2,7 +2,7 @@ import 'server-only';
 import { cookies } from 'next/headers';
 import { decodeJwt } from '../verify-jwt';
 
-const NEXT_PUBLIC_CONNECT_API_ORIGIN =
+const BASE_URLS.CONNECT_API =
 	process.env.CONNECT_API_URL || process.env.NEXT_PUBLIC_CONNECT_API_URL!;
 
 export async function connectFetch(
@@ -19,7 +19,7 @@ export async function connectFetch(
 		});
 	}
 
-	const url = `${NEXT_PUBLIC_CONNECT_API_ORIGIN}${path}`;
+	const url = `${BASE_URLS.CONNECT_API}${path}`;
 	const headers = new Headers(init.headers as any);
 	if (init.body && !headers.has('content-type')) {
 		headers.set('content-type', 'application/json');

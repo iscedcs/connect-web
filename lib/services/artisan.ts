@@ -1,5 +1,5 @@
 import { getAuthInfo } from '@/actions/auth';
-import { NEXT_PUBLIC_CONNECT_API_ORIGIN, URLS } from '../const';
+import { URLS } from '../const';
 import type {
 	ArtisanProfile,
 	ArtisanRequirements,
@@ -53,7 +53,7 @@ function headers(accessToken: string, json = true): HeadersInit {
 	return h;
 }
 
-const BASE = () => NEXT_PUBLIC_CONNECT_API_ORIGIN || '';
+const BASE = () => BASE_URLS.CONNECT_API || '';
 
 // ═══════════════════════════════════════════════════════════
 // REGISTRATION & PROFILE

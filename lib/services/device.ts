@@ -1,4 +1,4 @@
-import { AUTH_API, URLS } from '../const';
+import { BASE_URLS, URLS } from '../const';
 
 type BaseRes<T = any> = { ok: boolean; status: number; data: T };
 
@@ -43,7 +43,7 @@ export async function createDevice(params: {
 
 export async function getUserDevices(userId: string, accessToken: string) {
 	const res = await fetch(
-		`${AUTH_API}${URLS.device.user.replace('{userId}', userId)}`,
+		`${BASE_URLS.AUTH_API}${URLS.device.user.replace('{userId}', userId)}`,
 		{
 			headers: {
 				accept: 'application/json',

@@ -1,11 +1,11 @@
-import { NEXT_PUBLIC_CONNECT_API_ORIGIN, URLS } from '@/lib/const';
+import { URLS } from '@/lib/const';
 
 /**
  * Public proxy for recording card interactions (no auth required).
  * Forwards the body to connect-nest's record endpoint.
  */
 export async function POST(req: Request) {
-	const base = NEXT_PUBLIC_CONNECT_API_ORIGIN;
+	const base = BASE_URLS.CONNECT_API;
 	if (!base) {
 		return Response.json({ error: 'API not configured' }, { status: 500 });
 	}

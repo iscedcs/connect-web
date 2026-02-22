@@ -1,6 +1,6 @@
 import { getAuthInfo } from '@/actions/auth';
 import ProfileList from '@/components/settings/account/profile-list';
-import { NEXT_PUBLIC_CONNECT_API_ORIGIN, URLS } from '@/lib/const';
+import { BASE_URLS, URLS } from '@/lib/const';
 import { generateMetadata } from '@/lib/metadata';
 import { redirect } from 'next/navigation';
 import SubpageHeader from '@/components/shared/subpage-header';
@@ -22,7 +22,7 @@ export default async function ProfilesPage() {
 	const accessToken = auth.accessToken;
 
 	const res = await fetch(
-		`${NEXT_PUBLIC_CONNECT_API_ORIGIN}${URLS.multi_profile.all}`,
+		`${BASE_URLS.CONNECT_API}${URLS.multi_profile.all}`,
 		{
 			headers: { Authorization: `Bearer ${accessToken}` },
 			cache: 'no-store',

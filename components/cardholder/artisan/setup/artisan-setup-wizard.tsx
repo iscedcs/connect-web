@@ -7,20 +7,13 @@ import { SlideStep } from '@/components/ui/slide-step';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import {
-	ArrowLeft,
-	ArrowRight,
-	Briefcase,
-	CheckCircle2,
-	Loader2,
-} from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
 import type {
 	ArtisanCategory,
 	ArtisanRequirements,
 	WorkingHoursEntry,
 } from '@/lib/types/artisan';
-import { NEXT_PUBLIC_CONNECT_API_ORIGIN, URLS } from '@/lib/const';
-import Link from 'next/link';
+import { BASE_URLS, URLS } from '@/lib/const';
 
 type SetupStep = 'info' | 'categories' | 'hours' | 'review' | 'done';
 
@@ -64,10 +57,6 @@ export default function ArtisanSetupWizard({
 			isOpen: true,
 		})),
 	);
-
-	// Requirements check
-	const hasProfile = requirements?.hasProfile ?? false;
-	const hasWallet = requirements?.hasWallet ?? true; // default true to not block
 
 	const toggleCategory = (id: string) => {
 		setSelectedCategories((prev) =>
@@ -120,7 +109,7 @@ export default function ArtisanSetupWizard({
 			};
 
 			const res = await fetch(
-				`${NEXT_PUBLIC_CONNECT_API_ORIGIN}${URLS.artisan.register}`,
+				`${BASE_URLS.CONNECT_API}${URLS.artisan.register}`,
 				{
 					method: 'POST',
 					headers: {
@@ -148,31 +137,6 @@ export default function ArtisanSetupWizard({
 			setSubmitting(false);
 		}
 	};
-
-	// ─── Requirements Gate ──────────────────────────────────
-
-	if (!hasProfile) {
-		return (
-			<div className='flex flex-col items-center justify-center py-20 gap-6 text-center'>
-				<Briefcase className='size-12 text-white/30' />
-				<div>
-					<h2 className='text-xl font-semibold'>Profile Required</h2>
-					<p className='text-sm text-white/60 mt-2 max-w-xs'>
-						You need a Connect profile before you can register as an
-						artisan.
-					</p>
-				</div>
-				<Link href='/dashboard'>
-					<Button
-						variant='outline'
-						className='bg-white/5 border-white/10'
-					>
-						Go to Dashboard
-					</Button>
-				</Link>
-			</div>
-		);
-	}
 
 	// ─── Done Step ──────────────────────────────────────────
 

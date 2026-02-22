@@ -1,6 +1,6 @@
 import { getAuthInfo } from '@/actions/auth';
 import CloneProfileButton from '@/components/settings/account/clone-profile-button';
-import { NEXT_PUBLIC_CONNECT_API_ORIGIN, URLS } from '@/lib/const';
+import { BASE_URLS, URLS } from '@/lib/const';
 
 export default async function CloneProfilePage({
 	params,
@@ -12,7 +12,7 @@ export default async function CloneProfilePage({
 
 	// Fetch the profile we want to clone
 	const res = await fetch(
-		`${NEXT_PUBLIC_CONNECT_API_ORIGIN}${URLS.multi_profile.one.replace(
+		`${BASE_URLS.CONNECT_API}${URLS.multi_profile.one.replace(
 			'{profileId}',
 			(await params).profileId,
 		)}`,
