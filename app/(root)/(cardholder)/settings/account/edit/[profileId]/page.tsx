@@ -1,5 +1,5 @@
 import { getAuthInfo } from '@/actions/auth';
-import { URLS } from '@/lib/const';
+import { BASE_URLS, URLS } from '@/lib/const';
 import ProfileClient from '@/components/profileClient';
 
 async function getProfile(profileId: string, accessToken: string) {
