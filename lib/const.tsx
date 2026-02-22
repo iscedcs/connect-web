@@ -311,6 +311,46 @@ export const URLS = {
 		event_for_user: '/events/events',
 		public_user_events: '/events/public/{userId}',
 	},
+	artisan: {
+		requirements: '/api/artisan/requirements',
+		register: '/api/artisan/register',
+		me: '/api/artisan/me/{profileId}',
+		update: '/api/artisan/me',
+		deactivate: '/api/artisan/me/{profileId}/deactivate',
+		reactivate: '/api/artisan/me/{profileId}/reactivate',
+		services: '/api/artisan/services/{profileId}',
+		create_service: '/api/artisan/services/{profileId}',
+		update_service: '/api/artisan/services/{profileId}/{serviceId}',
+		delete_service: '/api/artisan/services/{profileId}/{serviceId}',
+		portfolio: '/api/artisan/portfolio/{profileId}',
+		add_portfolio: '/api/artisan/portfolio/{profileId}',
+		update_portfolio: '/api/artisan/portfolio/{profileId}/{itemId}',
+		delete_portfolio: '/api/artisan/portfolio/{profileId}/{itemId}',
+		update_categories: '/api/artisan/categories',
+		bookings: '/api/artisan/bookings/{profileId}',
+		confirm_booking:
+			'/api/artisan/bookings/{profileId}/{bookingId}/confirm',
+		start_booking: '/api/artisan/bookings/{profileId}/{bookingId}/start',
+		complete_booking:
+			'/api/artisan/bookings/{profileId}/{bookingId}/complete',
+		cancel_booking: '/api/artisan/bookings/{profileId}/{bookingId}/cancel',
+		book_artisan: '/api/artisan/{artisanId}/book',
+		my_bookings: '/api/artisan/my-bookings',
+		cancel_my_booking: '/api/artisan/my-bookings/{bookingId}/cancel',
+		submit_review: '/api/artisan/{artisanId}/reviews',
+		create_promotion: '/api/artisan/promotions',
+		my_promotions: '/api/artisan/promotions/{profileId}',
+		cancel_promotion:
+			'/api/artisan/promotions/{profileId}/{promotionId}/cancel',
+		earnings: '/api/artisan/earnings/{profileId}',
+	},
+	directory: {
+		artisans: '/api/directory/artisans',
+		featured: '/api/directory/artisans/featured',
+		artisan_profile: '/api/directory/artisans/{artisanId}',
+		artisan_reviews: '/api/directory/artisans/{artisanId}/reviews',
+		categories: '/api/directory/categories',
+	},
 };
 
 export const DEVICE_TYPE = {

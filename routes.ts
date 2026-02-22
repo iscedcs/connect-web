@@ -10,6 +10,7 @@ export const publicRoutes = [
 	'/privacy',
 	'/support',
 	'/card/connect',
+	'/artisans',
 ];
 
 /**

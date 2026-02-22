@@ -1,11 +1,13 @@
 import { getAuthInfo } from '@/actions/auth';
 import AccountSettingsList from '@/components/pages/cardholder/home/account-settings';
+import ArtisanCard from '@/components/pages/cardholder/home/artisan-card';
 import ConnectManagementWrapper from '@/components/pages/cardholder/home/connect-management-wrapper';
 import DevicesCard from '@/components/pages/cardholder/home/device-section';
 import EventCard from '@/components/pages/cardholder/home/event-card';
 import DevicesConnectedCard from '@/components/pages/cardholder/home/filled-state/device-connected';
 import ProfileHeader from '@/components/pages/cardholder/home/profile-header';
 import PromoBanner from '@/components/pages/cardholder/home/promo-banner';
+import { getMyArtisanProfile } from '@/lib/services/artisan';
 import { getConnectModules } from '@/lib/services/connect-modules';
 import { getUserDevices } from '@/lib/services/device';
 import { fetchPublicUserEvent } from '@/lib/services/events';
@@ -31,11 +33,16 @@ export default async function DashboardPage() {
 
 	let userDevices: DeviceInterface[] = [];
 	let userEvents: any[] = [];
+	let artisanProfile = null;
 	if (userId && accessToken) {
 		[userDevices, userEvents] = await Promise.all([
 			getUserDevices(userId, accessToken),
 			fetchPublicUserEvent(userId),
 		]);
+	}
+
+	if (connectProfile?.id) {
+		artisanProfile = await getMyArtisanProfile(connectProfile.id);
 	}
 	const hasDevices = userDevices.length > 0;
 
@@ -86,6 +93,7 @@ export default async function DashboardPage() {
 						<DevicesConnectedCard devices={userDevices} />
 					:	<DevicesCard />}
 					<WalletCard />
+					<ArtisanCard artisanProfile={artisanProfile} />
 				</section>
 				<section className='p-4 space-y-10'>
 					{accessToken && connectProfile?.id && (

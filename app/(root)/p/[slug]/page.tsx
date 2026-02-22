@@ -3,10 +3,12 @@ import ShareQrDialog from '@/components/customer/share-qr-dialog';
 import EmailDialog from '@/components/customer/email-dialog';
 import ScanRecorder from '@/components/customer/scan-recorder';
 import SendMoneyButton from '@/components/customer/send-money-button';
+import ArtisanProfileSection from '@/components/customer/artisan-profile-section';
 import { PhoneIcon } from '@/lib/icons';
 import { fetchPublicUserEvent } from '@/lib/services/events';
 import { fetchPublicProfileBySlug } from '@/lib/services/public-profile';
 import { getPublicWalletProfile } from '@/lib/services/wallet';
+import { getArtisanPublicReviews } from '@/lib/services/artisan';
 import { getPlatformInfo } from '@/lib/connect-social/detect-platform';
 import { ICONS, COVER_PHOTOS } from '@/lib/const';
 import Image from 'next/image';
@@ -210,9 +212,14 @@ export default async function SlugProfilePage({
 	const { profile, contact } = profileData;
 
 	const userId = profile?.userId;
-	const [events, walletProfile] = await Promise.all([
+	const artisan = profileData.artisan ?? null;
+
+	const [events, walletProfile, artisanReviewsData] = await Promise.all([
 		fetchPublicUserEvent(userId),
 		getPublicWalletProfile(userId ?? ''),
+		artisan ?
+			getArtisanPublicReviews(artisan.id, 1, 10)
+		:	Promise.resolve({ reviews: [], total: 0, page: 1, totalPages: 0 }),
 	]);
 
 	// Extract emails from socials
@@ -319,6 +326,14 @@ export default async function SlugProfilePage({
 					</div>
 				</div>
 			</section>
+
+			{artisan && (
+				<ArtisanProfileSection
+					artisan={artisan}
+					reviews={artisanReviewsData.reviews}
+					profileName={profile.name}
+				/>
+			)}
 
 			<PublicProfileTabs
 				connectItems={connectItems}
