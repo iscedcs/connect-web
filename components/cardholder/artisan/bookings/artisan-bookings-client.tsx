@@ -89,7 +89,10 @@ export default function ArtisanBookingsClient({
 	profileId,
 }: ArtisanBookingsClientProps) {
 	const router = useRouter();
-	const [bookings, setBookings] = useState<Booking[]>(bookingsData.bookings);
+	const [bookings, setBookings] = useState<Booking[]>(
+		bookingsData?.bookings ?? [],
+	);
+	const safeTotal = bookingsData?.total ?? 0;
 	const [activeFilter, setActiveFilter] = useState('');
 	const [actionLoading, setActionLoading] = useState<string | null>(null);
 	const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -215,8 +218,8 @@ export default function ArtisanBookingsClient({
 				<div className='flex-1'>
 					<h1 className='text-xl font-semibold'>Bookings</h1>
 					<p className='text-xs text-white/50'>
-						{bookingsData.total} total booking
-						{bookingsData.total !== 1 ? 's' : ''}
+						{safeTotal} total booking
+						{safeTotal !== 1 ? 's' : ''}
 					</p>
 				</div>
 			</div>

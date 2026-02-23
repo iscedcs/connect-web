@@ -168,13 +168,14 @@ function ReviewCard({ review }: { review: Review }) {
 
 export default function ArtisanProfileSection({
 	artisan,
-	reviews,
+	reviews: reviewsProp,
 	profileName,
 }: {
 	artisan: PublicArtisanData;
 	reviews: Review[];
 	profileName: string;
 }) {
+	const reviews = reviewsProp ?? [];
 	const [tab, setTab] = useState<'services' | 'portfolio' | 'reviews'>(
 		'services',
 	);
@@ -289,11 +290,11 @@ export default function ArtisanProfileSection({
 			{/* Portfolio tab */}
 			{tab === 'portfolio' && (
 				<div>
-					{artisan.portfolio.length === 0 ?
+					{(artisan.portfolio?.length ?? 0) === 0 ?
 						<p className='text-xs text-white/40 py-4 text-center'>
 							No portfolio items yet.
 						</p>
-					:	<PortfolioGallery items={artisan.portfolio} />}
+					:	<PortfolioGallery items={artisan.portfolio ?? []} />}
 				</div>
 			)}
 

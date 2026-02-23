@@ -299,8 +299,11 @@ export const URLS = {
 	device: {
 		verify_token: '/device/verify-token',
 		create: '/device/create',
+		request_token: '/device/request-token',
+		product: '/device/product',
 		user: '/device/user/{userId}',
 		update: '/device/update/{id}',
+		remove: '/device/remove/{id}',
 	},
 	device_profile: {
 		bindings: '/api/device-bindings',

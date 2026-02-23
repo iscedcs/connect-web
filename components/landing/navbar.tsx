@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
+import { getSignInUrl, getSignUpUrl } from '@/lib/client-auth-urls';
 
 const navLinks = [
 	{ label: 'Features', href: '#features' },
@@ -70,13 +71,13 @@ export function Navbar({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
 							</a>
 						:	<>
 								<a
-									href={`${process.env.NEXT_PUBLIC_AUTH_WEB_URL}/sign-in`}
+									href={getSignInUrl()}
 									className='text-sm text-zinc-400 hover:text-white transition-colors px-4 py-2'
 								>
 									Log in
 								</a>
 								<a
-									href={`${process.env.NEXT_PUBLIC_AUTH_WEB_URL}/sign-up`}
+									href={getSignUpUrl()}
 									className='text-sm bg-[#7B93FF] text-[#030014] px-5 py-2.5 rounded-lg hover:bg-[#7B93FF]/90 transition-colors font-medium'
 								>
 									Get Started
@@ -122,7 +123,9 @@ export function Navbar({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
 								</motion.a>
 							))}
 							<motion.a
-								href={isLoggedIn ? '/dashboard' : `${process.env.NEXT_PUBLIC_AUTH_WEB_URL}/sign-up`}
+								href={
+									isLoggedIn ? '/dashboard' : getSignUpUrl()
+								}
 								initial={{ opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ delay: 0.4 }}

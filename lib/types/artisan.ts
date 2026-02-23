@@ -34,7 +34,7 @@ export interface ArtisanService {
 	artisanId: string;
 	name: string;
 	description?: string;
-	price: number;
+	price: number | null;
 	currency: string;
 	duration?: number;
 	isActive: boolean;
@@ -215,14 +215,10 @@ export interface ArtisanDirectoryCard {
 	categories: ArtisanCategoryMap[];
 	profile?: {
 		id: string;
-		firstName: string;
-		lastName: string;
-		displayPicture?: string;
+		name: string;
+		profilePhoto?: string;
 		slug?: string;
-		city?: string;
-		state?: string;
 		location?: string;
-		bio?: string;
 	};
 	services: {
 		id: string;

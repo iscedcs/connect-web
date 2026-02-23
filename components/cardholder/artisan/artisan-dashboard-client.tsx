@@ -37,6 +37,7 @@ export default function ArtisanDashboardClient({
 	recentBookings,
 	earnings,
 }: ArtisanDashboardClientProps) {
+	const bookings = recentBookings?.bookings ?? [];
 	const isPending = artisan.status === 'PENDING_REVIEW';
 	const isSuspended = artisan.status === 'SUSPENDED';
 	const isDeactivated = artisan.status === 'DEACTIVATED';
@@ -144,7 +145,7 @@ export default function ArtisanDashboardClient({
 						icon={<CalendarCheck className='size-5' />}
 						label='Bookings'
 						badge={
-							recentBookings.bookings.filter(
+							bookings.filter(
 								(b) =>
 									b.status === 'PENDING' ||
 									b.status === 'CONFIRMED',
@@ -183,7 +184,7 @@ export default function ArtisanDashboardClient({
 			</div>
 
 			{/* Recent Bookings */}
-			{recentBookings.bookings.length > 0 && (
+			{bookings.length > 0 && (
 				<div className='space-y-3'>
 					<div className='flex items-center justify-between'>
 						<h2 className='text-sm font-medium text-white/60 uppercase tracking-wider'>
@@ -197,7 +198,7 @@ export default function ArtisanDashboardClient({
 						</Link>
 					</div>
 					<div className='space-y-2'>
-						{recentBookings.bookings.slice(0, 3).map((booking) => (
+						{bookings.slice(0, 3).map((booking) => (
 							<BookingRow
 								key={booking.id}
 								booking={booking}

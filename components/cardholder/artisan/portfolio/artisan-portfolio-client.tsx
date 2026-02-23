@@ -139,6 +139,24 @@ export default function ArtisanPortfolioClient({
 				return;
 			}
 
+			const newItem = json?.data as PortfolioItem | undefined;
+
+			if (isEdit && editingItem) {
+				setPortfolio((prev) =>
+					prev.map((p) =>
+						p.id === editingItem.id ?
+							(newItem ?? {
+								...p,
+								...body,
+								url: body.url as string,
+							})
+						:	p,
+					),
+				);
+			} else if (newItem) {
+				setPortfolio((prev) => [...prev, newItem]);
+			}
+
 			toast.success(isEdit ? 'Item updated' : 'Item added');
 			resetForm();
 			router.refresh();
@@ -184,9 +202,9 @@ export default function ArtisanPortfolioClient({
 			<div className='flex items-center gap-3'>
 				<Link
 					href='/connect/artisan'
-					className='p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors'
+					className='p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors'
 				>
-					<ArrowLeft className='size-4' />
+					<ArrowLeft className='size-5 text-white' />
 				</Link>
 				<div className='flex-1'>
 					<h1 className='text-xl font-semibold'>Portfolio</h1>

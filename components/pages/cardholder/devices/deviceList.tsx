@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { DevicesListSkeleton } from '@/components/shared/skeleton/deviceList';
 import { toast } from 'sonner';
+import { removeDevice } from '@/lib/services/device';
 import UpdateDeviceModal from '@/components/shared/models/updateDeviceModel';
 import Link from 'next/link';
 import {
@@ -67,6 +68,31 @@ export default function DevicesList({
 	/** Get the profile a device is currently linked to */
 	const getBoundProfile = (deviceId: string): DeviceBinding | undefined =>
 		bindings.find((b) => b.deviceId === deviceId);
+
+	const handleRemoveDevice = async (device: Device) => {
+		const confirmed = window.confirm(
+			`Remove "${device.label || device.productId}" from your account? You can re-add it later.`,
+		);
+		if (!confirmed) return;
+
+		setActionInProgress(device.id);
+		try {
+			const res = await removeDevice(device.id, accessToken);
+			if (res.ok) {
+				toast.success('Device removed from your account');
+				setDevices((prev) => prev.filter((d) => d.id !== device.id));
+				setBindings((prev) =>
+					prev.filter((b) => b.deviceId !== device.id),
+				);
+				setSelected(null);
+			} else {
+				toast.error(res.data?.message || 'Failed to remove device');
+			}
+		} catch {
+			toast.error('Failed to remove device');
+		}
+		setActionInProgress(null);
+	};
 
 	const handleRefresh = async () => {
 		setLoading(true);
@@ -237,15 +263,35 @@ export default function DevicesList({
 											)}
 										</div>
 										<div>
-											<h2 className='text-base font-medium'>
-												{device.label ||
-													getDeviceName(
-														device.type,
-														device.productId,
-													)}
+											<h2 className='text-sm font-medium'>
+												{device.label || 'Unlabelled'}
 											</h2>
-											<p className='text-xs text-white/60'>
-												Added {device.assignedAt ?? '—'}
+											<p className='text-[10px] text-white/50'>
+												{getDeviceName(
+													device.type,
+													device.productId,
+												)}{' '}
+												· •••
+												{device.productId?.slice(-5)}
+											</p>
+											<p className='text-xs text-white/60 mt-0.5'>
+												Added{' '}
+												{(
+													device.assignedAt ||
+													device.createdAt
+												) ?
+													new Date(
+														device.assignedAt ||
+															device.createdAt!,
+													).toLocaleDateString(
+														'en-GB',
+														{
+															day: 'numeric',
+															month: 'short',
+															year: 'numeric',
+														},
+													)
+												:	'—'}
 											</p>
 										</div>
 									</div>
@@ -441,7 +487,13 @@ export default function DevicesList({
 
 										{/* Actions */}
 										<div className='grid grid-cols-3 gap-3 text-center mt-5'>
-											<button className='flex flex-col items-center gap-2'>
+											<button
+												disabled={!!actionInProgress}
+												onClick={() =>
+													handleRemoveDevice(device)
+												}
+												className='flex flex-col items-center gap-2 disabled:opacity-50'
+											>
 												<span className='w-12 h-12 rounded-full bg-neutral-800 flex items-center justify-center'>
 													<DisconnectIcon className='w-5 h-5' />
 												</span>

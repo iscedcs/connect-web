@@ -58,10 +58,7 @@ function ArtisanSummaryCard({ artisan }: { artisan: ArtisanProfile }) {
 		: isPending ? 'text-amber-400'
 		: 'text-red-400';
 
-	const displayName =
-		artisan.profile ?
-			`${artisan.profile.firstName} ${artisan.profile.lastName}`
-		:	'Artisan';
+	const displayName = artisan.profile?.name || 'Artisan';
 
 	return (
 		<div className='overflow-hidden'>

@@ -6,7 +6,7 @@ import type {
 	ArtisanCategory,
 	DirectoryResponse,
 } from '@/lib/types/artisan';
-import { Search, Star, MapPin, X } from 'lucide-react';
+import { Search, Star, MapPin, X, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -24,11 +24,11 @@ export default function ArtisanDirectoryClient({
 	featured: featuredProp,
 	categories: categoriesProp,
 }: Props) {
-	const safeInitial = initialData ?? {
-		artisans: [],
-		total: 0,
-		page: 1,
-		totalPages: 1,
+	const safeInitial = {
+		artisans: initialData?.artisans ?? [],
+		total: initialData?.total ?? 0,
+		page: initialData?.page ?? 1,
+		totalPages: initialData?.totalPages ?? 1,
 	};
 	const featured = featuredProp ?? [];
 	const categories = categoriesProp ?? [];
@@ -40,6 +40,9 @@ export default function ArtisanDirectoryClient({
 	const [search, setSearch] = useState('');
 	const [selectedCategory, setSelectedCategory] = useState('');
 	const [loading, setLoading] = useState(false);
+
+	const [showAllCategories, setShowAllCategories] = useState(false);
+	const [categorySearch, setCategorySearch] = useState('');
 
 	const fetchArtisans = useCallback(
 		async (p: number, cat: string, q: string) => {
@@ -127,26 +130,152 @@ export default function ArtisanDirectoryClient({
 
 				{/* Categories */}
 				{categories.length > 0 && (
-					<div className='flex flex-wrap gap-2'>
-						{categories.map((cat) => (
-							<button
-								key={cat.id}
-								type='button'
-								onClick={() => handleCategoryFilter(cat.slug)}
-								className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-									selectedCategory === cat.slug ?
-										'bg-purple-600 text-white'
-									:	'bg-white/5 text-white/60 hover:bg-white/10'
-								}`}
-							>
-								{cat.name}
-								{cat.artisanCount != null && (
-									<span className='ml-1 opacity-60'>
-										({cat.artisanCount})
-									</span>
+					<div className='space-y-2'>
+						{/* Horizontal scroll row — top categories + active filter */}
+						<div className='flex items-center gap-2'>
+							<div className='flex-1 overflow-x-auto scrollbar-hide'>
+								<div className='flex gap-1.5 pb-1'>
+									<button
+										type='button'
+										onClick={() => {
+											setSelectedCategory('');
+											fetchArtisans(1, '', search);
+										}}
+										className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors shrink-0 ${
+											!selectedCategory ?
+												'bg-purple-600 text-white'
+											:	'bg-white/5 text-white/60 hover:bg-white/10'
+										}`}
+									>
+										All
+									</button>
+									{categories.slice(0, 8).map((cat) => (
+										<button
+											key={cat.id}
+											type='button'
+											onClick={() =>
+												handleCategoryFilter(cat.slug)
+											}
+											className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors shrink-0 ${
+												selectedCategory === cat.slug ?
+													'bg-purple-600 text-white'
+												:	'bg-white/5 text-white/60 hover:bg-white/10'
+											}`}
+										>
+											{cat.name}
+										</button>
+									))}
+								</div>
+							</div>
+							{categories.length > 8 && (
+								<button
+									type='button'
+									onClick={() =>
+										setShowAllCategories((v) => !v)
+									}
+									className={`p-2 rounded-lg transition-colors shrink-0 ${
+										showAllCategories ?
+											'bg-purple-600/20 text-purple-400'
+										:	'bg-white/5 text-white/50 hover:bg-white/10'
+									}`}
+									title='All categories'
+								>
+									<Filter className='size-4' />
+								</button>
+							)}
+						</div>
+
+						{/* Expanded category panel */}
+						{showAllCategories && (
+							<div className='bg-white/5 rounded-xl p-3 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200'>
+								{categories.length > 12 && (
+									<div className='relative'>
+										<Search className='absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-white/30' />
+										<input
+											type='text'
+											value={categorySearch}
+											onChange={(e) =>
+												setCategorySearch(
+													e.target.value,
+												)
+											}
+											placeholder='Search categories…'
+											className='w-full bg-white/5 border border-white/10 rounded-lg text-xs py-1.5 pl-8 pr-3 text-white placeholder:text-white/30 focus:outline-none focus:border-purple-500/50'
+										/>
+									</div>
 								)}
-							</button>
-						))}
+								<div className='flex flex-wrap gap-1.5'>
+									{categories
+										.filter(
+											(cat) =>
+												!categorySearch ||
+												cat.name
+													.toLowerCase()
+													.includes(
+														categorySearch.toLowerCase(),
+													),
+										)
+										.map((cat) => (
+											<button
+												key={cat.id}
+												type='button'
+												onClick={() => {
+													handleCategoryFilter(
+														cat.slug,
+													);
+													setShowAllCategories(false);
+													setCategorySearch('');
+												}}
+												className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+													(
+														selectedCategory ===
+														cat.slug
+													) ?
+														'bg-purple-600 text-white'
+													:	'bg-white/[0.07] text-white/60 hover:bg-white/[0.12]'
+												}`}
+											>
+												{cat.name}
+											</button>
+										))}
+								</div>
+								{categorySearch &&
+									!categories.some((cat) =>
+										cat.name
+											.toLowerCase()
+											.includes(
+												categorySearch.toLowerCase(),
+											),
+									) && (
+										<p className='text-xs text-white/30 text-center py-2'>
+											No categories match &ldquo;
+											{categorySearch}&rdquo;
+										</p>
+									)}
+							</div>
+						)}
+
+						{/* Active filter indicator */}
+						{selectedCategory && (
+							<div className='flex items-center gap-2'>
+								<span className='text-xs text-white/40'>
+									Filtered by:
+								</span>
+								<button
+									type='button'
+									onClick={() => {
+										setSelectedCategory('');
+										fetchArtisans(1, '', search);
+									}}
+									className='inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-600/20 text-purple-300 text-xs hover:bg-purple-600/30 transition-colors'
+								>
+									{categories.find(
+										(c) => c.slug === selectedCategory,
+									)?.name ?? selectedCategory}
+									<X className='size-3' />
+								</button>
+							</div>
+						)}
 					</div>
 				)}
 
@@ -278,7 +407,7 @@ function ArtisanCard({
 				<div className='aspect-[2/1] relative'>
 					<Image
 						src={coverImage}
-						alt={artisan.profile?.firstName ?? 'Artisan'}
+						alt={artisan.profile?.name ?? 'Artisan'}
 						fill
 						className='object-cover'
 					/>
@@ -288,22 +417,21 @@ function ArtisanCard({
 			<div className='p-3 space-y-2'>
 				{/* Avatar + Name */}
 				<div className='flex items-center gap-2.5'>
-					{artisan.profile?.displayPicture ?
+					{artisan.profile?.profilePhoto ?
 						<Image
-							src={artisan.profile.displayPicture}
+							src={artisan.profile.profilePhoto}
 							alt=''
 							width={36}
 							height={36}
 							className='size-9 rounded-full object-cover shrink-0'
 						/>
 					:	<div className='size-9 rounded-full bg-purple-500/20 flex items-center justify-center text-sm font-medium shrink-0'>
-							{artisan.profile?.firstName?.[0] ?? '?'}
+							{artisan.profile?.name?.[0] ?? '?'}
 						</div>
 					}
 					<div className='flex-1 min-w-0'>
 						<p className='text-sm font-medium truncate'>
-							{artisan.profile?.firstName}{' '}
-							{artisan.profile?.lastName}
+							{artisan.profile?.name ?? 'Artisan'}
 						</p>
 					</div>
 				</div>
@@ -319,13 +447,10 @@ function ArtisanCard({
 							</span>
 						</span>
 					)}
-					{artisan.profile?.city && (
+					{artisan.profile?.location && (
 						<span className='flex items-center gap-0.5'>
 							<MapPin className='size-3' />
-							{artisan.profile.city}
-							{artisan.profile.state ?
-								`, ${artisan.profile.state}`
-							:	''}
+							{artisan.profile.location}
 						</span>
 					)}
 					{startingPrice && (

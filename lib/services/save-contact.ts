@@ -23,6 +23,7 @@ export async function saveContactFlow({
 	note?: string;
 }) {
 	try {
+		// 1. Leave the contact on the profile
 		await http.post(`${CONNECT_API}${URLS.contact.leave}`, {
 			profileId,
 			firstName,
@@ -32,19 +33,25 @@ export async function saveContactFlow({
 			note,
 		});
 
-		const password = generatePassword();
-
-		await http.post(`${AUTH_API}${URLS.auth.quick_register}`, {
-			firstName,
-			lastName,
-			email,
-			phone,
-			password,
-		});
+		// 2. Try to register the person — ignore if they already exist
+		let password: string | undefined;
+		try {
+			password = generatePassword();
+			await http.post(`${AUTH_API}${URLS.auth.quick_register}`, {
+				firstName,
+				lastName,
+				email,
+				phone,
+				password,
+			});
+		} catch {
+			// User already exists — that's fine, contact was still saved
+			password = undefined;
+		}
 
 		return {
 			success: true,
-			password,
+			...(password ? { password } : {}),
 		};
 	} catch (err: any) {
 		return {

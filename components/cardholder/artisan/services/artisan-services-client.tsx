@@ -117,6 +117,20 @@ export default function ArtisanServicesClient({
 			}
 
 			toast.success(isEdit ? 'Service updated' : 'Service created');
+
+			// Update local state so the list refreshes immediately
+			if (json?.data) {
+				if (isEdit) {
+					setServices((prev) =>
+						prev.map((s) =>
+							s.id === editingService.id ? json.data : s,
+						),
+					);
+				} else {
+					setServices((prev) => [...prev, json.data]);
+				}
+			}
+
 			resetForm();
 			router.refresh();
 		} catch {
@@ -230,7 +244,10 @@ export default function ArtisanServicesClient({
 						<div className='grid grid-cols-2 gap-3'>
 							<div className='space-y-1.5'>
 								<label className='text-xs text-white/60'>
-									Price (₦)
+									Price (₦){' '}
+									<span className='text-white/30'>
+										— optional
+									</span>
 								</label>
 								<Input
 									type='number'

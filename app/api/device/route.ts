@@ -18,5 +18,15 @@ export async function GET(req: Request) {
 		},
 	);
 	const data = await res.json();
+	console.log(
+		'[device/list] userId:',
+		userId,
+		'status:',
+		res.status,
+		'count:',
+		data?.data?.length ?? 'N/A',
+		'body:',
+		JSON.stringify(data).slice(0, 500),
+	);
 	return NextResponse.json(data);
 }

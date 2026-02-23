@@ -44,6 +44,12 @@ export async function POST(req: Request) {
 		});
 
 		const text = await upstream.text();
+		console.log(
+			'[device/create] upstream status:',
+			upstream.status,
+			'body:',
+			text,
+		);
 		const contentType =
 			upstream.headers.get('content-type') ?? 'application/json';
 

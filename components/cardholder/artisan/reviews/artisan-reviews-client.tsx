@@ -36,7 +36,8 @@ export default function ArtisanReviewsClient({
 	reviewsData,
 	artisan,
 }: ArtisanReviewsClientProps) {
-	const { reviews, total } = reviewsData;
+	const reviews = reviewsData?.reviews ?? [];
+	const total = reviewsData?.total ?? 0;
 
 	return (
 		<div className='space-y-6'>

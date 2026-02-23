@@ -53,6 +53,7 @@ interface DeviceInterface {
 	isActive: boolean;
 	isPrimary: boolean;
 	assignedAt?: string | null;
+	createdAt?: string | null;
 	lastUsedAt?: string | null;
 	productId: string;
 	type: '6214bdef7dbcb' | '6214bdef6dbcb' | '6214bdef5dbcb' | '6214bdef4dbcb';

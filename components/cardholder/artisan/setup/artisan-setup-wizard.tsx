@@ -90,7 +90,8 @@ export default function ArtisanSetupWizard({
 	};
 
 	const canProceedFromInfo = bio.trim().length >= 10;
-	const canProceedFromCategories = selectedCategories.length >= 1;
+	const canProceedFromCategories =
+		selectedCategories.length >= 1 || customCategory.trim().length >= 2;
 
 	const handleSubmit = async () => {
 		if (!canProceedFromCategories || !termsAccepted) return;
@@ -225,19 +226,6 @@ export default function ArtisanSetupWizard({
 						</p>
 					</div>
 
-					<div className='space-y-2'>
-						<label className='text-sm text-white/70'>
-							Custom Category (Optional)
-						</label>
-						<Input
-							value={customCategory}
-							onChange={(e) => setCustomCategory(e.target.value)}
-							placeholder="If your specialty isn't listed below"
-							maxLength={100}
-							className='bg-white/5 border-white/10 text-white placeholder:text-white/30'
-						/>
-					</div>
-
 					<Button
 						onClick={() => setStep('categories')}
 						disabled={!canProceedFromInfo}
@@ -289,6 +277,19 @@ export default function ArtisanSetupWizard({
 							})}
 						</div>
 					}
+
+					<div className='space-y-2'>
+						<label className='text-sm text-white/70'>
+							Custom Category (Optional)
+						</label>
+						<Input
+							value={customCategory}
+							onChange={(e) => setCustomCategory(e.target.value)}
+							placeholder="If your specialty isn't listed above"
+							maxLength={100}
+							className='bg-white/5 border-white/10 text-white placeholder:text-white/30'
+						/>
+					</div>
 
 					<Button
 						onClick={() => setStep('hours')}

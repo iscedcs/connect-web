@@ -91,16 +91,26 @@ export default function DevicesConnectedCard({
 								<div className='flex-1'>
 									<div className='flex items-start justify-between'>
 										<div>
-											<p className='text-base font-normal'>
-												{getDeviceName(d.type)}
+											<p className='text-sm font-medium'>
+												{d.label || 'Unlabelled'}
 											</p>
-											<p className='text-2.5 text-[#868686] leading-tight'>
-												{d.label}
+											<p className='text-[10px] text-[#868686] leading-tight'>
+												{getDeviceName(d.type)} · •••
+												{d.productId?.slice(-5)}
 											</p>
 										</div>
 
-										<p className='text-2.5 text-[#868686] ml-4 mt-[2px]'>
-											{d.assignedAt}
+										<p className='text-[10px] text-[#868686] ml-4 mt-[2px]'>
+											{d.assignedAt || d.createdAt ?
+												new Date(
+													d.assignedAt ||
+														d.createdAt!,
+												).toLocaleDateString('en-GB', {
+													day: 'numeric',
+													month: 'short',
+													year: 'numeric',
+												})
+											:	'—'}
 										</p>
 									</div>
 

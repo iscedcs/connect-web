@@ -4,14 +4,10 @@ import { Button } from '@/components/ui/button';
 import { InfoIcon } from '@/lib/icons';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { BarcodeDetector as PolyfilledBarcodeDetector } from 'barcode-detector';
-import { useEffect, useRef, useState } from 'react';
+import QrScanner from 'qr-scanner';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { extractDeviceFromURL } from '@/lib/device-extract';
-
-type DetectorCtor =
-	| (new (opts?: { formats?: string[] }) => BarcodeDetector)
-	| undefined;
 
 export default function ConnectScanScreen({
 	onTapInstead,
@@ -23,108 +19,76 @@ export default function ConnectScanScreen({
 	const router = useRouter();
 
 	const videoRef = useRef<HTMLVideoElement | null>(null);
-	const streamRef = useRef<MediaStream | null>(null);
-	const canvasRef = useRef<HTMLCanvasElement | null>(null);
-	const rafRef = useRef<number | null>(null);
-	const detectorRef = useRef<BarcodeDetector | null>(null);
-	const detectorCtorRef = useRef<DetectorCtor>(undefined);
+	const scannerRef = useRef<QrScanner | null>(null);
 	const hasNavigatedRef = useRef(false);
 
-	const [loading, setLoading] = useState(false);
-	const [ready, setReady] = useState(false);
+	const [hasCamera, setHasCamera] = useState(true);
+	const [scanning, setScanning] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const [status, setStatus] = useState('Point your camera at the code');
+	const [status, setStatus] = useState('Starting camera…');
 
 	// ---- helpers -------------------------------------------------------------
 
-	function stopEverything() {
-		if (rafRef.current) cancelAnimationFrame(rafRef.current);
-		rafRef.current = null;
-		streamRef.current?.getTracks().forEach((t) => t.stop());
-		streamRef.current = null;
-		setReady(false);
-	}
-
-	function navigateWith(resultText: string) {
-		const extracted = extractDeviceFromURL(resultText);
-
-		if (!extracted?.cardid) {
-			setStatus('Invalid ISCE QR code');
-			hasNavigatedRef.current = false;
-			return;
+	const stopScan = useCallback(() => {
+		if (scannerRef.current) {
+			scannerRef.current.stop();
+			scannerRef.current.destroy();
+			scannerRef.current = null;
 		}
+		setScanning(false);
+	}, []);
 
-		stopEverything();
+	const navigateWith = useCallback(
+		(resultText: string) => {
+			if (hasNavigatedRef.current) return;
 
-		const params = new URLSearchParams({
-			cardid: extracted?.cardid!,
-		});
+			const extracted = extractDeviceFromURL(resultText);
+			console.log('[QR Scanner] extractDeviceFromURL result:', extracted);
 
-		if (extracted?.type) {
-			params.set('type', extracted.type);
-		}
-
-		router.push(`/otp/idle?${params.toString()}`);
-	}
-
-	// ---- scanner loop --------------------------------------------------------
-
-	async function scanLoop() {
-		if (
-			!videoRef.current ||
-			!canvasRef.current ||
-			!detectorRef.current ||
-			hasNavigatedRef.current
-		) {
-			rafRef.current = requestAnimationFrame(scanLoop);
-			return;
-		}
-		const video = videoRef.current;
-		const canvas = canvasRef.current;
-		if (video.readyState < 2) {
-			rafRef.current = requestAnimationFrame(scanLoop);
-			return;
-		}
-
-		// Match canvas size to current frame
-		if (
-			canvas.width !== video.videoWidth ||
-			canvas.height !== video.videoHeight
-		) {
-			canvas.width = video.videoWidth;
-			canvas.height = video.videoHeight;
-		}
-
-		const ctx = canvas.getContext('2d');
-		if (!ctx) {
-			rafRef.current = requestAnimationFrame(scanLoop);
-			return;
-		}
-
-		// Draw video frame to canvas
-		ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-		try {
-			const isNative =
-				typeof window !== 'undefined' && 'BarcodeDetector' in window;
-
-			const source = isNative ? video : canvas;
-
-			const codes = await detectorRef.current.detect(source as any);
-			if (codes.length > 0) {
-				const value = (codes[0] as any).rawValue;
-
-				if (value) {
-					setStatus('Code detected. Processing…');
-					navigateWith(value);
-					return;
-				}
+			if (!extracted?.cardid) {
+				console.log(
+					'[QR Scanner] Invalid QR — no cardid found in:',
+					resultText,
+				);
+				setStatus('Invalid ISCE QR code');
+				return;
 			}
-		} catch {}
-		rafRef.current = requestAnimationFrame(scanLoop);
-	}
 
-	// ---- init camera + detector ---------------------------------------------
+			console.log(
+				'[QR Scanner] Navigating with cardid:',
+				extracted.cardid,
+			);
+			hasNavigatedRef.current = true;
+			stopScan();
+
+			const params = new URLSearchParams({
+				cardid: extracted.cardid,
+			});
+
+			if (extracted.type) {
+				params.set('type', extracted.type);
+			}
+
+			router.push(`/otp/idle?${params.toString()}`);
+		},
+		[router, stopScan],
+	);
+
+	// ---- handle scan result --------------------------------------------------
+
+	const handleScanResult = useCallback(
+		(result: QrScanner.ScanResult) => {
+			console.log('[QR Scanner] Scan result received:', result);
+			if (result.data) {
+				console.log('[QR Scanner] QR data:', result.data);
+				setStatus('Code detected. Processing…');
+				navigateWith(result.data);
+			}
+		},
+		[navigateWith],
+	);
+
+	// ---- start scanner -------------------------------------------------------
 
 	useEffect(() => {
 		let cancelled = false;
@@ -132,77 +96,66 @@ export default function ConnectScanScreen({
 		(async () => {
 			setError(null);
 			setStatus('Starting camera…');
+			console.log('[QR Scanner] Checking camera availability…');
 
-			// 1) Check support
-			detectorCtorRef.current =
-				(typeof window !== 'undefined' ?
-					(window as any).BarcodeDetector
-				:	undefined) || PolyfilledBarcodeDetector;
-
-			if (!detectorCtorRef.current) {
-				setError(
-					'This browser doesn’t support in-page QR scanning. Use NFC Tap instead.',
-				);
+			// Check if device has a camera
+			const cameraAvailable = await QrScanner.hasCamera();
+			console.log('[QR Scanner] Camera available:', cameraAvailable);
+			if (!cameraAvailable) {
+				setHasCamera(false);
+				setError('No camera found. Use NFC Tap instead.');
 				return;
 			}
+
+			if (!videoRef.current || cancelled) return;
+
 			try {
-				// 2) Create detector for QR only
-				detectorRef.current = new detectorCtorRef.current({
-					formats: ['qr_code'],
-				} as any);
-				// 3) Request the rear camera
-				const stream = await navigator.mediaDevices.getUserMedia({
-					video: {
-						facingMode: { ideal: 'environment' },
-						width: { ideal: 1280 },
-						height: { ideal: 720 },
+				const scanner = new QrScanner(
+					videoRef.current,
+					handleScanResult,
+					{
+						preferredCamera: 'environment',
+						highlightScanRegion: false,
+						highlightCodeOutline: false,
+						returnDetailedScanResult: true,
 					},
-					audio: false,
-				});
+				);
+
+				scannerRef.current = scanner;
+				console.log('[QR Scanner] Starting scanner…');
+				await scanner.start();
+				console.log(
+					'[QR Scanner] Scanner started successfully. Actively scanning for QR codes.',
+				);
 
 				if (cancelled) {
-					// If unmounted before it resolved
-					stream.getTracks().forEach((t) => t.stop());
+					scanner.stop();
+					scanner.destroy();
+					scannerRef.current = null;
 					return;
 				}
 
-				streamRef.current = stream;
-
-				if (!videoRef.current) return;
-
-				videoRef.current.srcObject = stream;
-				videoRef.current.setAttribute('playsinline', 'true');
-				await videoRef.current.play();
-
-				await new Promise<void>((resolve) => {
-					if (videoRef.current!.videoWidth > 0) {
-						resolve();
-					} else {
-						videoRef.current!.onloadedmetadata = () => resolve();
-					}
-				});
-
-				setReady(true);
+				setScanning(true);
 				setStatus('Point your camera at the code');
-
-				// 4) Kick off the loop
-				rafRef.current = requestAnimationFrame(scanLoop);
-			} catch (e: any) {
+			} catch (e: unknown) {
+				const err = e as { name?: string; message?: string };
 				console.error('Camera error:', e);
-				setError(
-					e?.name === 'NotAllowedError' ?
-						'Camera permission denied. Allow camera or use NFC Tap instead.'
-					:	'Unable to start camera. Try NFC Tap instead.',
-				);
+
+				if (err?.name === 'NotAllowedError') {
+					setError(
+						'Camera permission denied. Allow camera access or use NFC Tap instead.',
+					);
+				} else {
+					setError('Unable to start camera. Try NFC Tap instead.');
+				}
 			}
 		})();
 
 		return () => {
 			cancelled = true;
-			stopEverything();
+			stopScan();
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [handleScanResult, stopScan]);
 
 	// ---- UI ------------------------------------------------------------------
 
@@ -245,8 +198,8 @@ export default function ConnectScanScreen({
 						}
 					</div>
 
-					{/* simple overlay guide */}
-					{!error && (
+					{/* overlay guide */}
+					{!error && scanning && (
 						<div className='pointer-events-none absolute inset-0 flex items-center justify-center'>
 							<div className='w-3/4 h-1/3 rounded-xl border-2 border-white/50' />
 						</div>
