@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import type { ArtisanService } from '@/lib/types/artisan';
-import { URLS } from '@/lib/const';
+import { BASE_URLS, URLS } from '@/lib/const';
 import {
 	ArrowLeft,
 	Loader2,

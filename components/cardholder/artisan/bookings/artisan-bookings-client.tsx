@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import type { Booking, BookingStatus } from '@/lib/types/artisan';
-import { URLS } from '@/lib/const';
+import { BASE_URLS, URLS } from '@/lib/const';
 import {
 	ArrowLeft,
 	Loader2,

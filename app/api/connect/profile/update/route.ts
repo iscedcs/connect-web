@@ -1,4 +1,4 @@
-import { URLS } from '@/lib/const';
+import { BASE_URLS, URLS } from '@/lib/const';
 import { getBearerAndUserId } from '../../_lib/auth';
 
 export async function PATCH(req: Request) {

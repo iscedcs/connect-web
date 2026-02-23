@@ -1,5 +1,5 @@
 import { getAuthInfo } from '@/actions/auth';
-import { URLS } from '../const';
+import { BASE_URLS, URLS } from '../const';
 import type {
 	ArtisanProfile,
 	ArtisanRequirements,

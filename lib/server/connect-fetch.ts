@@ -1,9 +1,7 @@
 import 'server-only';
 import { cookies } from 'next/headers';
 import { decodeJwt } from '../verify-jwt';
-
-const BASE_URLS.CONNECT_API =
-	process.env.CONNECT_API_URL || process.env.NEXT_PUBLIC_CONNECT_API_URL!;
+import { BASE_URLS } from '../const';
 
 export async function connectFetch(
 	path: string,

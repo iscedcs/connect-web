@@ -1,5 +1,5 @@
 import { getAuthInfo } from '@/actions/auth';
-import { URLS } from '../const';
+import { BASE_URLS, URLS } from '../const';
 
 async function safeJson(res: Response): Promise<any | null> {
 	const contentType = res.headers.get('content-type') || '';
