@@ -13,7 +13,7 @@ export default function FloatingDashboardButton({
 }: FloatingDashboardButtonProps) {
 	return (
 		<Link
-			href='/connect'
+			href='/dashboard'
 			className='fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg shadow-purple-600/30 transition hover:bg-purple-500 active:scale-95'
 			title='Go to Dashboard'
 		>
