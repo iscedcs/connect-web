@@ -349,6 +349,23 @@ export const URLS = {
 			'/api/artisan/promotions/{profileId}/{promotionId}/cancel',
 		earnings: '/api/artisan/earnings/{profileId}',
 	},
+	threads: {
+		create: '/api/threads',
+		my_threads: '/api/threads/my-threads',
+		artisan_threads: '/api/threads/artisan/{profileId}',
+		unread_count: '/api/threads/unread-count',
+		one: '/api/threads/{threadId}',
+		send_message: '/api/threads/{threadId}/messages',
+		send_proposal: '/api/threads/{threadId}/proposals',
+		accept_proposal: '/api/threads/{threadId}/proposals/accept',
+		decline_proposal: '/api/threads/{threadId}/proposals/decline',
+		close: '/api/threads/{threadId}/close',
+		confirm_payment_sent:
+			'/api/threads/bookings/{bookingId}/confirm-payment-sent',
+		confirm_payment_received:
+			'/api/threads/bookings/{bookingId}/confirm-payment-received',
+		dispute_payment: '/api/threads/bookings/{bookingId}/dispute-payment',
+	},
 	directory: {
 		artisans: '/api/directory/artisans',
 		featured: '/api/directory/artisans/featured',

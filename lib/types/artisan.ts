@@ -125,6 +125,16 @@ export interface Booking {
 	cancelledAt?: string;
 	startedAt?: string;
 	completedAt?: string;
+	paymentMethod?: PaymentMethod;
+	paymentTiming?: PaymentTiming;
+	clientPaymentConfirmed?: boolean;
+	clientPaymentConfirmedAt?: string;
+	artisanPaymentConfirmed?: boolean;
+	artisanPaymentConfirmedAt?: string;
+	paymentDisputed?: boolean;
+	paymentDisputedBy?: PaymentDisputedBy;
+	paymentDisputeReason?: string;
+	paymentDisputedAt?: string;
 	createdAt: string;
 	updatedAt: string;
 	artisan?: ArtisanProfile;
@@ -231,6 +241,123 @@ export interface ArtisanDirectoryCard {
 		thumbnail?: string;
 		caption?: string;
 	}[];
+}
+
+// ─── Thread / Conversation Types ────────────────────────
+
+export type ThreadStatus = 'OPEN' | 'PROPOSAL_SENT' | 'BOOKED' | 'CLOSED';
+export type ThreadMessageType = 'TEXT' | 'PROPOSAL' | 'SYSTEM';
+export type SenderRole = 'CLIENT' | 'ARTISAN';
+export type PaymentMethod = 'WALLET' | 'OFFLINE' | 'NONE';
+export type PaymentTiming = 'UPFRONT' | 'ON_COMPLETION';
+export type PaymentDisputedBy = 'CLIENT' | 'ARTISAN';
+
+export interface ProposalData {
+	serviceId?: string;
+	serviceName?: string;
+	price: number;
+	currency: string;
+	date: string;
+	time?: string;
+	duration?: number;
+	paymentPreference?: string;
+	paymentTiming?: string;
+	note?: string;
+}
+
+export interface ThreadMessage {
+	id: string;
+	threadId: string;
+	senderUserId: string;
+	senderRole: SenderRole;
+	type: ThreadMessageType;
+	content: string;
+	proposalData?: ProposalData;
+	isRead: boolean;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface BookingThread {
+	id: string;
+	artisanId: string;
+	serviceId?: string;
+	clientUserId: string;
+	clientProfileId?: string;
+	clientName?: string;
+	clientPhone?: string;
+	status: ThreadStatus;
+	lastMessageAt: string;
+	closedAt?: string;
+	closedBy?: string;
+	createdAt: string;
+	updatedAt: string;
+	artisan?: ArtisanProfile;
+	service?: ArtisanService;
+	messages?: ThreadMessage[];
+	booking?: Booking;
+	// last message preview (from list queries)
+	lastMessage?: ThreadMessage;
+}
+
+export interface ThreadListResponse {
+	threads: BookingThread[];
+	total: number;
+	page: number;
+	totalPages: number;
+}
+
+export interface ThreadDetailResponse extends BookingThread {
+	messages: ThreadMessage[];
+}
+
+export interface UnreadCountResponse {
+	count: number;
+}
+
+// ─── Thread DTOs (for forms) ────────────────────────────
+
+export interface CreateThreadDto {
+	artisanId: string;
+	serviceId?: string;
+	message: string;
+	clientName?: string;
+	clientPhone?: string;
+	clientProfileId?: string;
+}
+
+export interface SendMessageDto {
+	content: string;
+}
+
+export interface SendProposalDto {
+	serviceId?: string;
+	price: number;
+	currency?: string;
+	date: string;
+	time?: string;
+	duration?: number;
+	paymentPreference?: string;
+	paymentTiming?: string;
+	note?: string;
+}
+
+export interface AcceptProposalDto {
+	messageId: string;
+}
+
+export interface DeclineProposalDto {
+	messageId: string;
+	reason?: string;
+}
+
+export interface ConfirmPaymentDto {
+	reference?: string;
+	note?: string;
+}
+
+export interface DisputePaymentDto {
+	reason: string;
 }
 
 // ─── DTO Types (for forms) ──────────────────────────────

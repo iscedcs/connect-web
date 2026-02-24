@@ -7,7 +7,7 @@ import EventCard from '@/components/pages/cardholder/home/event-card';
 import DevicesConnectedCard from '@/components/pages/cardholder/home/filled-state/device-connected';
 import ProfileHeader from '@/components/pages/cardholder/home/profile-header';
 import PromoBanner from '@/components/pages/cardholder/home/promo-banner';
-import { getMyArtisanProfile } from '@/lib/services/artisan';
+import { getMyArtisanProfile, getUnreadThreadCount } from '@/lib/services/artisan';
 import { getConnectModules } from '@/lib/services/connect-modules';
 import { getUserDevices } from '@/lib/services/device';
 import { fetchPublicUserEvent } from '@/lib/services/events';
@@ -41,8 +41,12 @@ export default async function DashboardPage() {
 		]);
 	}
 
+	let unreadThreadCount = 0;
 	if (connectProfile?.id) {
-		artisanProfile = await getMyArtisanProfile(connectProfile.id);
+		[artisanProfile, unreadThreadCount] = await Promise.all([
+			getMyArtisanProfile(connectProfile.id),
+			getUnreadThreadCount(),
+		]);
 	}
 	const hasDevices = userDevices.length > 0;
 
@@ -62,6 +66,7 @@ export default async function DashboardPage() {
 						connectProfile={connectProfile}
 						user={authInfo.user}
 						profileId={connectProfile?.id}
+						unreadThreadCount={unreadThreadCount}
 						contactData={
 							connectModules?.contact?.contacts?.[0] ?
 								{

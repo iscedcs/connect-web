@@ -1,7 +1,7 @@
 'use client';
 
 import { ContactIcon, PrivacyIcon, SignOutIcon, TermsIcon } from '@/lib/icons';
-import { ChevronRight, Settings, Settings2, Users, Wallet } from 'lucide-react';
+import { ChevronRight, MessageSquare, Settings, Settings2, Users, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -20,6 +20,11 @@ export default function AccountSettingsList({
 	const router = useRouter();
 
 	const baseRows: Row[] = [
+		{
+			href: '/connect/artisan/threads',
+			label: 'Messages',
+			Icon: MessageSquare,
+		},
 		{
 			href: '/profiles',
 			label: 'View all profiles',

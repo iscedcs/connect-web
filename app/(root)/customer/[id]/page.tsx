@@ -3,9 +3,11 @@ import ShareQrDialog from '@/components/customer/share-qr-dialog';
 import EmailDialog from '@/components/customer/email-dialog';
 import ScanRecorder from '@/components/customer/scan-recorder';
 import SendMoneyButton from '@/components/customer/send-money-button';
+import ArtisanProfileSection from '@/components/customer/artisan-profile-section';
 import { PhoneIcon } from '@/lib/icons';
 import { fetchPublicUserEvent } from '@/lib/services/events';
 import { getPublicWalletProfile } from '@/lib/services/wallet';
+import { getArtisanPublicReviews } from '@/lib/services/artisan';
 import {
 	fetchPublicProfileUnified,
 	type PublicProfileLookupReason,
@@ -305,14 +307,19 @@ export default async function CustomerProfilePage({
 	const profileLookup = await fetchPublicProfileUnified(id);
 	const profileData = profileLookup.data;
 
-	const userId = profileData?.profile?.userId;
-	const [events, walletProfile] = await Promise.all([
-		fetchPublicUserEvent(userId),
-		getPublicWalletProfile(userId ?? ''),
-	]);
-
 	if (!profileData)
 		return <EmptyDeviceOrProfileState reason={profileLookup.reason} />;
+
+	const userId = profileData?.profile?.userId;
+	const artisan = profileData.artisan ?? null;
+
+	const [events, walletProfile, artisanReviewsData] = await Promise.all([
+		fetchPublicUserEvent(userId),
+		getPublicWalletProfile(userId ?? ''),
+		artisan ?
+			getArtisanPublicReviews(artisan.id, 1, 10)
+		:	Promise.resolve({ reviews: [], total: 0, page: 1, totalPages: 0 }),
+	]);
 
 	const { profile, contact, device } = profileData;
 
@@ -437,7 +444,14 @@ export default async function CustomerProfilePage({
 				</div>
 			</section>
 
-			{/* TABS */}
+			{artisan && (
+				<ArtisanProfileSection
+					artisan={artisan}
+					reviews={artisanReviewsData.reviews}
+					profileName={profile.name}
+				/>
+			)}
+
 			<PublicProfileTabs
 				connectItems={connectItems}
 				events={events!}

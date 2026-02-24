@@ -7,11 +7,13 @@ import type {
 	EarningsData,
 } from '@/lib/types/artisan';
 import {
+	ArrowLeft,
 	ArrowRight,
 	CalendarCheck,
 	Clock,
 	Image as ImageIcon,
 	Megaphone,
+	MessageSquare,
 	Settings,
 	Star,
 	TrendingUp,
@@ -47,11 +49,22 @@ export default function ArtisanDashboardClient({
 		<div className='space-y-6'>
 			{/* Header */}
 			<div className='flex items-center justify-between'>
-				<div>
-					<h1 className='text-xl font-semibold'>
-						{artisan.profile?.name || 'Your Artisan Profile'}
-					</h1>
-					<StatusBadge status={artisan.status} />
+				<div className='flex items-center gap-3'>
+					<Link href='/dashboard'>
+						<Button
+							variant='ghost'
+							size='icon'
+							className='text-white/60 hover:text-white hover:bg-white/10'
+						>
+							<ArrowLeft className='size-5' />
+						</Button>
+					</Link>
+					<div>
+						<h1 className='text-xl font-semibold'>
+							{artisan.profile?.name || 'Your Artisan Profile'}
+						</h1>
+						<StatusBadge status={artisan.status} />
+					</div>
 				</div>
 				<Link href='/connect/artisan/settings'>
 					<Button
@@ -140,6 +153,11 @@ export default function ArtisanDashboardClient({
 					Manage
 				</h2>
 				<div className='space-y-2'>
+					<QuickLink
+						href='/connect/artisan/threads'
+						icon={<MessageSquare className='size-5' />}
+						label='Messages'
+					/>
 					<QuickLink
 						href='/connect/artisan/bookings'
 						icon={<CalendarCheck className='size-5' />}

@@ -5,19 +5,29 @@ import type {
 	ArtisanRequirements,
 	ArtisanService,
 	Booking,
+	BookingThread,
 	CreateBookingDto,
 	CreatePromotionDto,
 	CreateReviewDto,
 	CreateServiceDto,
+	CreateThreadDto,
+	ConfirmPaymentDto,
 	DirectoryFilters,
 	DirectoryResponse,
 	ArtisanDirectoryCard,
 	ArtisanCategory,
+	DisputePaymentDto,
 	EarningsData,
 	PortfolioItem,
 	Promotion,
 	RegisterArtisanDto,
 	Review,
+	SendMessageDto,
+	SendProposalDto,
+	AcceptProposalDto,
+	DeclineProposalDto,
+	ThreadListResponse,
+	UnreadCountResponse,
 	UpdateArtisanDto,
 } from '../types/artisan';
 
@@ -816,5 +826,378 @@ export async function getDirectoryCategories(): Promise<ArtisanCategory[]> {
 		return json?.data ?? [];
 	} catch {
 		return [];
+	}
+}
+
+// ═══════════════════════════════════════════════════════════
+// BOOKING THREADS / CONVERSATIONS
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * Create a new inquiry thread with an artisan.
+ */
+export async function createThread(
+	data: CreateThreadDto,
+): Promise<{ success: boolean; data?: BookingThread; message?: string }> {
+	const auth = await getAuth();
+	if (!auth) return { success: false, message: 'Not authenticated' };
+	try {
+		const res = await fetch(`${BASE()}${URLS.threads.create}`, {
+			method: 'POST',
+			headers: headers(auth.accessToken),
+			body: JSON.stringify(data),
+		});
+		const json = await safeJson(res);
+		if (!res.ok)
+			return {
+				success: false,
+				message: json?.message || 'Failed to create thread',
+			};
+		return { success: true, data: json?.data };
+	} catch {
+		return { success: false, message: 'Network error' };
+	}
+}
+
+/**
+ * Get threads where the current user is a client.
+ */
+export async function getMyThreads(
+	page = 1,
+	limit = 20,
+	status?: string,
+): Promise<ThreadListResponse> {
+	const empty: ThreadListResponse = {
+		threads: [],
+		total: 0,
+		page: 1,
+		totalPages: 0,
+	};
+	const auth = await getAuth();
+	if (!auth) return empty;
+	try {
+		const params = new URLSearchParams({
+			page: String(page),
+			limit: String(limit),
+		});
+		if (status) params.set('status', status);
+		const res = await fetch(
+			`${BASE()}${URLS.threads.my_threads}?${params}`,
+			{ headers: headers(auth.accessToken), cache: 'no-store' },
+		);
+		const json = await safeJson(res);
+		if (!res.ok || !json?.data) return empty;
+		return json.data;
+	} catch {
+		return empty;
+	}
+}
+
+/**
+ * Get threads where the current user is the artisan.
+ */
+export async function getArtisanThreads(
+	profileId: string,
+	page = 1,
+	limit = 20,
+	status?: string,
+): Promise<ThreadListResponse> {
+	const empty: ThreadListResponse = {
+		threads: [],
+		total: 0,
+		page: 1,
+		totalPages: 0,
+	};
+	const auth = await getAuth();
+	if (!auth) return empty;
+	try {
+		const url = buildUrl(URLS.threads.artisan_threads, { profileId });
+		const params = new URLSearchParams({
+			page: String(page),
+			limit: String(limit),
+		});
+		if (status) params.set('status', status);
+		const res = await fetch(`${BASE()}${url}?${params}`, {
+			headers: headers(auth.accessToken),
+			cache: 'no-store',
+		});
+		const json = await safeJson(res);
+		if (!res.ok || !json?.data) return empty;
+		return json.data;
+	} catch {
+		return empty;
+	}
+}
+
+/**
+ * Get a single thread with all messages.
+ */
+export async function getThread(
+	threadId: string,
+): Promise<BookingThread | null> {
+	const auth = await getAuth();
+	if (!auth) return null;
+	try {
+		const url = buildUrl(URLS.threads.one, { threadId });
+		const res = await fetch(`${BASE()}${url}`, {
+			headers: headers(auth.accessToken),
+			cache: 'no-store',
+		});
+		const json = await safeJson(res);
+		return json?.data ?? null;
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Send a text message in a thread.
+ */
+export async function sendThreadMessage(
+	threadId: string,
+	data: SendMessageDto,
+): Promise<{ success: boolean; message?: string }> {
+	const auth = await getAuth();
+	if (!auth) return { success: false, message: 'Not authenticated' };
+	try {
+		const url = buildUrl(URLS.threads.send_message, { threadId });
+		const res = await fetch(`${BASE()}${url}`, {
+			method: 'POST',
+			headers: headers(auth.accessToken),
+			body: JSON.stringify(data),
+		});
+		if (!res.ok) {
+			const json = await safeJson(res);
+			return {
+				success: false,
+				message: json?.message || 'Failed to send',
+			};
+		}
+		return { success: true };
+	} catch {
+		return { success: false, message: 'Network error' };
+	}
+}
+
+/**
+ * Artisan sends a structured proposal in a thread.
+ */
+export async function sendProposal(
+	threadId: string,
+	profileId: string,
+	data: SendProposalDto,
+): Promise<{ success: boolean; message?: string }> {
+	const auth = await getAuth();
+	if (!auth) return { success: false, message: 'Not authenticated' };
+	try {
+		const url = buildUrl(URLS.threads.send_proposal, { threadId });
+		const res = await fetch(`${BASE()}${url}?profileId=${profileId}`, {
+			method: 'POST',
+			headers: headers(auth.accessToken),
+			body: JSON.stringify(data),
+		});
+		if (!res.ok) {
+			const json = await safeJson(res);
+			return {
+				success: false,
+				message: json?.message || 'Failed to send proposal',
+			};
+		}
+		return { success: true };
+	} catch {
+		return { success: false, message: 'Network error' };
+	}
+}
+
+/**
+ * Client accepts a proposal (creates a booking).
+ */
+export async function acceptProposal(
+	threadId: string,
+	data: AcceptProposalDto,
+): Promise<{ success: boolean; message?: string }> {
+	const auth = await getAuth();
+	if (!auth) return { success: false, message: 'Not authenticated' };
+	try {
+		const url = buildUrl(URLS.threads.accept_proposal, { threadId });
+		const res = await fetch(`${BASE()}${url}`, {
+			method: 'POST',
+			headers: headers(auth.accessToken),
+			body: JSON.stringify(data),
+		});
+		if (!res.ok) {
+			const json = await safeJson(res);
+			return {
+				success: false,
+				message: json?.message || 'Failed to accept proposal',
+			};
+		}
+		return { success: true };
+	} catch {
+		return { success: false, message: 'Network error' };
+	}
+}
+
+/**
+ * Client declines a proposal.
+ */
+export async function declineProposal(
+	threadId: string,
+	data: DeclineProposalDto,
+): Promise<{ success: boolean; message?: string }> {
+	const auth = await getAuth();
+	if (!auth) return { success: false, message: 'Not authenticated' };
+	try {
+		const url = buildUrl(URLS.threads.decline_proposal, { threadId });
+		const res = await fetch(`${BASE()}${url}`, {
+			method: 'POST',
+			headers: headers(auth.accessToken),
+			body: JSON.stringify(data),
+		});
+		if (!res.ok) {
+			const json = await safeJson(res);
+			return {
+				success: false,
+				message: json?.message || 'Failed to decline proposal',
+			};
+		}
+		return { success: true };
+	} catch {
+		return { success: false, message: 'Network error' };
+	}
+}
+
+/**
+ * Close a thread.
+ */
+export async function closeThread(
+	threadId: string,
+): Promise<{ success: boolean; message?: string }> {
+	const auth = await getAuth();
+	if (!auth) return { success: false, message: 'Not authenticated' };
+	try {
+		const url = buildUrl(URLS.threads.close, { threadId });
+		const res = await fetch(`${BASE()}${url}`, {
+			method: 'POST',
+			headers: headers(auth.accessToken),
+		});
+		if (!res.ok) {
+			const json = await safeJson(res);
+			return {
+				success: false,
+				message: json?.message || 'Failed to close thread',
+			};
+		}
+		return { success: true };
+	} catch {
+		return { success: false, message: 'Network error' };
+	}
+}
+
+/**
+ * Client confirms payment sent (offline bookings).
+ */
+export async function confirmPaymentSent(
+	bookingId: string,
+	data?: ConfirmPaymentDto,
+): Promise<{ success: boolean; message?: string }> {
+	const auth = await getAuth();
+	if (!auth) return { success: false, message: 'Not authenticated' };
+	try {
+		const url = buildUrl(URLS.threads.confirm_payment_sent, { bookingId });
+		const res = await fetch(`${BASE()}${url}`, {
+			method: 'POST',
+			headers: headers(auth.accessToken),
+			body: JSON.stringify(data ?? {}),
+		});
+		if (!res.ok) {
+			const json = await safeJson(res);
+			return {
+				success: false,
+				message: json?.message || 'Failed to confirm',
+			};
+		}
+		return { success: true };
+	} catch {
+		return { success: false, message: 'Network error' };
+	}
+}
+
+/**
+ * Artisan confirms payment received (offline bookings).
+ */
+export async function confirmPaymentReceived(
+	bookingId: string,
+	profileId: string,
+	data?: ConfirmPaymentDto,
+): Promise<{ success: boolean; message?: string }> {
+	const auth = await getAuth();
+	if (!auth) return { success: false, message: 'Not authenticated' };
+	try {
+		const url = buildUrl(URLS.threads.confirm_payment_received, {
+			bookingId,
+		});
+		const res = await fetch(`${BASE()}${url}?profileId=${profileId}`, {
+			method: 'POST',
+			headers: headers(auth.accessToken),
+			body: JSON.stringify(data ?? {}),
+		});
+		if (!res.ok) {
+			const json = await safeJson(res);
+			return {
+				success: false,
+				message: json?.message || 'Failed to confirm',
+			};
+		}
+		return { success: true };
+	} catch {
+		return { success: false, message: 'Network error' };
+	}
+}
+
+/**
+ * Dispute an offline payment on a booking.
+ */
+export async function disputePayment(
+	bookingId: string,
+	data: DisputePaymentDto,
+): Promise<{ success: boolean; message?: string }> {
+	const auth = await getAuth();
+	if (!auth) return { success: false, message: 'Not authenticated' };
+	try {
+		const url = buildUrl(URLS.threads.dispute_payment, { bookingId });
+		const res = await fetch(`${BASE()}${url}`, {
+			method: 'POST',
+			headers: headers(auth.accessToken),
+			body: JSON.stringify(data),
+		});
+		if (!res.ok) {
+			const json = await safeJson(res);
+			return {
+				success: false,
+				message: json?.message || 'Failed to dispute',
+			};
+		}
+		return { success: true };
+	} catch {
+		return { success: false, message: 'Network error' };
+	}
+}
+
+/**
+ * Get unread thread message count.
+ */
+export async function getUnreadThreadCount(): Promise<number> {
+	const auth = await getAuth();
+	if (!auth) return 0;
+	try {
+		const res = await fetch(`${BASE()}${URLS.threads.unread_count}`, {
+			headers: headers(auth.accessToken),
+			cache: 'no-store',
+		});
+		const json = await safeJson(res);
+		return (json?.data as UnreadCountResponse)?.count ?? 0;
+	} catch {
+		return 0;
 	}
 }

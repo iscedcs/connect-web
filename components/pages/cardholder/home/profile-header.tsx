@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { BellIcon } from '@/lib/icons';
 import { getDeterministicAvatarDataUri, getAvatarInitials } from '@/lib/utils';
-import { BarChart2, Users } from 'lucide-react';
+import { BarChart2, MessageSquare, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -29,6 +29,7 @@ interface ProfileHeaderProps {
 	};
 	linksData?: { title?: string; url?: string; platform?: string }[];
 	socialsData?: { title?: string; url?: string; platform?: string }[];
+	unreadThreadCount?: number;
 }
 
 export default function ProfileHeader({
@@ -38,6 +39,7 @@ export default function ProfileHeader({
 	contactData,
 	linksData,
 	socialsData,
+	unreadThreadCount = 0,
 }: ProfileHeaderProps) {
 	const coverUrl = connectProfile?.coverPhoto || '/cover-image.png';
 
@@ -139,6 +141,20 @@ export default function ProfileHeader({
 									slugMode
 								/>
 							:	<AddSlugDialog />}
+							<Link href='/connect/artisan/threads' className='relative'>
+								<Button
+									size='icon'
+									className='rounded-full bg-transparent hover:bg-transparent cursor-pointer'
+									title='Messages'
+								>
+									<MessageSquare className='w-10 h-10' />
+								</Button>
+								{unreadThreadCount > 0 && (
+									<span className='absolute -top-0.5 -right-0.5 bg-purple-500 text-white text-[9px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1'>
+										{unreadThreadCount > 99 ? '99+' : unreadThreadCount}
+									</span>
+								)}
+							</Link>
 							<Link href='/analytics'>
 								<Button
 									size='icon'

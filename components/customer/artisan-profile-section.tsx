@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { MessageSquare } from 'lucide-react';
 import type {
 	ArtisanCategoryMap,
 	ArtisanService,
@@ -229,6 +231,15 @@ export default function ArtisanProfileSection({
 						))}
 					</div>
 				)}
+
+				{/* Inquiry button */}
+				<Link
+					href={`/connect/artisan/threads/new?artisanId=${artisan.id}`}
+					className='mt-4 flex items-center justify-center gap-2 w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-xl transition'
+				>
+					<MessageSquare className='w-4 h-4' />
+					Send Inquiry
+				</Link>
 			</div>
 
 			{/* Tabs */}
@@ -282,6 +293,13 @@ export default function ArtisanProfileSection({
 									currency={service.currency}
 								/>
 							</div>
+							<Link
+								href={`/connect/artisan/threads/new?artisanId=${artisan.id}&serviceId=${service.id}`}
+								className='mt-2 flex items-center justify-center gap-1.5 w-full py-2 bg-purple-600/10 hover:bg-purple-600/20 text-purple-300 text-xs font-medium rounded-lg transition'
+							>
+								<MessageSquare className='w-3.5 h-3.5' />
+								Inquire
+							</Link>
 						</div>
 					))}
 				</div>
