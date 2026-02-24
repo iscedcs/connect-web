@@ -493,104 +493,102 @@ export default function BookingDetailClient({
 			)}
 
 			{/* ── Payment Card ── */}
-			{booking.status !== 'CANCELLED' &&
-				booking.paymentMethod !== 'NONE' && (
-					<div className='rounded-xl border border-white/10 bg-white/5 p-4 space-y-3'>
-						<div className='flex items-center justify-between'>
-							<p className='text-xs font-medium text-white/60'>
-								{paymentLabel}
-							</p>
-							{booking.isPaid && (
-								<Badge
-									variant='outline'
-									className='bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-[10px]'
-								>
-									Paid
-								</Badge>
-							)}
-						</div>
-
-						{disputed ?
-							<div className='flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-900/20 px-3 py-2 text-xs text-red-300'>
-								<AlertTriangle className='h-4 w-4 shrink-0' />
-								<span>Payment disputed — under review</span>
-							</div>
-						: clientConfirmed && artisanConfirmed ?
-							<div className='flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-900/20 px-3 py-2 text-xs text-emerald-300'>
-								<CheckCircle2 className='h-4 w-4 shrink-0' />
-								<span>Payment confirmed by both parties</span>
-							</div>
-						:	<>
-								{/* Status indicators */}
-								<div className='flex flex-col gap-1.5 text-xs'>
-									<div className='flex items-center gap-2'>
-										{clientConfirmed ?
-											<span className='text-emerald-400'>
-												✓ Client confirmed payment sent
-											</span>
-										:	<span className='text-white/40'>
-												○ Waiting for client to confirm
-											</span>
-										}
-									</div>
-									<div className='flex items-center gap-2'>
-										{artisanConfirmed ?
-											<span className='text-emerald-400'>
-												✓ Artisan confirmed payment
-												received
-											</span>
-										:	<span className='text-white/40'>
-												○ Waiting for artisan to confirm
-											</span>
-										}
-									</div>
-								</div>
-
-								{/* Payment action buttons */}
-								<div className='flex gap-2'>
-									{viewerRole === 'CLIENT' &&
-										!clientConfirmed && (
-											<Button
-												size='sm'
-												className='flex-1 bg-purple-600 hover:bg-purple-700'
-												onClick={() =>
-													setShowPaymentConfirm(true)
-												}
-											>
-												Confirm Payment Sent
-											</Button>
-										)}
-									{viewerRole === 'ARTISAN' &&
-										!artisanConfirmed && (
-											<Button
-												size='sm'
-												className='flex-1 bg-purple-600 hover:bg-purple-700'
-												onClick={() =>
-													setShowPaymentConfirm(true)
-												}
-											>
-												Confirm Payment Received
-											</Button>
-										)}
-									{(clientConfirmed || artisanConfirmed) &&
-										!disputed && (
-											<Button
-												size='sm'
-												variant='outline'
-												className='border-red-500/30 text-red-400 hover:bg-red-500/10'
-												onClick={() =>
-													setShowDisputeDialog(true)
-												}
-											>
-												<AlertTriangle className='mr-1 h-3 w-3' />
-												Dispute
-											</Button>
-										)}
-								</div>
-							</>
-						}
+			{booking.status !== 'CANCELLED' && (
+				<div className='rounded-xl border border-white/10 bg-white/5 p-4 space-y-3'>
+					<div className='flex items-center justify-between'>
+						<p className='text-xs font-medium text-white/60'>
+							{paymentLabel}
+						</p>
+						{booking.isPaid && (
+							<Badge
+								variant='outline'
+								className='bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-[10px]'
+							>
+								Paid
+							</Badge>
+						)}
 					</div>
-				)}
+
+					{disputed ?
+						<div className='flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-900/20 px-3 py-2 text-xs text-red-300'>
+							<AlertTriangle className='h-4 w-4 shrink-0' />
+							<span>Payment disputed — under review</span>
+						</div>
+					: clientConfirmed && artisanConfirmed ?
+						<div className='flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-900/20 px-3 py-2 text-xs text-emerald-300'>
+							<CheckCircle2 className='h-4 w-4 shrink-0' />
+							<span>Payment confirmed by both parties</span>
+						</div>
+					:	<>
+							{/* Status indicators */}
+							<div className='flex flex-col gap-1.5 text-xs'>
+								<div className='flex items-center gap-2'>
+									{clientConfirmed ?
+										<span className='text-emerald-400'>
+											✓ Client confirmed payment sent
+										</span>
+									:	<span className='text-white/40'>
+											○ Waiting for client to confirm
+										</span>
+									}
+								</div>
+								<div className='flex items-center gap-2'>
+									{artisanConfirmed ?
+										<span className='text-emerald-400'>
+											✓ Artisan confirmed payment received
+										</span>
+									:	<span className='text-white/40'>
+											○ Waiting for artisan to confirm
+										</span>
+									}
+								</div>
+							</div>
+
+							{/* Payment action buttons */}
+							<div className='flex gap-2'>
+								{viewerRole === 'CLIENT' &&
+									!clientConfirmed && (
+										<Button
+											size='sm'
+											className='flex-1 bg-purple-600 hover:bg-purple-700'
+											onClick={() =>
+												setShowPaymentConfirm(true)
+											}
+										>
+											Confirm Payment Sent
+										</Button>
+									)}
+								{viewerRole === 'ARTISAN' &&
+									!artisanConfirmed && (
+										<Button
+											size='sm'
+											className='flex-1 bg-purple-600 hover:bg-purple-700'
+											onClick={() =>
+												setShowPaymentConfirm(true)
+											}
+										>
+											Confirm Payment Received
+										</Button>
+									)}
+								{(clientConfirmed || artisanConfirmed) &&
+									!disputed && (
+										<Button
+											size='sm'
+											variant='outline'
+											className='border-red-500/30 text-red-400 hover:bg-red-500/10'
+											onClick={() =>
+												setShowDisputeDialog(true)
+											}
+										>
+											<AlertTriangle className='mr-1 h-3 w-3' />
+											Dispute
+										</Button>
+									)}
+							</div>
+						</>
+					}
+				</div>
+			)}
 
 			{/* ── Thread Link ── */}
 			{booking.thread?.id && (

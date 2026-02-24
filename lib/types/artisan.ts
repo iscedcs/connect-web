@@ -248,7 +248,7 @@ export interface ArtisanDirectoryCard {
 export type ThreadStatus = 'OPEN' | 'PROPOSAL_SENT' | 'BOOKED' | 'CLOSED';
 export type ThreadMessageType = 'TEXT' | 'PROPOSAL' | 'SYSTEM';
 export type SenderRole = 'CLIENT' | 'ARTISAN';
-export type PaymentMethod = 'WALLET' | 'OFFLINE' | 'NONE';
+export type PaymentMethod = 'WALLET' | 'OFFLINE';
 export type PaymentTiming = 'UPFRONT' | 'ON_COMPLETION';
 export type PaymentDisputedBy = 'CLIENT' | 'ARTISAN';
 
@@ -334,7 +334,7 @@ export interface SendProposalDto {
 	serviceId?: string;
 	price: number;
 	currency?: string;
-	date: string;
+	date?: string;
 	time?: string;
 	duration?: number;
 	paymentPreference?: string;

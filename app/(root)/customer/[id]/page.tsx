@@ -4,6 +4,8 @@ import EmailDialog from '@/components/customer/email-dialog';
 import ScanRecorder from '@/components/customer/scan-recorder';
 import SendMoneyButton from '@/components/customer/send-money-button';
 import ArtisanProfileSection from '@/components/customer/artisan-profile-section';
+import FloatingDashboardButton from '@/components/customer/floating-dashboard-button';
+import BackToThreadButton from '@/components/customer/back-to-thread-button';
 import { PhoneIcon } from '@/lib/icons';
 import { fetchPublicUserEvent } from '@/lib/services/events';
 import { getPublicWalletProfile } from '@/lib/services/wallet';
@@ -14,6 +16,7 @@ import {
 } from '@/lib/services/public-profile';
 import { getPlatformInfo } from '@/lib/connect-social/detect-platform';
 import { ICONS, COVER_PHOTOS } from '@/lib/const';
+import { isAuthenticated } from '@/actions/auth';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -313,13 +316,20 @@ export default async function CustomerProfilePage({
 	const userId = profileData?.profile?.userId;
 	const artisan = profileData.artisan ?? null;
 
-	const [events, walletProfile, artisanReviewsData] = await Promise.all([
-		fetchPublicUserEvent(userId),
-		getPublicWalletProfile(userId ?? ''),
-		artisan ?
-			getArtisanPublicReviews(artisan.id, 1, 10)
-		:	Promise.resolve({ reviews: [], total: 0, page: 1, totalPages: 0 }),
-	]);
+	const [events, walletProfile, artisanReviewsData, signedIn] =
+		await Promise.all([
+			fetchPublicUserEvent(userId),
+			getPublicWalletProfile(userId ?? ''),
+			artisan ?
+				getArtisanPublicReviews(artisan.id, 1, 10)
+			:	Promise.resolve({
+					reviews: [],
+					total: 0,
+					page: 1,
+					totalPages: 0,
+				}),
+			isAuthenticated(),
+		]);
 
 	const { profile, contact, device } = profileData;
 
@@ -458,6 +468,9 @@ export default async function CustomerProfilePage({
 				id={id}
 				canShowEventsTab={canShowEventsTab}
 			/>
+
+			{signedIn && <FloatingDashboardButton />}
+			<BackToThreadButton />
 		</main>
 	);
 }

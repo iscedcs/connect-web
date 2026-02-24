@@ -38,6 +38,7 @@ import {
 	X,
 	Play,
 	CheckSquare,
+	User,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useThreadSSE } from '@/hooks/useThreadSSE';
@@ -144,6 +145,7 @@ export default function ThreadConversationClient({
 		date: '',
 		time: '',
 		duration: 60,
+		paymentPreference: 'WALLET',
 		note: '',
 	});
 
@@ -340,8 +342,8 @@ export default function ThreadConversationClient({
 	// ─── Send proposal (artisan only) ───────────────────
 
 	const handleSendProposal = async () => {
-		if (!proposalForm.price || !proposalForm.date) {
-			toast.error('Price and date are required');
+		if (!proposalForm.price) {
+			toast.error('Price is required');
 			return;
 		}
 		setActionLoading('proposal');
@@ -365,6 +367,7 @@ export default function ThreadConversationClient({
 					date: '',
 					time: '',
 					duration: 60,
+					paymentPreference: 'WALLET',
 					note: '',
 				});
 				setThread((prev) => ({ ...prev, status: 'PROPOSAL_SENT' }));
@@ -1040,9 +1043,22 @@ export default function ThreadConversationClient({
 					</Button>
 				</Link>
 				<div className='min-w-0 flex-1'>
-					<h2 className='truncate text-sm font-semibold text-white'>
-						{otherPartyName}
-					</h2>
+					{(() => {
+						const profileSlug =
+							myRole === 'CLIENT' ?
+								thread.artisan?.profile?.slug
+							:	null;
+						return profileSlug ?
+								<Link
+									href={`/p/${profileSlug}?from=thread&threadId=${thread.id}`}
+									className='truncate text-sm font-semibold text-white hover:text-purple-300 transition'
+								>
+									{otherPartyName}
+								</Link>
+							:	<h2 className='truncate text-sm font-semibold text-white'>
+									{otherPartyName}
+								</h2>;
+					})()}
 					<div className='flex items-center gap-2'>
 						{thread.service?.name && (
 							<p className='truncate text-xs text-white/50'>
@@ -1073,18 +1089,60 @@ export default function ThreadConversationClient({
 						<MoreVertical className='h-5 w-5' />
 					</Button>
 					{showMenu && (
-						<div className='absolute right-0 top-10 z-50 w-48 rounded-lg border border-white/10 bg-neutral-900 py-1 shadow-lg'>
-							{!isClosed && (
+						<div className='absolute right-0 top-10 z-50 w-56 rounded-lg border border-white/10 bg-neutral-900 py-1 shadow-lg'>
+							{/* Quick Actions */}
+							{myRole === 'CLIENT' &&
+								thread.artisan?.profile?.slug && (
+									<Link
+										href={`/p/${thread.artisan.profile.slug}?from=thread&threadId=${thread.id}`}
+										onClick={() => setShowMenu(false)}
+										className='flex w-full items-center gap-2 px-4 py-2 text-sm text-white/80 hover:bg-white/5'
+									>
+										<User className='h-4 w-4' />
+										View Artisan Profile
+									</Link>
+								)}
+							{thread.booking && thread.booking.agreedPrice && (
 								<button
 									onClick={() => {
 										setShowMenu(false);
-										setShowCloseConfirm(true);
+										toast.info(
+											`Payment: ${thread.booking!.currency} ${thread.booking!.agreedPrice?.toLocaleString()} via ${thread.booking!.paymentMethod || 'WALLET'}`,
+										);
 									}}
-									className='flex w-full items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-white/5'
+									className='flex w-full items-center gap-2 px-4 py-2 text-sm text-white/80 hover:bg-white/5'
 								>
-									<X className='h-4 w-4' />
-									Close Conversation
+									<DollarSign className='h-4 w-4' />
+									Payment Details
 								</button>
+							)}
+							<button
+								onClick={() => {
+									navigator.clipboard.writeText(
+										window.location.href,
+									);
+									setShowMenu(false);
+									toast.success('Thread link copied');
+								}}
+								className='flex w-full items-center gap-2 px-4 py-2 text-sm text-white/80 hover:bg-white/5'
+							>
+								<ClipboardList className='h-4 w-4' />
+								Copy Thread Link
+							</button>
+							{!isClosed && (
+								<>
+									<div className='my-1 border-t border-white/10' />
+									<button
+										onClick={() => {
+											setShowMenu(false);
+											setShowCloseConfirm(true);
+										}}
+										className='flex w-full items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-white/5'
+									>
+										<X className='h-4 w-4' />
+										Close Conversation
+									</button>
+								</>
 							)}
 						</div>
 					)}
@@ -1218,10 +1276,60 @@ export default function ThreadConversationClient({
 								/>
 							</div>
 						</div>
+
+						{/* Payment Preference */}
+						<div>
+							<label className='mb-1.5 block text-xs text-white/60'>
+								Payment Mode *
+							</label>
+							<div className='grid grid-cols-2 gap-2'>
+								<button
+									type='button'
+									onClick={() =>
+										setProposalForm({
+											...proposalForm,
+											paymentPreference: 'WALLET',
+										})
+									}
+									className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition ${
+										(
+											proposalForm.paymentPreference ===
+											'WALLET'
+										) ?
+											'border-purple-500 bg-purple-500/20 text-purple-300'
+										:	'border-white/10 bg-white/5 text-white/50 hover:bg-white/10'
+									}`}
+								>
+									<DollarSign className='h-3.5 w-3.5' />
+									Wallet
+								</button>
+								<button
+									type='button'
+									onClick={() =>
+										setProposalForm({
+											...proposalForm,
+											paymentPreference: 'OFFLINE',
+										})
+									}
+									className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition ${
+										(
+											proposalForm.paymentPreference ===
+											'OFFLINE'
+										) ?
+											'border-purple-500 bg-purple-500/20 text-purple-300'
+										:	'border-white/10 bg-white/5 text-white/50 hover:bg-white/10'
+									}`}
+								>
+									<Calendar className='h-3.5 w-3.5' />
+									Offline
+								</button>
+							</div>
+						</div>
+
 						<div className='grid grid-cols-2 gap-3'>
 							<div>
 								<label className='mb-1 block text-xs text-white/60'>
-									Date *
+									Date
 								</label>
 								<Input
 									type='date'

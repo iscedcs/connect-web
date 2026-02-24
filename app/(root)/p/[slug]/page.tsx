@@ -4,6 +4,8 @@ import EmailDialog from '@/components/customer/email-dialog';
 import ScanRecorder from '@/components/customer/scan-recorder';
 import SendMoneyButton from '@/components/customer/send-money-button';
 import ArtisanProfileSection from '@/components/customer/artisan-profile-section';
+import FloatingDashboardButton from '@/components/customer/floating-dashboard-button';
+import BackToThreadButton from '@/components/customer/back-to-thread-button';
 import { PhoneIcon } from '@/lib/icons';
 import { fetchPublicUserEvent } from '@/lib/services/events';
 import { fetchPublicProfileBySlug } from '@/lib/services/public-profile';
@@ -11,6 +13,7 @@ import { getPublicWalletProfile } from '@/lib/services/wallet';
 import { getArtisanPublicReviews } from '@/lib/services/artisan';
 import { getPlatformInfo } from '@/lib/connect-social/detect-platform';
 import { ICONS, COVER_PHOTOS } from '@/lib/const';
+import { isAuthenticated } from '@/actions/auth';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -214,13 +217,20 @@ export default async function SlugProfilePage({
 	const userId = profile?.userId;
 	const artisan = profileData.artisan ?? null;
 
-	const [events, walletProfile, artisanReviewsData] = await Promise.all([
-		fetchPublicUserEvent(userId),
-		getPublicWalletProfile(userId ?? ''),
-		artisan ?
-			getArtisanPublicReviews(artisan.id, 1, 10)
-		:	Promise.resolve({ reviews: [], total: 0, page: 1, totalPages: 0 }),
-	]);
+	const [events, walletProfile, artisanReviewsData, signedIn] =
+		await Promise.all([
+			fetchPublicUserEvent(userId),
+			getPublicWalletProfile(userId ?? ''),
+			artisan ?
+				getArtisanPublicReviews(artisan.id, 1, 10)
+			:	Promise.resolve({
+					reviews: [],
+					total: 0,
+					page: 1,
+					totalPages: 0,
+				}),
+			isAuthenticated(),
+		]);
 
 	// Extract emails from socials
 	const emailItems = (profileData.socials || []).filter(
@@ -342,6 +352,9 @@ export default async function SlugProfilePage({
 				canShowEventsTab={canShowEventsTab}
 				basePath='/p'
 			/>
+
+			{signedIn && <FloatingDashboardButton />}
+			<BackToThreadButton />
 		</main>
 	);
 }
