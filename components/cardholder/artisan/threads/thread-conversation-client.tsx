@@ -172,6 +172,86 @@ export default function ThreadConversationClient({
 		scrollToBottom();
 	}, [messages, scrollToBottom]);
 
+	// ─── Real-time SSE updates ──────────────────────────
+
+	useThreadSSE({
+		threadId: thread.id,
+		currentUserId,
+		onMessage: useCallback(
+			(msg: ThreadMessage) => {
+				setMessages((prev) => {
+					// Avoid duplicates (if server echo matches existing)
+					if (prev.some((m) => m.id === msg.id)) return prev;
+					return [...prev, msg];
+				});
+			},
+			[],
+		),
+		onStatusChange: useCallback(
+			(status: ThreadStatus, data?: Record<string, unknown>) => {
+				setThread((prev) => ({ ...prev, status }));
+				if (status === 'BOOKED' && data?.booking) {
+					setThread((prev) => ({
+						...prev,
+						booking: data.booking as BookingThread['booking'],
+					}));
+				}
+			},
+			[],
+		),
+		onPaymentUpdate: useCallback(
+			(data: Record<string, unknown>) => {
+				if (data.isPaid) {
+					setThread((prev) => ({
+						...prev,
+						booking: prev.booking
+							? { ...prev.booking, isPaid: true }
+							: prev.booking,
+					}));
+				}
+				if (data.action === 'payment_sent' && thread.booking) {
+					setThread((prev) => ({
+						...prev,
+						booking: prev.booking
+							? {
+									...prev.booking,
+									clientPaymentConfirmed: true,
+								}
+							: prev.booking,
+					}));
+				}
+				if (data.action === 'payment_received' && thread.booking) {
+					setThread((prev) => ({
+						...prev,
+						booking: prev.booking
+							? {
+									...prev.booking,
+									artisanPaymentConfirmed: true,
+								}
+							: prev.booking,
+					}));
+				}
+				if (data.action === 'payment_disputed') {
+					setThread((prev) => ({
+						...prev,
+						booking: prev.booking
+							? {
+									...prev.booking,
+									paymentDisputed: true,
+									paymentDisputeReason:
+										(data.reason as string) || null,
+								}
+							: prev.booking,
+					}));
+				}
+			},
+			[thread.booking],
+		),
+		onThreadClosed: useCallback(() => {
+			setThread((prev) => ({ ...prev, status: 'CLOSED' as ThreadStatus }));
+		}, []),
+	});
+
 	// ─── API helpers ────────────────────────────────────
 
 	const apiCall = async (
