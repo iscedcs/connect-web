@@ -456,10 +456,13 @@ export async function getArtisanBookings(
 	}
 }
 
-export async function getBookingById(
-	bookingId: string,
-): Promise<{
-	booking: (Booking & { viewerRole: 'CLIENT' | 'ARTISAN'; thread?: { id: string; status: string } | null }) | null;
+export async function getBookingById(bookingId: string): Promise<{
+	booking:
+		| (Booking & {
+				viewerRole: 'CLIENT' | 'ARTISAN';
+				thread?: { id: string; status: string } | null;
+		  })
+		| null;
 }> {
 	const auth = await getAuth();
 	if (!auth) return { booking: null };
@@ -471,7 +474,13 @@ export async function getBookingById(
 		});
 		if (!res.ok) return { booking: null };
 		const json = await safeJson(res);
-		return { booking: json ?? null };
+		return {
+			booking:
+				(json as Booking & {
+					viewerRole: 'CLIENT' | 'ARTISAN';
+					thread?: { id: string; status: string } | null;
+				}) ?? null,
+		};
 	} catch {
 		return { booking: null };
 	}
