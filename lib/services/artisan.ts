@@ -441,6 +441,15 @@ export async function getArtisanBookings(
 			cache: 'no-store',
 		});
 		const json = await safeJson(res);
+		// Backend returns { data: [...bookings], meta: { total, page, totalPages } }
+		if (json?.data && Array.isArray(json.data)) {
+			return {
+				bookings: json.data,
+				total: json.meta?.total ?? json.data.length,
+				page: json.meta?.page ?? 1,
+				totalPages: json.meta?.totalPages ?? 1,
+			};
+		}
 		return json?.data ?? { bookings: [], total: 0, page: 1, totalPages: 0 };
 	} catch {
 		return { bookings: [], total: 0, page: 1, totalPages: 0 };

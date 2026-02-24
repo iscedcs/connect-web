@@ -123,7 +123,7 @@ export default function ArtisanDashboardClient({
 							<CalendarCheck className='size-4 text-blue-400' />
 						}
 						label='Bookings'
-						value={String(artisan.totalBookings)}
+						value={String(recentBookings?.total ?? artisan.totalBookings)}
 						sub='total bookings'
 					/>
 					<StatCard

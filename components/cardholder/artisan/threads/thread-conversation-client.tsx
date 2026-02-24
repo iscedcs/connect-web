@@ -277,6 +277,7 @@ export default function ThreadConversationClient({
 					duration: 60,
 					note: '',
 				});
+				setThread((prev) => ({ ...prev, status: 'PROPOSAL_SENT' }));
 				router.refresh();
 			}
 		} catch {
@@ -299,6 +300,7 @@ export default function ThreadConversationClient({
 				toast.error(result.message || 'Failed to accept proposal');
 			} else {
 				toast.success('Proposal accepted — booking created!');
+				setThread((prev) => ({ ...prev, status: 'BOOKED' }));
 				router.refresh();
 			}
 		} catch {
@@ -319,6 +321,7 @@ export default function ThreadConversationClient({
 				toast.error(result.message || 'Failed to decline proposal');
 			} else {
 				toast.success('Proposal declined');
+				setThread((prev) => ({ ...prev, status: 'OPEN' }));
 				router.refresh();
 			}
 		} catch {
@@ -342,6 +345,7 @@ export default function ThreadConversationClient({
 			} else {
 				toast.success('Conversation closed');
 				setShowCloseConfirm(false);
+				setThread((prev) => ({ ...prev, status: 'CLOSED' }));
 				router.refresh();
 			}
 		} catch {
