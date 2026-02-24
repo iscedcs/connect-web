@@ -144,11 +144,12 @@ export default function NewThreadClient({
 						onChange={(e) => setSelectedServiceId(e.target.value)}
 						className='w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-purple-500'
 					>
-						<option value=''>General inquiry</option>
+						<option value='' className='bg-neutral-900 text-white'>General inquiry</option>
 						{services.map((s) => (
 							<option
 								key={s.id}
 								value={s.id}
+								className='bg-neutral-900 text-white'
 							>
 								{s.name}
 								{s.price ?
@@ -170,7 +171,7 @@ export default function NewThreadClient({
 					value={message}
 					onChange={(e) => setMessage(e.target.value)}
 					rows={5}
-					className='bg-white/5 border-white/10 rounded-xl text-sm resize-none focus:ring-1 focus:ring-purple-500'
+					className='bg-white/5 border-white/10 rounded-xl text-sm text-white placeholder:text-white/30 resize-none focus:ring-1 focus:ring-purple-500'
 				/>
 			</div>
 

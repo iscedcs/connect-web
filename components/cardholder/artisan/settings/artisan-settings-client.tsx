@@ -192,7 +192,7 @@ export default function ArtisanSettingsClient({
 						onChange={(e) => setBio(e.target.value)}
 						rows={3}
 						placeholder='Tell customers about your experience…'
-						className='bg-white/5 border-white/10 resize-none'
+						className='bg-white/5 border-white/10 text-white placeholder:text-white/30 resize-none'
 					/>
 				</div>
 
@@ -241,7 +241,7 @@ export default function ArtisanSettingsClient({
 												e.target.value,
 											)
 										}
-										className='bg-white/5 border-white/10 flex-1'
+										className='bg-white/5 border-white/10 text-white flex-1'
 									/>
 									<span className='text-xs text-white/30'>
 										to
@@ -256,7 +256,7 @@ export default function ArtisanSettingsClient({
 												e.target.value,
 											)
 										}
-										className='bg-white/5 border-white/10 flex-1'
+										className='bg-white/5 border-white/10 text-white flex-1'
 									/>
 								</>
 							:	<span className='text-xs text-white/30 italic'>
