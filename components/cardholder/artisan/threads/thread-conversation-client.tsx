@@ -36,8 +36,11 @@ import {
 	AlertTriangle,
 	MoreVertical,
 	X,
+	Play,
+	CheckSquare,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useThreadSSE } from '@/hooks/useThreadSSE';
 
 // ─── Props ──────────────────────────────────────────────
 
@@ -177,16 +180,13 @@ export default function ThreadConversationClient({
 	useThreadSSE({
 		threadId: thread.id,
 		currentUserId,
-		onMessage: useCallback(
-			(msg: ThreadMessage) => {
-				setMessages((prev) => {
-					// Avoid duplicates (if server echo matches existing)
-					if (prev.some((m) => m.id === msg.id)) return prev;
-					return [...prev, msg];
-				});
-			},
-			[],
-		),
+		onMessage: useCallback((msg: ThreadMessage) => {
+			setMessages((prev) => {
+				// Avoid duplicates (if server echo matches existing)
+				if (prev.some((m) => m.id === msg.id)) return prev;
+				return [...prev, msg];
+			});
+		}, []),
 		onStatusChange: useCallback(
 			(status: ThreadStatus, data?: Record<string, unknown>) => {
 				setThread((prev) => ({ ...prev, status }));
@@ -204,51 +204,61 @@ export default function ThreadConversationClient({
 				if (data.isPaid) {
 					setThread((prev) => ({
 						...prev,
-						booking: prev.booking
-							? { ...prev.booking, isPaid: true }
-							: prev.booking,
+						booking:
+							prev.booking ?
+								{ ...prev.booking, isPaid: true }
+							:	prev.booking,
 					}));
 				}
 				if (data.action === 'payment_sent' && thread.booking) {
 					setThread((prev) => ({
 						...prev,
-						booking: prev.booking
-							? {
+						booking:
+							prev.booking ?
+								{
 									...prev.booking,
 									clientPaymentConfirmed: true,
 								}
-							: prev.booking,
+							:	prev.booking,
 					}));
 				}
 				if (data.action === 'payment_received' && thread.booking) {
 					setThread((prev) => ({
 						...prev,
-						booking: prev.booking
-							? {
+						booking:
+							prev.booking ?
+								{
 									...prev.booking,
 									artisanPaymentConfirmed: true,
 								}
-							: prev.booking,
+							:	prev.booking,
 					}));
 				}
 				if (data.action === 'payment_disputed') {
+					const disputeReason: string | undefined =
+						typeof data.reason === 'string' ?
+							data.reason
+						:	undefined;
 					setThread((prev) => ({
 						...prev,
-						booking: prev.booking
-							? {
+						booking:
+							prev.booking ?
+								{
 									...prev.booking,
 									paymentDisputed: true,
-									paymentDisputeReason:
-										(data.reason as string) || null,
+									paymentDisputeReason: disputeReason,
 								}
-							: prev.booking,
+							:	prev.booking,
 					}));
 				}
 			},
 			[thread.booking],
 		),
 		onThreadClosed: useCallback(() => {
-			setThread((prev) => ({ ...prev, status: 'CLOSED' as ThreadStatus }));
+			setThread((prev) => ({
+				...prev,
+				status: 'CLOSED' as ThreadStatus,
+			}));
 		}, []),
 	});
 
@@ -505,6 +515,70 @@ export default function ThreadConversationClient({
 		}
 	};
 
+	// ─── Booking lifecycle actions ──────────────────────
+
+	const handleBookingAction = async (
+		action: 'confirm' | 'start' | 'complete',
+	) => {
+		const booking = thread.booking;
+		if (!booking?.id) return;
+
+		setActionLoading(`booking-${action}`);
+		try {
+			const urlMap: Record<string, string> = {
+				confirm: URLS.artisan.confirm_booking,
+				start: URLS.artisan.start_booking,
+				complete: URLS.artisan.complete_booking,
+			};
+
+			const url = buildUrl(urlMap[action], {
+				profileId,
+				bookingId: booking.id,
+			});
+
+			const result = await apiCall(url, 'POST');
+			if (!result.ok) {
+				toast.error(result.message || `Failed to ${action} booking`);
+			} else {
+				const statusMap: Record<string, string> = {
+					confirm: 'CONFIRMED',
+					start: 'IN_PROGRESS',
+					complete: 'COMPLETED',
+				};
+				toast.success(
+					`Booking ${
+						action === 'confirm' ? 'confirmed'
+						: action === 'start' ? 'started'
+						: 'completed'
+					}`,
+				);
+				setThread((prev) => ({
+					...prev,
+					booking:
+						prev.booking ?
+							{
+								...prev.booking,
+								status: statusMap[
+									action
+								] as typeof prev.booking.status,
+								...(action === 'start' ?
+									{ startedAt: new Date().toISOString() }
+								:	{}),
+								...(action === 'complete' ?
+									{ completedAt: new Date().toISOString() }
+								:	{}),
+							}
+						:	prev.booking,
+				}));
+				router.refresh();
+			}
+		} catch {
+			toast.error('Network error');
+		} finally {
+			setActionLoading(null);
+		}
+	};
+
 	// ─── Key handler ────────────────────────────────────
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -699,14 +773,147 @@ export default function ThreadConversationClient({
 		);
 	};
 
+	// ─── Booking panel ──────────────────────────────────
+
+	const renderBookingPanel = () => {
+		const booking = thread.booking;
+		if (!booking || thread.status !== 'BOOKED') return null;
+
+		const statusConfig: Record<string, { label: string; color: string }> = {
+			PENDING: {
+				label: 'Pending',
+				color: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
+			},
+			CONFIRMED: {
+				label: 'Confirmed',
+				color: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+			},
+			IN_PROGRESS: {
+				label: 'In Progress',
+				color: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
+			},
+			COMPLETED: {
+				label: 'Completed',
+				color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+			},
+			CANCELLED: {
+				label: 'Cancelled',
+				color: 'bg-red-500/20 text-red-300 border-red-500/30',
+			},
+		};
+
+		const cfg = statusConfig[booking.status] || {
+			label: booking.status,
+			color: 'bg-white/10 text-white/60 border-white/20',
+		};
+
+		return (
+			<div className='mx-4 mb-2 rounded-lg border border-white/10 bg-white/5 p-3'>
+				{/* Status + heading */}
+				<div className='mb-2 flex items-center justify-between'>
+					<p className='text-xs font-medium text-white/60'>
+						Booking Details
+					</p>
+					<Badge
+						variant='outline'
+						className={`text-[10px] ${cfg.color}`}
+					>
+						{cfg.label}
+					</Badge>
+				</div>
+
+				{/* Info rows */}
+				<div className='flex flex-col gap-1.5 text-xs text-white/50'>
+					{booking.service?.name && (
+						<div className='flex items-center gap-2'>
+							<ClipboardList className='h-3.5 w-3.5 shrink-0' />
+							<span>{booking.service.name}</span>
+						</div>
+					)}
+					{booking.scheduledDate && (
+						<div className='flex items-center gap-2'>
+							<Calendar className='h-3.5 w-3.5 shrink-0' />
+							<span>
+								{new Date(
+									booking.scheduledDate,
+								).toLocaleDateString()}
+								{booking.scheduledTime &&
+									` at ${booking.scheduledTime}`}
+							</span>
+						</div>
+					)}
+					{booking.agreedPrice && (
+						<div className='flex items-center gap-2'>
+							<DollarSign className='h-3.5 w-3.5 shrink-0' />
+							<span>
+								{booking.currency || '₦'}
+								{Number(booking.agreedPrice).toLocaleString()}
+							</span>
+						</div>
+					)}
+				</div>
+
+				{/* Artisan action buttons */}
+				{myRole === 'ARTISAN' && (
+					<div className='mt-3 flex gap-2'>
+						{booking.status === 'PENDING' && (
+							<Button
+								size='sm'
+								className='flex-1 bg-blue-600 hover:bg-blue-700'
+								disabled={actionLoading === 'booking-confirm'}
+								onClick={() => handleBookingAction('confirm')}
+							>
+								{actionLoading === 'booking-confirm' ?
+									<Loader2 className='mr-1 h-3.5 w-3.5 animate-spin' />
+								:	<CheckCircle2 className='mr-1 h-3.5 w-3.5' />}
+								Confirm Booking
+							</Button>
+						)}
+						{booking.status === 'CONFIRMED' && (
+							<Button
+								size='sm'
+								className='flex-1 bg-orange-600 hover:bg-orange-700'
+								disabled={actionLoading === 'booking-start'}
+								onClick={() => handleBookingAction('start')}
+							>
+								{actionLoading === 'booking-start' ?
+									<Loader2 className='mr-1 h-3.5 w-3.5 animate-spin' />
+								:	<Play className='mr-1 h-3.5 w-3.5' />}
+								Start Job
+							</Button>
+						)}
+						{booking.status === 'IN_PROGRESS' && (
+							<Button
+								size='sm'
+								className='flex-1 bg-emerald-600 hover:bg-emerald-700'
+								disabled={actionLoading === 'booking-complete'}
+								onClick={() => handleBookingAction('complete')}
+							>
+								{actionLoading === 'booking-complete' ?
+									<Loader2 className='mr-1 h-3.5 w-3.5 animate-spin' />
+								:	<CheckSquare className='mr-1 h-3.5 w-3.5' />}
+								Mark Complete
+							</Button>
+						)}
+					</div>
+				)}
+
+				{/* Completed indicator for client */}
+				{myRole === 'CLIENT' && booking.status === 'COMPLETED' && (
+					<div className='mt-2 flex items-center gap-1.5 text-xs text-emerald-400'>
+						<CheckCircle2 className='h-3.5 w-3.5' />
+						<span>Job completed</span>
+					</div>
+				)}
+			</div>
+		);
+	};
+
 	// ─── Payment action bar ─────────────────────────────
 
 	const renderPaymentBar = () => {
 		const booking = thread.booking;
 		if (!booking || thread.status !== 'BOOKED') return null;
-
-		// Show only for offline payment bookings
-		if (booking.paymentMethod !== 'OFFLINE') return null;
 
 		const clientConfirmed = booking.clientPaymentConfirmed;
 		const artisanConfirmed = booking.artisanPaymentConfirmed;
@@ -731,10 +938,25 @@ export default function ThreadConversationClient({
 			);
 		}
 
+		// If booking is paid
+		if (booking.isPaid) {
+			return (
+				<div className='mx-4 mb-2 flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-900/20 px-4 py-3 text-xs text-emerald-300'>
+					<CheckCircle2 className='h-4 w-4 shrink-0' />
+					<span>Payment completed</span>
+				</div>
+			);
+		}
+
+		const paymentLabel =
+			booking.paymentMethod === 'OFFLINE' ? 'Offline Payment'
+			: booking.paymentMethod === 'WALLET' ? 'Wallet Payment'
+			: 'Payment Confirmation';
+
 		return (
 			<div className='mx-4 mb-2 rounded-lg border border-white/10 bg-white/5 p-3'>
 				<p className='mb-2 text-xs font-medium text-white/60'>
-					Offline Payment
+					{paymentLabel}
 				</p>
 				<div className='flex flex-col gap-2'>
 					{/* Status indicators */}
@@ -897,6 +1119,9 @@ export default function ThreadConversationClient({
 					})}
 				</div>
 			</div>
+
+			{/* ── Booking Panel ── */}
+			{renderBookingPanel()}
 
 			{/* ── Payment Bar ── */}
 			{renderPaymentBar()}

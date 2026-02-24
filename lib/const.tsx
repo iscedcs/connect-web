@@ -333,6 +333,7 @@ export const URLS = {
 		delete_portfolio: '/api/artisan/portfolio/{profileId}/{itemId}',
 		update_categories: '/api/artisan/categories',
 		bookings: '/api/artisan/bookings/{profileId}',
+		get_booking: '/api/artisan/bookings/detail/{bookingId}',
 		confirm_booking:
 			'/api/artisan/bookings/{profileId}/{bookingId}/confirm',
 		start_booking: '/api/artisan/bookings/{profileId}/{bookingId}/start',

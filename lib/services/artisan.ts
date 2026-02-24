@@ -456,6 +456,27 @@ export async function getArtisanBookings(
 	}
 }
 
+export async function getBookingById(
+	bookingId: string,
+): Promise<{
+	booking: (Booking & { viewerRole: 'CLIENT' | 'ARTISAN'; thread?: { id: string; status: string } | null }) | null;
+}> {
+	const auth = await getAuth();
+	if (!auth) return { booking: null };
+	try {
+		const url = buildUrl(URLS.artisan.get_booking, { bookingId });
+		const res = await fetch(`${BASE()}${url}`, {
+			headers: headers(auth.accessToken),
+			cache: 'no-store',
+		});
+		if (!res.ok) return { booking: null };
+		const json = await safeJson(res);
+		return { booking: json ?? null };
+	} catch {
+		return { booking: null };
+	}
+}
+
 export async function confirmBooking(
 	profileId: string,
 	bookingId: string,
