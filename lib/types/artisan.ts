@@ -77,14 +77,12 @@ export interface ArtisanProfile {
 	portfolio?: PortfolioItem[];
 	profile?: {
 		id: string;
-		firstName: string;
-		lastName: string;
-		displayPicture?: string;
+		name: string;
+		profilePicture?: string;
 		slug?: string;
-		city?: string;
-		state?: string;
 		location?: string;
-		bio?: string;
+		description?: string;
+		position?: string;
 	};
 }
 

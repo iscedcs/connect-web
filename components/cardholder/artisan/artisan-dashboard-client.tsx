@@ -49,7 +49,7 @@ export default function ArtisanDashboardClient({
 			<div className='flex items-center justify-between'>
 				<div>
 					<h1 className='text-xl font-semibold'>
-						{artisan.profile?.firstName} {artisan.profile?.lastName}
+						{artisan.profile?.name || 'Your Artisan Profile'}
 					</h1>
 					<StatusBadge status={artisan.status} />
 				</div>

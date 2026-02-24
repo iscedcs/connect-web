@@ -59,7 +59,7 @@ export default function ArtisanEarningsClient({
 				<div>
 					<h1 className='text-xl font-semibold'>Earnings</h1>
 					<p className='text-xs text-white/50'>
-						{artisan.profile?.firstName} {artisan.profile?.lastName}
+						{artisan.profile?.name || 'Your Artisan Profile'}
 					</p>
 				</div>
 			</div>
