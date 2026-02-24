@@ -1,7 +1,7 @@
 import { getAuthInfo } from '@/actions/auth';
+import NewThreadClient from '@/components/cardholder/artisan/threads/new-thread-client';
 import { getConnectProfile } from '@/lib/services/profile';
 import { redirect } from 'next/navigation';
-import NewThreadClient from '@/components/cardholder/artisan/threads/new-thread-client';
 
 interface Props {
 	searchParams: Promise<{ artisanId?: string; serviceId?: string }>;
@@ -25,7 +25,7 @@ export default async function NewThreadPage({ searchParams }: Props) {
 				serviceId={serviceId}
 				accessToken={auth.accessToken}
 				profileId={connectProfile.id}
-				userName={`${connectProfile.firstName || ''} ${connectProfile.lastName || ''}`.trim()}
+				userName={`${connectProfile.name || ''}`.trim()}
 			/>
 		</div>
 	);
