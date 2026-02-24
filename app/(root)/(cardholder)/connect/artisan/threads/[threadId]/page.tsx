@@ -27,7 +27,7 @@ export default async function ThreadConversationPage({ params }: Props) {
 	return (
 		<ThreadConversationClient
 			thread={thread}
-			currentUserId={auth.decoded.id}
+			currentUserId={auth.user.id!}
 			accessToken={auth.accessToken}
 			profileId={connectProfile.id}
 			isArtisan={!!artisan}
