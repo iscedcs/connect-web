@@ -10,6 +10,7 @@ import { getDeterministicAvatarDataUri, getAvatarInitials } from '@/lib/utils';
 import { BarChart2, MessageSquare, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useNotificationSocket } from '@/hooks/useNotificationSocket';
 
 type ProfileHeaderProfile = {
 	profilePhoto: string | null;
@@ -30,6 +31,8 @@ interface ProfileHeaderProps {
 	linksData?: { title?: string; url?: string; platform?: string }[];
 	socialsData?: { title?: string; url?: string; platform?: string }[];
 	unreadThreadCount?: number;
+	unreadNotificationCount?: number;
+	accessToken?: string;
 }
 
 export default function ProfileHeader({
@@ -40,7 +43,20 @@ export default function ProfileHeader({
 	linksData,
 	socialsData,
 	unreadThreadCount = 0,
+	unreadNotificationCount = 0,
+	accessToken,
 }: ProfileHeaderProps) {
+	// Real-time notification count via WebSocket
+	const { unreadCount: wsUnreadCount } = useNotificationSocket({
+		accessToken: accessToken || '',
+		enabled: !!accessToken,
+	});
+
+	// Use WebSocket count if available (> 0 means we've received an update),
+	// otherwise fall back to server-side count
+	const notifCount =
+		wsUnreadCount > 0 ? wsUnreadCount : unreadNotificationCount;
+
 	const coverUrl = connectProfile?.coverPhoto || '/cover-image.png';
 
 	const avatarUrl =
@@ -141,7 +157,10 @@ export default function ProfileHeader({
 									slugMode
 								/>
 							:	<AddSlugDialog />}
-							<Link href='/connect/artisan/threads' className='relative'>
+							<Link
+								href='/connect/artisan/threads'
+								className='relative'
+							>
 								<Button
 									size='icon'
 									className='rounded-full bg-transparent hover:bg-transparent cursor-pointer'
@@ -151,7 +170,9 @@ export default function ProfileHeader({
 								</Button>
 								{unreadThreadCount > 0 && (
 									<span className='absolute -top-0.5 -right-0.5 bg-purple-500 text-white text-[9px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1'>
-										{unreadThreadCount > 99 ? '99+' : unreadThreadCount}
+										{unreadThreadCount > 99 ?
+											'99+'
+										:	unreadThreadCount}
 									</span>
 								)}
 							</Link>
@@ -164,7 +185,10 @@ export default function ProfileHeader({
 									<BarChart2 className='w-10 h-10' />
 								</Button>
 							</Link>
-							<Link href='/notifications'>
+							<Link
+								href='/notifications'
+								className='relative'
+							>
 								<Button
 									size='icon'
 									className='rounded-full bg-transparent hover:bg-transparent cursor-pointer'
@@ -172,6 +196,11 @@ export default function ProfileHeader({
 								>
 									<BellIcon className='w-10 h-10' />
 								</Button>
+								{notifCount > 0 && (
+									<span className='absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1'>
+										{notifCount > 99 ? '99+' : notifCount}
+									</span>
+								)}
 							</Link>
 							<Link href='/contacts'>
 								<Button

@@ -7,11 +7,15 @@ import EventCard from '@/components/pages/cardholder/home/event-card';
 import DevicesConnectedCard from '@/components/pages/cardholder/home/filled-state/device-connected';
 import ProfileHeader from '@/components/pages/cardholder/home/profile-header';
 import PromoBanner from '@/components/pages/cardholder/home/promo-banner';
-import { getMyArtisanProfile, getUnreadThreadCount } from '@/lib/services/artisan';
+import {
+	getMyArtisanProfile,
+	getUnreadThreadCount,
+} from '@/lib/services/artisan';
 import { getConnectModules } from '@/lib/services/connect-modules';
 import { getUserDevices } from '@/lib/services/device';
 import { fetchPublicUserEvent } from '@/lib/services/events';
 import { getConnectProfile } from '@/lib/services/profile';
+import { fetchNotificationStats } from '@/lib/services/notification';
 import { generateMetadata } from '@/lib/metadata';
 import WalletCard from '@/components/pages/cardholder/home/contact-wallet';
 
@@ -42,11 +46,18 @@ export default async function DashboardPage() {
 	}
 
 	let unreadThreadCount = 0;
+	let unreadNotificationCount = 0;
 	if (connectProfile?.id) {
-		[artisanProfile, unreadThreadCount] = await Promise.all([
+		const results = await Promise.all([
 			getMyArtisanProfile(connectProfile.id),
 			getUnreadThreadCount(),
+			accessToken ?
+				fetchNotificationStats({ accessToken }).catch(() => null)
+			:	Promise.resolve(null),
 		]);
+		artisanProfile = results[0];
+		unreadThreadCount = results[1];
+		unreadNotificationCount = results[2]?.unreadNotifications ?? 0;
 	}
 	const hasDevices = userDevices.length > 0;
 
@@ -67,6 +78,8 @@ export default async function DashboardPage() {
 						user={authInfo.user}
 						profileId={connectProfile?.id}
 						unreadThreadCount={unreadThreadCount}
+						unreadNotificationCount={unreadNotificationCount}
+						accessToken={accessToken || undefined}
 						contactData={
 							connectModules?.contact?.contacts?.[0] ?
 								{

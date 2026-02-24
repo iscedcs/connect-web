@@ -4,7 +4,81 @@ import { URLS } from '@/lib/const';
 const BASE =
 	process.env.CONNECT_API_URL || process.env.NEXT_PUBLIC_CONNECT_API_URL;
 
-export type NotificationType = 'CARD_INTERACTION' | 'CONTACT_SHARED';
+export type NotificationType =
+	| 'CARD_INTERACTION'
+	| 'CONTACT_SHARED'
+	| 'WALLET_UPDATE'
+	| 'WALLET_FUNDED'
+	| 'WALLET_TRANSFER'
+	| 'CONTACT_SAVED'
+	| 'MEETING_REQUEST'
+	| 'APPOINTMENT_BOOKED'
+	| 'ARTISAN_ACTIVATED'
+	| 'ARTISAN_SUSPENDED'
+	| 'BOOKING_RECEIVED'
+	| 'BOOKING_CONFIRMED'
+	| 'BOOKING_CANCELLED'
+	| 'BOOKING_COMPLETED'
+	| 'REVIEW_RECEIVED'
+	| 'PROMOTION_STARTED'
+	| 'PROMOTION_EXPIRED'
+	| 'THREAD_NEW_INQUIRY'
+	| 'THREAD_NEW_MESSAGE'
+	| 'THREAD_PROPOSAL_RECEIVED'
+	| 'THREAD_PROPOSAL_ACCEPTED'
+	| 'THREAD_PROPOSAL_DECLINED'
+	| 'PAYMENT_SENT_CONFIRMED'
+	| 'PAYMENT_RECEIVED_CONFIRMED'
+	| 'PAYMENT_DISPUTED';
+
+/** Notification category groupings for tab filtering */
+export type NotificationCategory =
+	| 'all'
+	| 'unread'
+	| 'card'
+	| 'contact'
+	| 'booking'
+	| 'thread'
+	| 'payment'
+	| 'wallet'
+	| 'artisan';
+
+/** Map category to the notification types it includes */
+export const CATEGORY_TYPES: Record<
+	Exclude<NotificationCategory, 'all' | 'unread'>,
+	NotificationType[]
+> = {
+	card: ['CARD_INTERACTION'],
+	contact: ['CONTACT_SHARED', 'CONTACT_SAVED'],
+	booking: [
+		'BOOKING_RECEIVED',
+		'BOOKING_CONFIRMED',
+		'BOOKING_CANCELLED',
+		'BOOKING_COMPLETED',
+		'APPOINTMENT_BOOKED',
+		'MEETING_REQUEST',
+	],
+	thread: [
+		'THREAD_NEW_INQUIRY',
+		'THREAD_NEW_MESSAGE',
+		'THREAD_PROPOSAL_RECEIVED',
+		'THREAD_PROPOSAL_ACCEPTED',
+		'THREAD_PROPOSAL_DECLINED',
+	],
+	payment: [
+		'PAYMENT_SENT_CONFIRMED',
+		'PAYMENT_RECEIVED_CONFIRMED',
+		'PAYMENT_DISPUTED',
+	],
+	wallet: ['WALLET_UPDATE', 'WALLET_FUNDED', 'WALLET_TRANSFER'],
+	artisan: [
+		'ARTISAN_ACTIVATED',
+		'ARTISAN_SUSPENDED',
+		'REVIEW_RECEIVED',
+		'PROMOTION_STARTED',
+		'PROMOTION_EXPIRED',
+	],
+};
 
 export interface Notification {
 	id: string;
