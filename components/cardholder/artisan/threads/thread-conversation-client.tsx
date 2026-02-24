@@ -41,7 +41,7 @@ import {
 	User,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useThreadSSE } from '@/hooks/useThreadSSE';
+import { useThreadSocket } from '@/hooks/useThreadSocket';
 
 // ─── Props ──────────────────────────────────────────────
 
@@ -177,11 +177,12 @@ export default function ThreadConversationClient({
 		scrollToBottom();
 	}, [messages, scrollToBottom]);
 
-	// ─── Real-time SSE updates ──────────────────────────
+	// ─── Real-time WebSocket updates ────────────────────
 
-	useThreadSSE({
+	useThreadSocket({
 		threadId: thread.id,
 		currentUserId,
+		accessToken,
 		onMessage: useCallback((msg: ThreadMessage) => {
 			setMessages((prev) => {
 				// Avoid duplicates (if server echo matches existing)

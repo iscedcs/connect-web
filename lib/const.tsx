@@ -356,7 +356,6 @@ export const URLS = {
 		artisan_threads: '/api/threads/artisan/{profileId}',
 		unread_count: '/api/threads/unread-count',
 		one: '/api/threads/{threadId}',
-		events: '/api/threads/{threadId}/events',
 		send_message: '/api/threads/{threadId}/messages',
 		send_proposal: '/api/threads/{threadId}/proposals',
 		accept_proposal: '/api/threads/{threadId}/proposals/accept',
