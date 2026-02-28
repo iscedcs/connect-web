@@ -17,6 +17,7 @@ import {
 	Wallet,
 	AtSign,
 	ExternalLink,
+	UserX,
 } from 'lucide-react';
 
 export const metadata = generateMetadata({
@@ -110,11 +111,12 @@ const SETTINGS_SECTIONS = [
 				description: 'How we handle your data',
 				Icon: Shield,
 			},
-		],
-	},
-];
-
-export default async function SettingsPage() {
+		{
+			href: '/manage-account',
+			label: 'Manage Account',
+			description: 'Delete your account and all associated data',
+			Icon: UserX,
+		},
 	const authInfo = await getAuthInfo();
 	const isAuthed = !('error' in authInfo) && !authInfo.isExpired;
 	if (!isAuthed) redirect('/');

@@ -1,7 +1,92 @@
 /* eslint-disable no-undef */
-// Firebase Cloud Messaging service worker for background notifications.
+// Service worker for ISCE Connect PWA
+// Handles: push notifications (Firebase), offline caching, install prompt
+
+// ─── Cache configuration ────────────────────────────────────────────
+const CACHE_NAME = 'isce-connect-v1';
+const OFFLINE_URL = '/offline';
+const PRECACHE_URLS = [
+	'/',
+	'/offline',
+	'/android-chrome-192x192.png',
+	'/android-chrome-512x512.png',
+	'/favicon.ico',
+	'/manifest.json',
+];
+
+// ─── Install: precache shell assets ─────────────────────────────────
+self.addEventListener('install', (event) => {
+	event.waitUntil(
+		caches
+			.open(CACHE_NAME)
+			.then((cache) => cache.addAll(PRECACHE_URLS))
+			.then(() => self.skipWaiting()),
+	);
+});
+
+// ─── Activate: clean old caches ─────────────────────────────────────
+self.addEventListener('activate', (event) => {
+	event.waitUntil(
+		caches
+			.keys()
+			.then((keys) =>
+				Promise.all(
+					keys
+						.filter((key) => key !== CACHE_NAME)
+						.map((key) => caches.delete(key)),
+				),
+			)
+			.then(() => self.clients.claim()),
+	);
+});
+
+// ─── Fetch: network-first with offline fallback ─────────────────────
+self.addEventListener('fetch', (event) => {
+	// Only handle GET requests and same-origin
+	if (
+		event.request.method !== 'GET' ||
+		!event.request.url.startsWith(self.location.origin)
+	) {
+		return;
+	}
+
+	// Skip API routes and auth routes — they must always be live
+	const url = new URL(event.request.url);
+	if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/auth/')) {
+		return;
+	}
+
+	event.respondWith(
+		fetch(event.request)
+			.then((response) => {
+				// Cache successful page/asset responses
+				if (response.ok) {
+					const clone = response.clone();
+					caches.open(CACHE_NAME).then((cache) => {
+						cache.put(event.request, clone);
+					});
+				}
+				return response;
+			})
+			.catch(() => {
+				// Serve from cache, or show offline page for navigation requests
+				return caches.match(event.request).then((cached) => {
+					if (cached) return cached;
+					if (event.request.mode === 'navigate') {
+						return caches.match(OFFLINE_URL);
+					}
+					return new Response('Offline', {
+						status: 503,
+						statusText: 'Service Unavailable',
+					});
+				});
+			}),
+	);
+});
+
+// ─── Firebase Cloud Messaging ───────────────────────────────────────
 // The Firebase config values below are injected at build time or can be
-// replaced by a CI/CD pipeline.  They are NOT secrets — they are the same
+// replaced by a CI/CD pipeline. They are NOT secrets — they are the same
 // public keys shipped to every browser that loads the app.
 
 importScripts(
@@ -27,8 +112,8 @@ messaging.onBackgroundMessage((payload) => {
 	const title = payload.notification?.title || 'ISCE Connect';
 	const options = {
 		body: payload.notification?.body || '',
-		icon: '/assets/isce-icon.png',
-		badge: '/assets/isce-icon.png',
+		icon: '/android-chrome-192x192.png',
+		badge: '/android-chrome-192x192.png',
 		data: payload.data,
 	};
 

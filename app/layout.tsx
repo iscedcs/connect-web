@@ -16,6 +16,7 @@ export const viewport: Viewport = {
 	initialScale: 1,
 	maximumScale: 1,
 	userScalable: false,
+	themeColor: '#000000',
 };
 
 export const metadata: Metadata = generateMetadataUtil({
@@ -40,6 +41,28 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang='en'>
+			<head>
+				<link
+					rel='manifest'
+					href='/manifest.json'
+				/>
+				<link
+					rel='apple-touch-icon'
+					href='/apple-touch-icon.png'
+				/>
+				<meta
+					name='apple-mobile-web-app-capable'
+					content='yes'
+				/>
+				<meta
+					name='apple-mobile-web-app-status-bar-style'
+					content='black-translucent'
+				/>
+				<meta
+					name='apple-mobile-web-app-title'
+					content='Connect'
+				/>
+			</head>
 			<body className={`${interTight} antialiased min-h-svh bg-black`}>
 				<NextTopLoader
 					color='#ffffff'

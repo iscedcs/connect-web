@@ -1,0 +1,27 @@
+{
+	"name": "Connect by ISCE",
+	"short_name": "Connect",
+	"start_url": "/",
+	"display": "standalone",
+	"description": "A dynamic digital business card and networking platform for seamless connectivity.",
+	"lang": "en-US",
+	"dir": "auto",
+	"theme_color": "#000000",
+	"background_color": "#000000",
+	"orientation": "portrait",
+	"icons": [
+		{
+			"src": "/android-chrome-192x192.png",
+			"sizes": "192x192",
+			"type": "image/png",
+			"purpose": "any"
+		},
+		{
+			"src": "/android-chrome-512x512.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "maskable"
+		}
+	],
+	"prefer_related_applications": false
+}
