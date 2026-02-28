@@ -111,12 +111,17 @@ const SETTINGS_SECTIONS = [
 				description: 'How we handle your data',
 				Icon: Shield,
 			},
-		{
-			href: '/manage-account',
-			label: 'Manage Account',
-			description: 'Delete your account and all associated data',
-			Icon: UserX,
-		},
+			{
+				href: '/manage-account',
+				label: 'Manage Account',
+				description: 'Delete your account and all associated data',
+				Icon: UserX,
+			},
+		],
+	},
+];
+
+export default async function SettingsPage() {
 	const authInfo = await getAuthInfo();
 	const isAuthed = !('error' in authInfo) && !authInfo.isExpired;
 	if (!isAuthed) redirect('/');
