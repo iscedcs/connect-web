@@ -243,118 +243,115 @@ export default async function SlugProfilePage({
 	const fallbackCover = COVER_PHOTOS[hashCode(slug) % COVER_PHOTOS.length];
 
 	return (
-		<main className='min-h-screen bg-black text-white pb-16'>
-			{isScan && <ScanRecorder slug={slug} />}
-			<section>
-				<div className='w-full h-44 md:h-64 relative'>
-					<div className='w-full h-44 md:h-64 bg-linear-180 from-black/0 via-black/30 to-black/100 absolute top-0 left-0 '></div>
-					<Image
-						src={
-							profile.coverPhoto?.startsWith('http') ?
-								profile.coverPhoto
-							:	fallbackCover
-						}
-						height={176}
-						width={1440}
-						alt='Cover Photo'
-						unoptimized
-						className='w-full h-44 md:h-64 object-cover'
-					/>
-				</div>
+    <main className="min-h-screen bg-black text-white pb-16">
+      {isScan && <ScanRecorder slug={slug} />}
+      <section>
+        <div className="w-full h-44 md:h-64 relative">
+          <div className="w-full h-44 md:h-64 bg-linear-180 from-black/0 via-black/30 to-black/100 absolute top-0 left-0 "></div>
+          <Image
+            src={
+              profile.coverPhoto?.startsWith("http")
+                ? profile.coverPhoto
+                : fallbackCover
+            }
+            height={176}
+            width={1440}
+            alt="Cover Photo"
+            unoptimized
+            className="w-full h-44 md:h-64 object-cover"
+          />
+        </div>
 
-				<div className='px-4 -mt-14 md:-mt-20 flex items-end gap-3 z-10 relative'>
-					<Image
-						src={profile.profilePhoto}
-						height={80}
-						width={80}
-						alt='Profile Photo'
-						unoptimized
-						className='w-20 h-20 rounded-full border-4 border-black object-cover overflow-clip shrink-0'
-					/>
+        <div className="px-4 -mt-14 md:-mt-20 flex items-end gap-3 z-10 relative">
+          <Image
+            src={profile.profilePhoto}
+            height={80}
+            width={80}
+            alt="Profile Photo"
+            unoptimized
+            className="w-20 h-20 rounded-full border-4 border-black object-cover overflow-clip shrink-0"
+          />
 
-					<div>
-						<h1 className='text-3xl md:text-4xl font-extrabold leading-tight'>
-							{profile.name}
-						</h1>
-						<p className='text-sm text-white/80 -mt-0.5'>
-							{profile.position}
-						</p>
-					</div>
-				</div>
+          <div>
+            <h1 className="text-3xl md:text-4xl font-extrabold leading-tight">
+              {profile.name}
+            </h1>
+            <p className="text-sm text-white/80 -mt-0.5">{profile.position}</p>
+          </div>
+        </div>
 
-				{profile.bio && (
-					<div className='px-4 mt-4'>
-						<div className='flex items-center gap-2 mb-1'>
-							<span className='h-px w-6 bg-white/20' />
-							<span className='text-2.5 uppercase tracking-wider text-white/50'>
-								Bio
-							</span>
-						</div>
+        {profile.bio && (
+          <div className="px-4 mt-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="h-px w-6 bg-white/20" />
+              <span className="text-2.5 uppercase tracking-wider text-white/50">
+                Bio
+              </span>
+            </div>
 
-						<p className='max-w-md text-xs leading-relaxed text-white/70'>
-							{profile.bio}
-						</p>
-					</div>
-				)}
+            <p className="max-w-md text-xs leading-relaxed text-white/70">
+              {profile.bio}
+            </p>
+          </div>
+        )}
 
-				<div className='px-4 mt-4 flex items-center font-medium gap-3 flex-wrap'>
-					<Link
-						href={`/p/${slug}/save-contact?download=1`}
-						className='px-5 py-2 bg-white/5 border border-[#868686] rounded-full text-xs'
-					>
-						Save Contact
-					</Link>
-					{walletProfile?.canReceive && userId && (
-						<SendMoneyButton
-							recipientUserId={userId}
-							recipientName={profile.name}
-							recipientPhoto={profile.profilePhoto}
-							recipientPosition={profile.position}
-							wallet={walletProfile}
-						/>
-					)}
+        <div className="px-4 mt-4 flex items-center font-medium gap-3 flex-wrap">
+          <Link
+            href={`/p/${slug}/save-contact?download=1`}
+            className="px-5 py-2 bg-white/5 border border-[#868686] rounded-full text-xs"
+          >
+            Save Contact
+          </Link>
+          {walletProfile?.canReceive && userId && (
+            <SendMoneyButton
+              recipientName={profile.name}
+              recipientPhoto={profile.profilePhoto}
+              recipientPosition={profile.position}
+              wallet={walletProfile}
+            />
+          )}
 
-					<div className='flex items-center gap-2 text-xl ml-auto'>
-						<ShareQrDialog
-							profileId={slug}
-							profile={profile}
-							contact={contact}
-							links={profileData?.links ?? []}
-							socials={profileData?.socials ?? []}
-							slugMode
-						/>
-						<EmailDialog emails={emailItems} />
-						{contact?.primary?.phone_number && (
-							<a
-								href={`tel:${contact.primary.phone_number}`}
-								title='phone'
-								className='h-9 w-9 rounded-full border border-white/10 bg-white/5 text-white/80 hover:text-white hover:bg-white/10 transition inline-flex items-center justify-center'
-							>
-								<PhoneIcon />
-							</a>
-						)}
-					</div>
-				</div>
-			</section>
+          <div className="flex items-center gap-2 text-xl ml-auto">
+            <ShareQrDialog
+              profileId={slug}
+              profile={profile}
+              contact={contact}
+              links={profileData?.links ?? []}
+              socials={profileData?.socials ?? []}
+              slugMode
+            />
+            <EmailDialog emails={emailItems} />
+            {contact?.primary?.phone_number && (
+              <a
+                href={`tel:${contact.primary.phone_number}`}
+                title="phone"
+                className="h-9 w-9 rounded-full border border-white/10 bg-white/5 text-white/80 hover:text-white hover:bg-white/10 transition inline-flex items-center justify-center"
+              >
+                <PhoneIcon />
+              </a>
+            )}
+          </div>
+        </div>
+      </section>
 
-			{artisan && (
-				<ArtisanProfileSection
-					artisan={artisan}
-					reviews={artisanReviewsData.reviews}
-					profileName={profile.name}
-				/>
-			)}
+      {artisan && (
+        <ArtisanProfileSection
+          artisan={artisan}
+          reviews={artisanReviewsData.reviews}
+          profileName={profile.name}
+        />
+      )}
 
-			<PublicProfileTabs
-				connectItems={connectItems}
-				events={events!}
-				id={slug}
-				canShowEventsTab={canShowEventsTab}
-				basePath='/p'
-			/>
+      <PublicProfileTabs
+        connectItems={connectItems}
+        events={events!}
+        id={slug}
+        canShowEventsTab={canShowEventsTab}
+        basePath="/p"
+      />
 
-			{signedIn && <FloatingDashboardButton />}
-			<BackToThreadButton />
-		</main>
-	);
+      {signedIn && <FloatingDashboardButton />}
+      <BackToThreadButton />
+    </main>
+  );
 }
