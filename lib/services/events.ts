@@ -11,27 +11,33 @@ export async function fetchPublicUserEvent(userId: string) {
 	const path = URLS.events.public_user_events.replace('{userId}', userId);
 	const url = `${baseUrl}${path}`;
 	try {
-		const res = await fetch(url, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			cache: 'no-store',
-		});
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
 
-		const payload = await res.json();
+    const payload = await res.json();
+    console.log("[fetchPublicUserEvent]", {
+      url,
+      status: res.status,
+      dataLength: payload?.data?.length,
+    });
 
-		if (!res.ok) {
-			if (payload?.message === 'No events found') {
-				return [];
-			}
-			return [];
-		}
+    if (!res.ok) {
+      if (payload?.message === "No events found") {
+        return [];
+      }
+      return [];
+    }
 
-		return payload?.data ?? [];
-	} catch (error) {
-		return [];
-	}
+    return payload?.data ?? [];
+  } catch (error) {
+    console.error("[fetchPublicUserEvent] error:", error);
+    return [];
+  }
 }
 
 // export async function fetchUserEvents(userId: string) {

@@ -8,125 +8,113 @@ import DevicesConnectedCard from '@/components/pages/cardholder/home/filled-stat
 import ProfileHeader from '@/components/pages/cardholder/home/profile-header';
 import PromoBanner from '@/components/pages/cardholder/home/promo-banner';
 import {
-	getMyArtisanProfile,
-	getUnreadThreadCount,
-} from '@/lib/services/artisan';
-import { getConnectModules } from '@/lib/services/connect-modules';
-import { getUserDevices } from '@/lib/services/device';
-import { fetchPublicUserEvent } from '@/lib/services/events';
-import { getConnectProfile } from '@/lib/services/profile';
-import { fetchNotificationStats } from '@/lib/services/notification';
-import { generateMetadata } from '@/lib/metadata';
-import WalletCard from '@/components/pages/cardholder/home/contact-wallet';
+  getMyArtisanProfile,
+  getUnreadThreadCount,
+} from "@/lib/services/artisan";
+import { getConnectModules } from "@/lib/services/connect-modules";
+import { getUserDevices } from "@/lib/services/device";
+import { fetchPublicUserEvent } from "@/lib/services/events";
+import { getConnectProfile } from "@/lib/services/profile";
+import { fetchNotificationStats } from "@/lib/services/notification";
+import { generateMetadata } from "@/lib/metadata";
+import WalletCard from "@/components/pages/cardholder/home/contact-wallet";
 
 export const metadata = generateMetadata({
-	title: 'Dashboard',
-	description:
-		'Manage your digital lifestyle, connect with NFC and QR codes, manage devices, and access all your Connect features in one place.',
-	keywords: ['dashboard', 'connect', 'devices', 'profile'],
+  title: "Dashboard",
+  description:
+    "Manage your digital lifestyle, connect with NFC and QR codes, manage devices, and access all your Connect features in one place.",
+  keywords: ["dashboard", "connect", "devices", "profile"],
 });
 
 export default async function DashboardPage() {
-	const [connectProfile, authInfo] = await Promise.all([
-		getConnectProfile(),
-		getAuthInfo(),
-	]);
-	const isAuthed = !('error' in authInfo) && !authInfo.isExpired;
-	const accessToken = isAuthed ? authInfo.accessToken : null;
-	const userId = isAuthed ? authInfo.user.id : null;
+  // Stage 1: Auth + profile (must resolve first — everything else depends on these)
+  const [connectProfile, authInfo] = await Promise.all([
+    getConnectProfile(),
+    getAuthInfo(),
+  ]);
+  const isAuthed = !("error" in authInfo) && !authInfo.isExpired;
+  const accessToken = isAuthed ? authInfo.accessToken : null;
+  const userId = isAuthed ? authInfo.user.id : null;
+  const profileId = connectProfile?.id;
 
-	let userDevices: DeviceInterface[] = [];
-	let userEvents: any[] = [];
-	let artisanProfile = null;
-	if (userId && accessToken) {
-		[userDevices, userEvents] = await Promise.all([
-			getUserDevices(userId, accessToken),
-			fetchPublicUserEvent(userId),
-		]);
-	}
+  // Stage 2: All remaining data in parallel (was 3 sequential stages before)
+  const [
+    userDevices,
+    userEvents,
+    artisanProfile,
+    unreadThreadCount,
+    notifStats,
+    connectModules,
+  ] = await Promise.all([
+    userId && accessToken
+      ? getUserDevices(userId, accessToken)
+      : Promise.resolve([] as DeviceInterface[]),
+    userId ? fetchPublicUserEvent(userId) : Promise.resolve([]),
+    profileId ? getMyArtisanProfile(profileId) : Promise.resolve(null),
+    profileId ? getUnreadThreadCount() : Promise.resolve(0),
+    profileId && accessToken
+      ? fetchNotificationStats({ accessToken }).catch(() => null)
+      : Promise.resolve(null),
+    profileId && accessToken
+      ? getConnectModules(profileId, accessToken)
+      : Promise.resolve(null),
+  ]);
 
-	let unreadThreadCount = 0;
-	let unreadNotificationCount = 0;
-	if (connectProfile?.id) {
-		const results = await Promise.all([
-			getMyArtisanProfile(connectProfile.id),
-			getUnreadThreadCount(),
-			accessToken ?
-				fetchNotificationStats({ accessToken }).catch(() => null)
-			:	Promise.resolve(null),
-		]);
-		artisanProfile = results[0];
-		unreadThreadCount = results[1];
-		unreadNotificationCount = results[2]?.unreadNotifications ?? 0;
-	}
-	const hasDevices = userDevices.length > 0;
-
-	let connectModules = null;
-
-	if (connectProfile?.id && accessToken) {
-		connectModules = await getConnectModules(
-			connectProfile.id,
-			accessToken,
-		);
-	}
-	return (
-		<main className='relative bg-black text-white min-h-screen overflow-x-hidden'>
-			<section className='fixed  top-0 left-0 right-0 z-50  pointer-events-none'>
-				<div className='max-w-md  mx-auto pointer-events-auto'>
-					<ProfileHeader
-						connectProfile={connectProfile}
-						user={authInfo.user}
-						profileId={connectProfile?.id}
-						unreadThreadCount={unreadThreadCount}
-						unreadNotificationCount={unreadNotificationCount}
-						accessToken={accessToken || undefined}
-						contactData={
-							connectModules?.contact?.contacts?.[0] ?
-								{
-									primary: {
-										email: undefined,
-										phone_number:
-											connectModules.contact.contacts[0]
-												?.phone_number,
-									},
-								}
-							:	undefined
-						}
-						linksData={connectModules?.links?.links}
-						socialsData={connectModules?.socials?.socials}
-					/>
-				</div>{' '}
-			</section>
-			{/* <section className=''>
+  const unreadNotificationCount = notifStats?.unreadNotifications ?? 0;
+  const hasDevices = userDevices.length > 0;
+  return (
+    <main className="relative bg-black text-white min-h-screen overflow-x-hidden">
+      <section className="fixed  top-0 left-0 right-0 z-50  pointer-events-none">
+        <div className="max-w-md  mx-auto pointer-events-auto">
+          <ProfileHeader
+            connectProfile={connectProfile}
+            user={authInfo.user}
+            profileId={connectProfile?.id}
+            unreadThreadCount={unreadThreadCount}
+            unreadNotificationCount={unreadNotificationCount}
+            accessToken={accessToken || undefined}
+            contactData={
+              connectModules?.contact?.contacts?.[0]
+                ? {
+                    primary: {
+                      email: undefined,
+                      phone_number:
+                        connectModules.contact.contacts[0]?.phone_number,
+                    },
+                  }
+                : undefined
+            }
+            linksData={connectModules?.links?.links}
+            socialsData={connectModules?.socials?.socials}
+          />
+        </div>{" "}
+      </section>
+      {/* <section className=''>
 				<NFCChecker />
 			</section> */}
 
-			<div className='pt-80  space-y-10'>
-				<section className='p-4 space-y-5'>
-					<PromoBanner />
-					<EventCard events={userEvents} />
-				</section>
-				<section className='p-4 space-y-10'>
-					{hasDevices ?
-						<DevicesConnectedCard devices={userDevices} />
-					:	<DevicesCard />}
-					<WalletCard />
-					<ArtisanCard artisanProfile={artisanProfile} />
-				</section>
-				<section className='p-4 space-y-10'>
-					{accessToken && connectProfile?.id && (
-						<ConnectManagementWrapper
-							initialModules={connectModules}
-						/>
-					)}
+      <div className="pt-80  space-y-10">
+        <section className="p-4 space-y-5">
+          <PromoBanner />
+        </section>
+        <section className="p-4 space-y-10">
+          {accessToken && connectProfile?.id && (
+            <ConnectManagementWrapper initialModules={connectModules} />
+          )}
+          <ArtisanCard artisanProfile={artisanProfile} />
+          <WalletCard />
+          <EventCard events={userEvents} />
+          {hasDevices ? (
+            <DevicesConnectedCard devices={userDevices} />
+          ) : (
+            <DevicesCard />
+          )}
+        </section>
 
-					{/* <StoreManagement /> */}
-				</section>
-
-				<section className='p-4'>
-					<AccountSettingsList isAuthenticated={isAuthed} />
-				</section>
-			</div>
-		</main>
-	);
+        <section className="p-4">
+          <AccountSettingsList isAuthenticated={isAuthed} />
+        </section>
+      </div>
+    </main>
+  );
 }

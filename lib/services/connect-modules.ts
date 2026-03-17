@@ -20,33 +20,37 @@ export async function getConnectModules(
 		}
 	}
 
-	return {
-		contact: await fetchList(
-			URLS.profile_contact.all.replace('{profileId}', profileId),
-		),
-		links: await fetchList(
-			URLS.links.all.replace('{profileId}', profileId),
-		),
-		videos: await fetchList(
-			URLS.videos.all.replace('{profileId}', profileId),
-		),
-		socials: await fetchList(
-			URLS.profile_social.all.replace('{profileId}', profileId),
-		),
-		meetings: await fetchList(
-			URLS.meetings.all.replace('{profileId}', profileId),
-		),
-		appointments: await fetchList(
-			URLS.appointments.all.replace('{profileId}', profileId),
-		),
-		spotify: await fetchList(
-			URLS.spotify.all.replace('{profileId}', profileId),
-		),
-		files: await fetchList(
-			URLS.files.all.replace('{profileId}', profileId),
-		),
-		forms: await fetchList(
-			URLS.forms.all.replace('{profileId}', profileId),
-		),
-	};
+	const [
+    contact,
+    links,
+    videos,
+    socials,
+    meetings,
+    appointments,
+    spotify,
+    files,
+    forms,
+  ] = await Promise.all([
+    fetchList(URLS.profile_contact.all.replace("{profileId}", profileId)),
+    fetchList(URLS.links.all.replace("{profileId}", profileId)),
+    fetchList(URLS.videos.all.replace("{profileId}", profileId)),
+    fetchList(URLS.profile_social.all.replace("{profileId}", profileId)),
+    fetchList(URLS.meetings.all.replace("{profileId}", profileId)),
+    fetchList(URLS.appointments.all.replace("{profileId}", profileId)),
+    fetchList(URLS.spotify.all.replace("{profileId}", profileId)),
+    fetchList(URLS.files.all.replace("{profileId}", profileId)),
+    fetchList(URLS.forms.all.replace("{profileId}", profileId)),
+  ]);
+
+  return {
+    contact,
+    links,
+    videos,
+    socials,
+    meetings,
+    appointments,
+    spotify,
+    files,
+    forms,
+  };
 }

@@ -12,6 +12,7 @@ const steps = [
     title: "Create Your Profile",
     description:
       "Sign up for free and build your digital identity. Add contacts, social links, portfolio, files, videos — everything that represents you.",
+    accent: "#7B93FF",
   },
   {
     number: "02",
@@ -19,6 +20,7 @@ const steps = [
     title: "Share Instantly",
     description:
       "Share via your QR code (online or offline version), a profile link, or upgrade to NFC smart devices like cards, wristbands, and badges.",
+    accent: "#A5B8FF",
   },
   {
     number: "03",
@@ -26,6 +28,7 @@ const steps = [
     title: "Connect & Grow",
     description:
       "Your contacts see your full profile — no app needed on their end. Track views, exchange contacts, and build meaningful connections.",
+    accent: "#C77DFF",
   },
 ];
 
@@ -55,6 +58,7 @@ export function HowItWorks() {
           <motion.h2
             variants={fadeInUp}
             className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white text-balance"
+            style={{ fontFamily: "var(--font-syne), sans-serif" }}
           >
             Three Steps.
             <br className="hidden md:block" />
@@ -66,34 +70,68 @@ export function HowItWorks() {
           variants={staggerContainer}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 relative"
+          className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6"
         >
-          {/* Connecting line (desktop only) */}
-          <div className="hidden md:block absolute top-24 left-[20%] right-[20%] h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-
           {steps.map((step) => {
             const Icon = step.icon;
             return (
               <motion.div
                 key={step.number}
                 variants={fadeInUp}
-                className="relative text-center"
+                className="group relative rounded-2xl p-7 md:p-9 overflow-hidden border border-white/[0.08] bg-white/[0.02] hover:border-white/[0.15] transition-all duration-500 cursor-default"
               >
-                {/* Step number */}
-                <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-white/10 bg-zinc-900/50 relative z-10">
-                  <span className="text-xl md:text-2xl font-bold text-[#7B93FF] font-mono">
-                    {step.number}
-                  </span>
+                {/* Watermark step number */}
+                <div
+                  className="absolute -right-4 -bottom-6 text-[8rem] md:text-[10rem] font-black leading-none select-none transition-all duration-500 group-hover:scale-110 group-hover:opacity-[0.07]"
+                  style={{
+                    fontFamily: "var(--font-syne), sans-serif",
+                    color: step.accent,
+                    opacity: 0.04,
+                  }}
+                >
+                  {step.number}
                 </div>
 
-                <div className="mt-6 md:mt-8">
-                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-[#7B93FF]/10 mb-4">
-                    <Icon size={18} className="text-[#7B93FF]" />
+                {/* Hover aurora tint */}
+                <div
+                  className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{
+                    background: `radial-gradient(ellipse at 0% 100%, ${step.accent}07 0%, transparent 70%)`,
+                  }}
+                />
+
+                <div className="relative">
+                  {/* Step badge */}
+                  <div className="flex items-center gap-3 mb-6">
+                    <span
+                      className="text-xs font-bold tracking-widest px-2.5 py-1 rounded-md"
+                      style={{
+                        color: step.accent,
+                        background: `${step.accent}15`,
+                        border: `1px solid ${step.accent}25`,
+                        fontFamily: "var(--font-syne), sans-serif",
+                      }}
+                    >
+                      {step.number}
+                    </span>
+                    <div
+                      className="w-8 h-8 rounded-lg flex items-center justify-center"
+                      style={{
+                        background: `${step.accent}15`,
+                        border: `1px solid ${step.accent}20`,
+                      }}
+                    >
+                      <Icon size={15} style={{ color: step.accent }} />
+                    </div>
                   </div>
-                  <h3 className="text-lg md:text-xl font-semibold text-white mb-3">
+
+                  <h3
+                    className="text-lg md:text-xl font-bold text-white mb-3"
+                    style={{ fontFamily: "var(--font-syne), sans-serif" }}
+                  >
                     {step.title}
                   </h3>
-                  <p className="text-sm md:text-base text-zinc-400 leading-relaxed max-w-xs mx-auto">
+                  <p className="text-sm md:text-base text-zinc-400 leading-relaxed">
                     {step.description}
                   </p>
                 </div>
