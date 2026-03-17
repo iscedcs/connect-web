@@ -95,7 +95,13 @@ export default async function DashboardPage() {
 
       <div className="pt-80  space-y-10">
         <section className="p-4 space-y-5">
-          <PromoBanner />
+          <PromoBanner
+            hasDevices={hasDevices}
+            hasEvents={userEvents.length > 0}
+            profileComplete={
+              !!(connectProfile?.name && connectProfile?.profilePhoto)
+            }
+          />
         </section>
         <section className="p-4 space-y-10">
           {accessToken && connectProfile?.id && (
