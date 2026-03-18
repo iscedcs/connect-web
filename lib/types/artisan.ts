@@ -142,20 +142,19 @@ export interface Booking {
 }
 
 export interface Review {
-	id: string;
-	artisanId: string;
-	reviewerUserId: string;
-	bookingId?: string;
-	reviewerName?: string;
-	rating: number;
-	comment?: string;
-	isVisible: boolean;
-	createdAt: string;
-	reviewer?: {
-		firstName: string;
-		lastName: string;
-		displayPicture?: string;
-	};
+  id: string;
+  artisanId: string;
+  reviewerUserId: string;
+  bookingId?: string;
+  reviewerName?: string;
+  rating: number;
+  comment?: string;
+  isVisible: boolean;
+  createdAt: string;
+  reviewer?: {
+    name: string;
+    profilePhoto?: string | null;
+  } | null;
 }
 
 export interface Promotion {

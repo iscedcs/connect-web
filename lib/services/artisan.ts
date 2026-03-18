@@ -1,187 +1,187 @@
 import { getAuthInfo } from '@/actions/auth';
 import { BASE_URLS, URLS } from '../const';
 import type {
-	ArtisanProfile,
-	ArtisanRequirements,
-	ArtisanService,
-	Booking,
-	BookingThread,
-	CreateBookingDto,
-	CreatePromotionDto,
-	CreateReviewDto,
-	CreateServiceDto,
-	CreateThreadDto,
-	ConfirmPaymentDto,
-	DirectoryFilters,
-	DirectoryResponse,
-	ArtisanDirectoryCard,
-	ArtisanCategory,
-	DisputePaymentDto,
-	EarningsData,
-	PortfolioItem,
-	Promotion,
-	RegisterArtisanDto,
-	Review,
-	SendMessageDto,
-	SendProposalDto,
-	AcceptProposalDto,
-	DeclineProposalDto,
-	ThreadListResponse,
-	UnreadCountResponse,
-	UpdateArtisanDto,
-} from '../types/artisan';
+  ArtisanProfile,
+  ArtisanRequirements,
+  ArtisanService,
+  Booking,
+  BookingThread,
+  CreateBookingDto,
+  CreatePromotionDto,
+  CreateReviewDto,
+  CreateServiceDto,
+  CreateThreadDto,
+  ConfirmPaymentDto,
+  DirectoryFilters,
+  DirectoryResponse,
+  ArtisanDirectoryCard,
+  ArtisanCategory,
+  DisputePaymentDto,
+  EarningsData,
+  PortfolioItem,
+  Promotion,
+  RegisterArtisanDto,
+  Review,
+  SendMessageDto,
+  SendProposalDto,
+  AcceptProposalDto,
+  DeclineProposalDto,
+  ThreadListResponse,
+  UnreadCountResponse,
+  UpdateArtisanDto,
+} from "../types/artisan";
 
 // ─── Helpers ────────────────────────────────────────────
 
 async function safeJson(res: Response): Promise<Record<string, any> | null> {
-	const contentType = res.headers.get('content-type') || '';
-	if (!contentType.toLowerCase().includes('application/json')) return null;
-	try {
-		return await res.json();
-	} catch {
-		return null;
-	}
+  const contentType = res.headers.get("content-type") || "";
+  if (!contentType.toLowerCase().includes("application/json")) return null;
+  try {
+    return await res.json();
+  } catch {
+    return null;
+  }
 }
 
 function buildUrl(template: string, params: Record<string, string>): string {
-	let url = template;
-	for (const [key, value] of Object.entries(params)) {
-		url = url.replace(`{${key}}`, encodeURIComponent(value));
-	}
-	return url;
+  let url = template;
+  for (const [key, value] of Object.entries(params)) {
+    url = url.replace(`{${key}}`, encodeURIComponent(value));
+  }
+  return url;
 }
 
 async function getAuth() {
-	const auth = await getAuthInfo();
-	if ('error' in auth || auth.isExpired) return null;
-	return auth;
+  const auth = await getAuthInfo();
+  if ("error" in auth || auth.isExpired) return null;
+  return auth;
 }
 
 function headers(accessToken: string, json = true): HeadersInit {
-	const h: HeadersInit = { Authorization: `Bearer ${accessToken}` };
-	if (json) h['Content-Type'] = 'application/json';
-	return h;
+  const h: HeadersInit = { Authorization: `Bearer ${accessToken}` };
+  if (json) h["Content-Type"] = "application/json";
+  return h;
 }
 
-const BASE = () => BASE_URLS.CONNECT_API || '';
+const BASE = () => BASE_URLS.CONNECT_API || "";
 
 // ═══════════════════════════════════════════════════════════
 // REGISTRATION & PROFILE
 // ═══════════════════════════════════════════════════════════
 
 export async function getArtisanRequirements(): Promise<ArtisanRequirements | null> {
-	const auth = await getAuth();
-	if (!auth) return null;
-	try {
-		const res = await fetch(`${BASE()}${URLS.artisan.requirements}`, {
-			headers: headers(auth.accessToken),
-			cache: 'no-store',
-		});
-		const json = await safeJson(res);
-		return json?.data ?? null;
-	} catch {
-		return null;
-	}
+  const auth = await getAuth();
+  if (!auth) return null;
+  try {
+    const res = await fetch(`${BASE()}${URLS.artisan.requirements}`, {
+      headers: headers(auth.accessToken),
+      cache: "no-store",
+    });
+    const json = await safeJson(res);
+    return json?.data ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export async function registerArtisan(
-	data: RegisterArtisanDto,
+  data: RegisterArtisanDto,
 ): Promise<{ success: boolean; data?: ArtisanProfile; message?: string }> {
-	const auth = await getAuth();
-	if (!auth) return { success: false, message: 'Not authenticated' };
-	try {
-		const res = await fetch(`${BASE()}${URLS.artisan.register}`, {
-			method: 'POST',
-			headers: headers(auth.accessToken),
-			body: JSON.stringify(data),
-		});
-		const json = await safeJson(res);
-		if (!res.ok)
-			return {
-				success: false,
-				message: json?.message || 'Registration failed',
-			};
-		return { success: true, data: json?.data };
-	} catch {
-		return { success: false, message: 'Network error' };
-	}
+  const auth = await getAuth();
+  if (!auth) return { success: false, message: "Not authenticated" };
+  try {
+    const res = await fetch(`${BASE()}${URLS.artisan.register}`, {
+      method: "POST",
+      headers: headers(auth.accessToken),
+      body: JSON.stringify(data),
+    });
+    const json = await safeJson(res);
+    if (!res.ok)
+      return {
+        success: false,
+        message: json?.message || "Registration failed",
+      };
+    return { success: true, data: json?.data };
+  } catch {
+    return { success: false, message: "Network error" };
+  }
 }
 
 export async function getMyArtisanProfile(
-	profileId: string,
+  profileId: string,
 ): Promise<ArtisanProfile | null> {
-	const auth = await getAuth();
-	if (!auth) return null;
-	try {
-		const url = buildUrl(URLS.artisan.me, { profileId });
-		const res = await fetch(`${BASE()}${url}`, {
-			headers: headers(auth.accessToken),
-			cache: 'no-store',
-		});
-		const json = await safeJson(res);
-		return json?.data ?? null;
-	} catch {
-		return null;
-	}
+  const auth = await getAuth();
+  if (!auth) return null;
+  try {
+    const url = buildUrl(URLS.artisan.me, { profileId });
+    const res = await fetch(`${BASE()}${url}`, {
+      headers: headers(auth.accessToken),
+      cache: "no-store",
+    });
+    const json = await safeJson(res);
+    return json?.data ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export async function updateArtisanProfile(
-	data: UpdateArtisanDto,
+  data: UpdateArtisanDto,
 ): Promise<{ success: boolean; data?: ArtisanProfile; message?: string }> {
-	const auth = await getAuth();
-	if (!auth) return { success: false, message: 'Not authenticated' };
-	try {
-		const res = await fetch(`${BASE()}${URLS.artisan.update}`, {
-			method: 'PATCH',
-			headers: headers(auth.accessToken),
-			body: JSON.stringify(data),
-		});
-		const json = await safeJson(res);
-		if (!res.ok)
-			return {
-				success: false,
-				message: json?.message || 'Update failed',
-			};
-		return { success: true, data: json?.data };
-	} catch {
-		return { success: false, message: 'Network error' };
-	}
+  const auth = await getAuth();
+  if (!auth) return { success: false, message: "Not authenticated" };
+  try {
+    const res = await fetch(`${BASE()}${URLS.artisan.update}`, {
+      method: "PATCH",
+      headers: headers(auth.accessToken),
+      body: JSON.stringify(data),
+    });
+    const json = await safeJson(res);
+    if (!res.ok)
+      return {
+        success: false,
+        message: json?.message || "Update failed",
+      };
+    return { success: true, data: json?.data };
+  } catch {
+    return { success: false, message: "Network error" };
+  }
 }
 
 export async function deactivateArtisan(
-	profileId: string,
+  profileId: string,
 ): Promise<{ success: boolean; message?: string }> {
-	const auth = await getAuth();
-	if (!auth) return { success: false, message: 'Not authenticated' };
-	try {
-		const url = buildUrl(URLS.artisan.deactivate, { profileId });
-		const res = await fetch(`${BASE()}${url}`, {
-			method: 'POST',
-			headers: headers(auth.accessToken),
-		});
-		const json = await safeJson(res);
-		return { success: res.ok, message: json?.message };
-	} catch {
-		return { success: false, message: 'Network error' };
-	}
+  const auth = await getAuth();
+  if (!auth) return { success: false, message: "Not authenticated" };
+  try {
+    const url = buildUrl(URLS.artisan.deactivate, { profileId });
+    const res = await fetch(`${BASE()}${url}`, {
+      method: "POST",
+      headers: headers(auth.accessToken),
+    });
+    const json = await safeJson(res);
+    return { success: res.ok, message: json?.message };
+  } catch {
+    return { success: false, message: "Network error" };
+  }
 }
 
 export async function reactivateArtisan(
-	profileId: string,
+  profileId: string,
 ): Promise<{ success: boolean; message?: string }> {
-	const auth = await getAuth();
-	if (!auth) return { success: false, message: 'Not authenticated' };
-	try {
-		const url = buildUrl(URLS.artisan.reactivate, { profileId });
-		const res = await fetch(`${BASE()}${url}`, {
-			method: 'POST',
-			headers: headers(auth.accessToken),
-		});
-		const json = await safeJson(res);
-		return { success: res.ok, message: json?.message };
-	} catch {
-		return { success: false, message: 'Network error' };
-	}
+  const auth = await getAuth();
+  if (!auth) return { success: false, message: "Not authenticated" };
+  try {
+    const url = buildUrl(URLS.artisan.reactivate, { profileId });
+    const res = await fetch(`${BASE()}${url}`, {
+      method: "POST",
+      headers: headers(auth.accessToken),
+    });
+    const json = await safeJson(res);
+    return { success: res.ok, message: json?.message };
+  } catch {
+    return { success: false, message: "Network error" };
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -189,97 +189,97 @@ export async function reactivateArtisan(
 // ═══════════════════════════════════════════════════════════
 
 export async function getArtisanServices(
-	profileId: string,
+  profileId: string,
 ): Promise<ArtisanService[]> {
-	const auth = await getAuth();
-	if (!auth) return [];
-	try {
-		const url = buildUrl(URLS.artisan.services, { profileId });
-		const res = await fetch(`${BASE()}${url}`, {
-			headers: headers(auth.accessToken),
-			cache: 'no-store',
-		});
-		const json = await safeJson(res);
-		return json?.data ?? [];
-	} catch {
-		return [];
-	}
+  const auth = await getAuth();
+  if (!auth) return [];
+  try {
+    const url = buildUrl(URLS.artisan.services, { profileId });
+    const res = await fetch(`${BASE()}${url}`, {
+      headers: headers(auth.accessToken),
+      cache: "no-store",
+    });
+    const json = await safeJson(res);
+    return json?.data ?? [];
+  } catch {
+    return [];
+  }
 }
 
 export async function createArtisanService(
-	profileId: string,
-	data: CreateServiceDto,
+  profileId: string,
+  data: CreateServiceDto,
 ): Promise<{ success: boolean; data?: ArtisanService; message?: string }> {
-	const auth = await getAuth();
-	if (!auth) return { success: false, message: 'Not authenticated' };
-	try {
-		const url = buildUrl(URLS.artisan.create_service, { profileId });
-		const res = await fetch(`${BASE()}${url}`, {
-			method: 'POST',
-			headers: headers(auth.accessToken),
-			body: JSON.stringify(data),
-		});
-		const json = await safeJson(res);
-		if (!res.ok)
-			return {
-				success: false,
-				message: json?.message || 'Failed to create service',
-			};
-		return { success: true, data: json?.data };
-	} catch {
-		return { success: false, message: 'Network error' };
-	}
+  const auth = await getAuth();
+  if (!auth) return { success: false, message: "Not authenticated" };
+  try {
+    const url = buildUrl(URLS.artisan.create_service, { profileId });
+    const res = await fetch(`${BASE()}${url}`, {
+      method: "POST",
+      headers: headers(auth.accessToken),
+      body: JSON.stringify(data),
+    });
+    const json = await safeJson(res);
+    if (!res.ok)
+      return {
+        success: false,
+        message: json?.message || "Failed to create service",
+      };
+    return { success: true, data: json?.data };
+  } catch {
+    return { success: false, message: "Network error" };
+  }
 }
 
 export async function updateArtisanService(
-	profileId: string,
-	serviceId: string,
-	data: Partial<CreateServiceDto>,
+  profileId: string,
+  serviceId: string,
+  data: Partial<CreateServiceDto>,
 ): Promise<{ success: boolean; data?: ArtisanService; message?: string }> {
-	const auth = await getAuth();
-	if (!auth) return { success: false, message: 'Not authenticated' };
-	try {
-		const url = buildUrl(URLS.artisan.update_service, {
-			profileId,
-			serviceId,
-		});
-		const res = await fetch(`${BASE()}${url}`, {
-			method: 'PATCH',
-			headers: headers(auth.accessToken),
-			body: JSON.stringify(data),
-		});
-		const json = await safeJson(res);
-		if (!res.ok)
-			return {
-				success: false,
-				message: json?.message || 'Failed to update service',
-			};
-		return { success: true, data: json?.data };
-	} catch {
-		return { success: false, message: 'Network error' };
-	}
+  const auth = await getAuth();
+  if (!auth) return { success: false, message: "Not authenticated" };
+  try {
+    const url = buildUrl(URLS.artisan.update_service, {
+      profileId,
+      serviceId,
+    });
+    const res = await fetch(`${BASE()}${url}`, {
+      method: "PATCH",
+      headers: headers(auth.accessToken),
+      body: JSON.stringify(data),
+    });
+    const json = await safeJson(res);
+    if (!res.ok)
+      return {
+        success: false,
+        message: json?.message || "Failed to update service",
+      };
+    return { success: true, data: json?.data };
+  } catch {
+    return { success: false, message: "Network error" };
+  }
 }
 
 export async function deleteArtisanService(
-	profileId: string,
-	serviceId: string,
+  profileId: string,
+  serviceId: string,
 ): Promise<{ success: boolean; message?: string }> {
-	const auth = await getAuth();
-	if (!auth) return { success: false, message: 'Not authenticated' };
-	try {
-		const url = buildUrl(URLS.artisan.delete_service, {
-			profileId,
-			serviceId,
-		});
-		const res = await fetch(`${BASE()}${url}`, {
-			method: 'DELETE',
-			headers: headers(auth.accessToken),
-		});
-		const json = await safeJson(res);
-		return { success: res.ok, message: json?.message };
-	} catch {
-		return { success: false, message: 'Network error' };
-	}
+  const auth = await getAuth();
+  if (!auth) return { success: false, message: "Not authenticated" };
+  try {
+    const url = buildUrl(URLS.artisan.delete_service, {
+      profileId,
+      serviceId,
+    });
+    const res = await fetch(`${BASE()}${url}`, {
+      method: "DELETE",
+      headers: headers(auth.accessToken),
+    });
+    const json = await safeJson(res);
+    return { success: res.ok, message: json?.message };
+  } catch {
+    return { success: false, message: "Network error" };
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -287,109 +287,109 @@ export async function deleteArtisanService(
 // ═══════════════════════════════════════════════════════════
 
 export async function getArtisanPortfolio(
-	profileId: string,
+  profileId: string,
 ): Promise<PortfolioItem[]> {
-	const auth = await getAuth();
-	if (!auth) return [];
-	try {
-		const url = buildUrl(URLS.artisan.portfolio, { profileId });
-		const res = await fetch(`${BASE()}${url}`, {
-			headers: headers(auth.accessToken),
-			cache: 'no-store',
-		});
-		const json = await safeJson(res);
-		return json?.data ?? [];
-	} catch {
-		return [];
-	}
+  const auth = await getAuth();
+  if (!auth) return [];
+  try {
+    const url = buildUrl(URLS.artisan.portfolio, { profileId });
+    const res = await fetch(`${BASE()}${url}`, {
+      headers: headers(auth.accessToken),
+      cache: "no-store",
+    });
+    const json = await safeJson(res);
+    return json?.data ?? [];
+  } catch {
+    return [];
+  }
 }
 
 export async function addPortfolioItem(
-	profileId: string,
-	data: {
-		url: string;
-		type?: string;
-		thumbnail?: string;
-		caption?: string;
-		order?: number;
-	},
+  profileId: string,
+  data: {
+    url: string;
+    type?: string;
+    thumbnail?: string;
+    caption?: string;
+    order?: number;
+  },
 ): Promise<{ success: boolean; data?: PortfolioItem; message?: string }> {
-	const auth = await getAuth();
-	if (!auth) return { success: false, message: 'Not authenticated' };
-	try {
-		const url = buildUrl(URLS.artisan.add_portfolio, { profileId });
-		const res = await fetch(`${BASE()}${url}`, {
-			method: 'POST',
-			headers: headers(auth.accessToken),
-			body: JSON.stringify(data),
-		});
-		const json = await safeJson(res);
-		if (!res.ok)
-			return {
-				success: false,
-				message: json?.message || 'Failed to add item',
-			};
-		return { success: true, data: json?.data };
-	} catch {
-		return { success: false, message: 'Network error' };
-	}
+  const auth = await getAuth();
+  if (!auth) return { success: false, message: "Not authenticated" };
+  try {
+    const url = buildUrl(URLS.artisan.add_portfolio, { profileId });
+    const res = await fetch(`${BASE()}${url}`, {
+      method: "POST",
+      headers: headers(auth.accessToken),
+      body: JSON.stringify(data),
+    });
+    const json = await safeJson(res);
+    if (!res.ok)
+      return {
+        success: false,
+        message: json?.message || "Failed to add item",
+      };
+    return { success: true, data: json?.data };
+  } catch {
+    return { success: false, message: "Network error" };
+  }
 }
 
 export async function updatePortfolioItem(
-	profileId: string,
-	itemId: string,
-	data: Partial<{
-		url: string;
-		type: string;
-		thumbnail: string;
-		caption: string;
-		order: number;
-	}>,
+  profileId: string,
+  itemId: string,
+  data: Partial<{
+    url: string;
+    type: string;
+    thumbnail: string;
+    caption: string;
+    order: number;
+  }>,
 ): Promise<{ success: boolean; data?: PortfolioItem; message?: string }> {
-	const auth = await getAuth();
-	if (!auth) return { success: false, message: 'Not authenticated' };
-	try {
-		const url = buildUrl(URLS.artisan.update_portfolio, {
-			profileId,
-			itemId,
-		});
-		const res = await fetch(`${BASE()}${url}`, {
-			method: 'PATCH',
-			headers: headers(auth.accessToken),
-			body: JSON.stringify(data),
-		});
-		const json = await safeJson(res);
-		if (!res.ok)
-			return {
-				success: false,
-				message: json?.message || 'Failed to update item',
-			};
-		return { success: true, data: json?.data };
-	} catch {
-		return { success: false, message: 'Network error' };
-	}
+  const auth = await getAuth();
+  if (!auth) return { success: false, message: "Not authenticated" };
+  try {
+    const url = buildUrl(URLS.artisan.update_portfolio, {
+      profileId,
+      itemId,
+    });
+    const res = await fetch(`${BASE()}${url}`, {
+      method: "PATCH",
+      headers: headers(auth.accessToken),
+      body: JSON.stringify(data),
+    });
+    const json = await safeJson(res);
+    if (!res.ok)
+      return {
+        success: false,
+        message: json?.message || "Failed to update item",
+      };
+    return { success: true, data: json?.data };
+  } catch {
+    return { success: false, message: "Network error" };
+  }
 }
 
 export async function deletePortfolioItem(
-	profileId: string,
-	itemId: string,
+  profileId: string,
+  itemId: string,
 ): Promise<{ success: boolean; message?: string }> {
-	const auth = await getAuth();
-	if (!auth) return { success: false, message: 'Not authenticated' };
-	try {
-		const url = buildUrl(URLS.artisan.delete_portfolio, {
-			profileId,
-			itemId,
-		});
-		const res = await fetch(`${BASE()}${url}`, {
-			method: 'DELETE',
-			headers: headers(auth.accessToken),
-		});
-		const json = await safeJson(res);
-		return { success: res.ok, message: json?.message };
-	} catch {
-		return { success: false, message: 'Network error' };
-	}
+  const auth = await getAuth();
+  if (!auth) return { success: false, message: "Not authenticated" };
+  try {
+    const url = buildUrl(URLS.artisan.delete_portfolio, {
+      profileId,
+      itemId,
+    });
+    const res = await fetch(`${BASE()}${url}`, {
+      method: "DELETE",
+      headers: headers(auth.accessToken),
+    });
+    const json = await safeJson(res);
+    return { success: res.ok, message: json?.message };
+  } catch {
+    return { success: false, message: "Network error" };
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -397,21 +397,21 @@ export async function deletePortfolioItem(
 // ═══════════════════════════════════════════════════════════
 
 export async function updateArtisanCategories(
-	categoryIds: string[],
+  categoryIds: string[],
 ): Promise<{ success: boolean; message?: string }> {
-	const auth = await getAuth();
-	if (!auth) return { success: false, message: 'Not authenticated' };
-	try {
-		const res = await fetch(`${BASE()}${URLS.artisan.update_categories}`, {
-			method: 'PATCH',
-			headers: headers(auth.accessToken),
-			body: JSON.stringify({ categoryIds }),
-		});
-		const json = await safeJson(res);
-		return { success: res.ok, message: json?.message };
-	} catch {
-		return { success: false, message: 'Network error' };
-	}
+  const auth = await getAuth();
+  if (!auth) return { success: false, message: "Not authenticated" };
+  try {
+    const res = await fetch(`${BASE()}${URLS.artisan.update_categories}`, {
+      method: "PATCH",
+      headers: headers(auth.accessToken),
+      body: JSON.stringify({ categoryIds }),
+    });
+    const json = await safeJson(res);
+    return { success: res.ok, message: json?.message };
+  } catch {
+    return { success: false, message: "Network error" };
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -419,161 +419,161 @@ export async function updateArtisanCategories(
 // ═══════════════════════════════════════════════════════════
 
 export async function getArtisanBookings(
-	profileId: string,
-	filters?: { status?: string; page?: number; limit?: number },
+  profileId: string,
+  filters?: { status?: string; page?: number; limit?: number },
 ): Promise<{
-	bookings: Booking[];
-	total: number;
-	page: number;
-	totalPages: number;
+  bookings: Booking[];
+  total: number;
+  page: number;
+  totalPages: number;
 }> {
-	const auth = await getAuth();
-	if (!auth) return { bookings: [], total: 0, page: 1, totalPages: 0 };
-	try {
-		const url = buildUrl(URLS.artisan.bookings, { profileId });
-		const searchParams = new URLSearchParams();
-		if (filters?.status) searchParams.set('status', filters.status);
-		if (filters?.page) searchParams.set('page', String(filters.page));
-		if (filters?.limit) searchParams.set('limit', String(filters.limit));
-		const qs = searchParams.toString();
-		const res = await fetch(`${BASE()}${url}${qs ? `?${qs}` : ''}`, {
-			headers: headers(auth.accessToken),
-			cache: 'no-store',
-		});
-		const json = await safeJson(res);
-		// Backend returns { data: [...bookings], meta: { total, page, totalPages } }
-		if (json?.data && Array.isArray(json.data)) {
-			return {
-				bookings: json.data,
-				total: json.meta?.total ?? json.data.length,
-				page: json.meta?.page ?? 1,
-				totalPages: json.meta?.totalPages ?? 1,
-			};
-		}
-		return json?.data ?? { bookings: [], total: 0, page: 1, totalPages: 0 };
-	} catch {
-		return { bookings: [], total: 0, page: 1, totalPages: 0 };
-	}
+  const auth = await getAuth();
+  if (!auth) return { bookings: [], total: 0, page: 1, totalPages: 0 };
+  try {
+    const url = buildUrl(URLS.artisan.bookings, { profileId });
+    const searchParams = new URLSearchParams();
+    if (filters?.status) searchParams.set("status", filters.status);
+    if (filters?.page) searchParams.set("page", String(filters.page));
+    if (filters?.limit) searchParams.set("limit", String(filters.limit));
+    const qs = searchParams.toString();
+    const res = await fetch(`${BASE()}${url}${qs ? `?${qs}` : ""}`, {
+      headers: headers(auth.accessToken),
+      cache: "no-store",
+    });
+    const json = await safeJson(res);
+    // Backend returns { data: [...bookings], meta: { total, page, totalPages } }
+    if (json?.data && Array.isArray(json.data)) {
+      return {
+        bookings: json.data,
+        total: json.meta?.total ?? json.data.length,
+        page: json.meta?.page ?? 1,
+        totalPages: json.meta?.totalPages ?? 1,
+      };
+    }
+    return json?.data ?? { bookings: [], total: 0, page: 1, totalPages: 0 };
+  } catch {
+    return { bookings: [], total: 0, page: 1, totalPages: 0 };
+  }
 }
 
 export async function getBookingById(bookingId: string): Promise<{
-	booking:
-		| (Booking & {
-				viewerRole: 'CLIENT' | 'ARTISAN';
-				thread?: { id: string; status: string } | null;
-		  })
-		| null;
+  booking:
+    | (Booking & {
+        viewerRole: "CLIENT" | "ARTISAN";
+        thread?: { id: string; status: string } | null;
+      })
+    | null;
 }> {
-	const auth = await getAuth();
-	if (!auth) return { booking: null };
-	try {
-		const url = buildUrl(URLS.artisan.get_booking, { bookingId });
-		const res = await fetch(`${BASE()}${url}`, {
-			headers: headers(auth.accessToken),
-			cache: 'no-store',
-		});
-		if (!res.ok) return { booking: null };
-		const json = await safeJson(res);
-		return {
-			booking:
-				(json as Booking & {
-					viewerRole: 'CLIENT' | 'ARTISAN';
-					thread?: { id: string; status: string } | null;
-				}) ?? null,
-		};
-	} catch {
-		return { booking: null };
-	}
+  const auth = await getAuth();
+  if (!auth) return { booking: null };
+  try {
+    const url = buildUrl(URLS.artisan.get_booking, { bookingId });
+    const res = await fetch(`${BASE()}${url}`, {
+      headers: headers(auth.accessToken),
+      cache: "no-store",
+    });
+    if (!res.ok) return { booking: null };
+    const json = await safeJson(res);
+    return {
+      booking:
+        (json as Booking & {
+          viewerRole: "CLIENT" | "ARTISAN";
+          thread?: { id: string; status: string } | null;
+        }) ?? null,
+    };
+  } catch {
+    return { booking: null };
+  }
 }
 
 export async function confirmBooking(
-	profileId: string,
-	bookingId: string,
+  profileId: string,
+  bookingId: string,
 ): Promise<{ success: boolean; message?: string }> {
-	const auth = await getAuth();
-	if (!auth) return { success: false, message: 'Not authenticated' };
-	try {
-		const url = buildUrl(URLS.artisan.confirm_booking, {
-			profileId,
-			bookingId,
-		});
-		const res = await fetch(`${BASE()}${url}`, {
-			method: 'POST',
-			headers: headers(auth.accessToken),
-		});
-		const json = await safeJson(res);
-		return { success: res.ok, message: json?.message };
-	} catch {
-		return { success: false, message: 'Network error' };
-	}
+  const auth = await getAuth();
+  if (!auth) return { success: false, message: "Not authenticated" };
+  try {
+    const url = buildUrl(URLS.artisan.confirm_booking, {
+      profileId,
+      bookingId,
+    });
+    const res = await fetch(`${BASE()}${url}`, {
+      method: "POST",
+      headers: headers(auth.accessToken),
+    });
+    const json = await safeJson(res);
+    return { success: res.ok, message: json?.message };
+  } catch {
+    return { success: false, message: "Network error" };
+  }
 }
 
 export async function startBooking(
-	profileId: string,
-	bookingId: string,
+  profileId: string,
+  bookingId: string,
 ): Promise<{ success: boolean; message?: string }> {
-	const auth = await getAuth();
-	if (!auth) return { success: false, message: 'Not authenticated' };
-	try {
-		const url = buildUrl(URLS.artisan.start_booking, {
-			profileId,
-			bookingId,
-		});
-		const res = await fetch(`${BASE()}${url}`, {
-			method: 'POST',
-			headers: headers(auth.accessToken),
-		});
-		const json = await safeJson(res);
-		return { success: res.ok, message: json?.message };
-	} catch {
-		return { success: false, message: 'Network error' };
-	}
+  const auth = await getAuth();
+  if (!auth) return { success: false, message: "Not authenticated" };
+  try {
+    const url = buildUrl(URLS.artisan.start_booking, {
+      profileId,
+      bookingId,
+    });
+    const res = await fetch(`${BASE()}${url}`, {
+      method: "POST",
+      headers: headers(auth.accessToken),
+    });
+    const json = await safeJson(res);
+    return { success: res.ok, message: json?.message };
+  } catch {
+    return { success: false, message: "Network error" };
+  }
 }
 
 export async function completeBooking(
-	profileId: string,
-	bookingId: string,
+  profileId: string,
+  bookingId: string,
 ): Promise<{ success: boolean; message?: string }> {
-	const auth = await getAuth();
-	if (!auth) return { success: false, message: 'Not authenticated' };
-	try {
-		const url = buildUrl(URLS.artisan.complete_booking, {
-			profileId,
-			bookingId,
-		});
-		const res = await fetch(`${BASE()}${url}`, {
-			method: 'POST',
-			headers: headers(auth.accessToken),
-		});
-		const json = await safeJson(res);
-		return { success: res.ok, message: json?.message };
-	} catch {
-		return { success: false, message: 'Network error' };
-	}
+  const auth = await getAuth();
+  if (!auth) return { success: false, message: "Not authenticated" };
+  try {
+    const url = buildUrl(URLS.artisan.complete_booking, {
+      profileId,
+      bookingId,
+    });
+    const res = await fetch(`${BASE()}${url}`, {
+      method: "POST",
+      headers: headers(auth.accessToken),
+    });
+    const json = await safeJson(res);
+    return { success: res.ok, message: json?.message };
+  } catch {
+    return { success: false, message: "Network error" };
+  }
 }
 
 export async function cancelBookingAsArtisan(
-	profileId: string,
-	bookingId: string,
-	reason: string,
+  profileId: string,
+  bookingId: string,
+  reason: string,
 ): Promise<{ success: boolean; message?: string }> {
-	const auth = await getAuth();
-	if (!auth) return { success: false, message: 'Not authenticated' };
-	try {
-		const url = buildUrl(URLS.artisan.cancel_booking, {
-			profileId,
-			bookingId,
-		});
-		const res = await fetch(`${BASE()}${url}`, {
-			method: 'POST',
-			headers: headers(auth.accessToken),
-			body: JSON.stringify({ reason }),
-		});
-		const json = await safeJson(res);
-		return { success: res.ok, message: json?.message };
-	} catch {
-		return { success: false, message: 'Network error' };
-	}
+  const auth = await getAuth();
+  if (!auth) return { success: false, message: "Not authenticated" };
+  try {
+    const url = buildUrl(URLS.artisan.cancel_booking, {
+      profileId,
+      bookingId,
+    });
+    const res = await fetch(`${BASE()}${url}`, {
+      method: "POST",
+      headers: headers(auth.accessToken),
+      body: JSON.stringify({ reason }),
+    });
+    const json = await safeJson(res);
+    return { success: res.ok, message: json?.message };
+  } catch {
+    return { success: false, message: "Network error" };
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -581,82 +581,82 @@ export async function cancelBookingAsArtisan(
 // ═══════════════════════════════════════════════════════════
 
 export async function bookArtisan(
-	artisanId: string,
-	profileId: string,
-	data: CreateBookingDto,
+  artisanId: string,
+  profileId: string,
+  data: CreateBookingDto,
 ): Promise<{ success: boolean; data?: Booking; message?: string }> {
-	const auth = await getAuth();
-	if (!auth) return { success: false, message: 'Not authenticated' };
-	try {
-		const url = buildUrl(URLS.artisan.book_artisan, { artisanId });
-		const res = await fetch(
-			`${BASE()}${url}?profileId=${encodeURIComponent(profileId)}`,
-			{
-				method: 'POST',
-				headers: headers(auth.accessToken),
-				body: JSON.stringify(data),
-			},
-		);
-		const json = await safeJson(res);
-		if (!res.ok)
-			return {
-				success: false,
-				message: json?.message || 'Booking failed',
-			};
-		return { success: true, data: json?.data };
-	} catch {
-		return { success: false, message: 'Network error' };
-	}
+  const auth = await getAuth();
+  if (!auth) return { success: false, message: "Not authenticated" };
+  try {
+    const url = buildUrl(URLS.artisan.book_artisan, { artisanId });
+    const res = await fetch(
+      `${BASE()}${url}?profileId=${encodeURIComponent(profileId)}`,
+      {
+        method: "POST",
+        headers: headers(auth.accessToken),
+        body: JSON.stringify(data),
+      },
+    );
+    const json = await safeJson(res);
+    if (!res.ok)
+      return {
+        success: false,
+        message: json?.message || "Booking failed",
+      };
+    return { success: true, data: json?.data };
+  } catch {
+    return { success: false, message: "Network error" };
+  }
 }
 
 export async function getMyBookings(filters?: {
-	page?: number;
-	limit?: number;
+  page?: number;
+  limit?: number;
 }): Promise<{
-	bookings: Booking[];
-	total: number;
-	page: number;
-	totalPages: number;
+  bookings: Booking[];
+  total: number;
+  page: number;
+  totalPages: number;
 }> {
-	const auth = await getAuth();
-	if (!auth) return { bookings: [], total: 0, page: 1, totalPages: 0 };
-	try {
-		const searchParams = new URLSearchParams();
-		if (filters?.page) searchParams.set('page', String(filters.page));
-		if (filters?.limit) searchParams.set('limit', String(filters.limit));
-		const qs = searchParams.toString();
-		const res = await fetch(
-			`${BASE()}${URLS.artisan.my_bookings}${qs ? `?${qs}` : ''}`,
-			{
-				headers: headers(auth.accessToken),
-				cache: 'no-store',
-			},
-		);
-		const json = await safeJson(res);
-		return json?.data ?? { bookings: [], total: 0, page: 1, totalPages: 0 };
-	} catch {
-		return { bookings: [], total: 0, page: 1, totalPages: 0 };
-	}
+  const auth = await getAuth();
+  if (!auth) return { bookings: [], total: 0, page: 1, totalPages: 0 };
+  try {
+    const searchParams = new URLSearchParams();
+    if (filters?.page) searchParams.set("page", String(filters.page));
+    if (filters?.limit) searchParams.set("limit", String(filters.limit));
+    const qs = searchParams.toString();
+    const res = await fetch(
+      `${BASE()}${URLS.artisan.my_bookings}${qs ? `?${qs}` : ""}`,
+      {
+        headers: headers(auth.accessToken),
+        cache: "no-store",
+      },
+    );
+    const json = await safeJson(res);
+    return json?.data ?? { bookings: [], total: 0, page: 1, totalPages: 0 };
+  } catch {
+    return { bookings: [], total: 0, page: 1, totalPages: 0 };
+  }
 }
 
 export async function cancelBookingAsCustomer(
-	bookingId: string,
-	reason: string,
+  bookingId: string,
+  reason: string,
 ): Promise<{ success: boolean; message?: string }> {
-	const auth = await getAuth();
-	if (!auth) return { success: false, message: 'Not authenticated' };
-	try {
-		const url = buildUrl(URLS.artisan.cancel_my_booking, { bookingId });
-		const res = await fetch(`${BASE()}${url}`, {
-			method: 'POST',
-			headers: headers(auth.accessToken),
-			body: JSON.stringify({ reason }),
-		});
-		const json = await safeJson(res);
-		return { success: res.ok, message: json?.message };
-	} catch {
-		return { success: false, message: 'Network error' };
-	}
+  const auth = await getAuth();
+  if (!auth) return { success: false, message: "Not authenticated" };
+  try {
+    const url = buildUrl(URLS.artisan.cancel_my_booking, { bookingId });
+    const res = await fetch(`${BASE()}${url}`, {
+      method: "POST",
+      headers: headers(auth.accessToken),
+      body: JSON.stringify({ reason }),
+    });
+    const json = await safeJson(res);
+    return { success: res.ok, message: json?.message };
+  } catch {
+    return { success: false, message: "Network error" };
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -664,28 +664,28 @@ export async function cancelBookingAsCustomer(
 // ═══════════════════════════════════════════════════════════
 
 export async function submitReview(
-	artisanId: string,
-	data: CreateReviewDto,
+  artisanId: string,
+  data: CreateReviewDto,
 ): Promise<{ success: boolean; data?: Review; message?: string }> {
-	const auth = await getAuth();
-	if (!auth) return { success: false, message: 'Not authenticated' };
-	try {
-		const url = buildUrl(URLS.artisan.submit_review, { artisanId });
-		const res = await fetch(`${BASE()}${url}`, {
-			method: 'POST',
-			headers: headers(auth.accessToken),
-			body: JSON.stringify(data),
-		});
-		const json = await safeJson(res);
-		if (!res.ok)
-			return {
-				success: false,
-				message: json?.message || 'Review failed',
-			};
-		return { success: true, data: json?.data };
-	} catch {
-		return { success: false, message: 'Network error' };
-	}
+  const auth = await getAuth();
+  if (!auth) return { success: false, message: "Not authenticated" };
+  try {
+    const url = buildUrl(URLS.artisan.submit_review, { artisanId });
+    const res = await fetch(`${BASE()}${url}`, {
+      method: "POST",
+      headers: headers(auth.accessToken),
+      body: JSON.stringify(data),
+    });
+    const json = await safeJson(res);
+    if (!res.ok)
+      return {
+        success: false,
+        message: json?.message || "Review failed",
+      };
+    return { success: true, data: json?.data };
+  } catch {
+    return { success: false, message: "Network error" };
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -693,64 +693,64 @@ export async function submitReview(
 // ═══════════════════════════════════════════════════════════
 
 export async function createPromotion(
-	data: CreatePromotionDto,
+  data: CreatePromotionDto,
 ): Promise<{ success: boolean; data?: Promotion; message?: string }> {
-	const auth = await getAuth();
-	if (!auth) return { success: false, message: 'Not authenticated' };
-	try {
-		const res = await fetch(`${BASE()}${URLS.artisan.create_promotion}`, {
-			method: 'POST',
-			headers: headers(auth.accessToken),
-			body: JSON.stringify(data),
-		});
-		const json = await safeJson(res);
-		if (!res.ok)
-			return {
-				success: false,
-				message: json?.message || 'Promotion failed',
-			};
-		return { success: true, data: json?.data };
-	} catch {
-		return { success: false, message: 'Network error' };
-	}
+  const auth = await getAuth();
+  if (!auth) return { success: false, message: "Not authenticated" };
+  try {
+    const res = await fetch(`${BASE()}${URLS.artisan.create_promotion}`, {
+      method: "POST",
+      headers: headers(auth.accessToken),
+      body: JSON.stringify(data),
+    });
+    const json = await safeJson(res);
+    if (!res.ok)
+      return {
+        success: false,
+        message: json?.message || "Promotion failed",
+      };
+    return { success: true, data: json?.data };
+  } catch {
+    return { success: false, message: "Network error" };
+  }
 }
 
 export async function getMyPromotions(profileId: string): Promise<Promotion[]> {
-	const auth = await getAuth();
-	if (!auth) return [];
-	try {
-		const url = buildUrl(URLS.artisan.my_promotions, { profileId });
-		const res = await fetch(`${BASE()}${url}`, {
-			headers: headers(auth.accessToken),
-			cache: 'no-store',
-		});
-		const json = await safeJson(res);
-		return json?.data ?? [];
-	} catch {
-		return [];
-	}
+  const auth = await getAuth();
+  if (!auth) return [];
+  try {
+    const url = buildUrl(URLS.artisan.my_promotions, { profileId });
+    const res = await fetch(`${BASE()}${url}`, {
+      headers: headers(auth.accessToken),
+      cache: "no-store",
+    });
+    const json = await safeJson(res);
+    return json?.data ?? [];
+  } catch {
+    return [];
+  }
 }
 
 export async function cancelPromotion(
-	profileId: string,
-	promotionId: string,
+  profileId: string,
+  promotionId: string,
 ): Promise<{ success: boolean; message?: string }> {
-	const auth = await getAuth();
-	if (!auth) return { success: false, message: 'Not authenticated' };
-	try {
-		const url = buildUrl(URLS.artisan.cancel_promotion, {
-			profileId,
-			promotionId,
-		});
-		const res = await fetch(`${BASE()}${url}`, {
-			method: 'POST',
-			headers: headers(auth.accessToken),
-		});
-		const json = await safeJson(res);
-		return { success: res.ok, message: json?.message };
-	} catch {
-		return { success: false, message: 'Network error' };
-	}
+  const auth = await getAuth();
+  if (!auth) return { success: false, message: "Not authenticated" };
+  try {
+    const url = buildUrl(URLS.artisan.cancel_promotion, {
+      profileId,
+      promotionId,
+    });
+    const res = await fetch(`${BASE()}${url}`, {
+      method: "POST",
+      headers: headers(auth.accessToken),
+    });
+    const json = await safeJson(res);
+    return { success: res.ok, message: json?.message };
+  } catch {
+    return { success: false, message: "Network error" };
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -758,21 +758,21 @@ export async function cancelPromotion(
 // ═══════════════════════════════════════════════════════════
 
 export async function getArtisanEarnings(
-	profileId: string,
+  profileId: string,
 ): Promise<EarningsData | null> {
-	const auth = await getAuth();
-	if (!auth) return null;
-	try {
-		const url = buildUrl(URLS.artisan.earnings, { profileId });
-		const res = await fetch(`${BASE()}${url}`, {
-			headers: headers(auth.accessToken),
-			cache: 'no-store',
-		});
-		const json = await safeJson(res);
-		return json?.data ?? null;
-	} catch {
-		return null;
-	}
+  const auth = await getAuth();
+  if (!auth) return null;
+  try {
+    const url = buildUrl(URLS.artisan.earnings, { profileId });
+    const res = await fetch(`${BASE()}${url}`, {
+      headers: headers(auth.accessToken),
+      cache: "no-store",
+    });
+    const json = await safeJson(res);
+    return json?.data ?? null;
+  } catch {
+    return null;
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -780,80 +780,93 @@ export async function getArtisanEarnings(
 // ═══════════════════════════════════════════════════════════
 
 export async function getDirectoryArtisans(
-	filters?: DirectoryFilters,
+  filters?: DirectoryFilters,
 ): Promise<DirectoryResponse> {
-	try {
-		const searchParams = new URLSearchParams();
-		if (filters?.category) searchParams.set('category', filters.category);
-		if (filters?.search) searchParams.set('search', filters.search);
-		if (filters?.location) searchParams.set('location', filters.location);
-		if (filters?.minRating)
-			searchParams.set('minRating', String(filters.minRating));
-		if (filters?.page) searchParams.set('page', String(filters.page));
-		if (filters?.limit) searchParams.set('limit', String(filters.limit));
-		if (filters?.sortBy) searchParams.set('sortBy', filters.sortBy);
-		const qs = searchParams.toString();
-		const res = await fetch(
-			`${BASE()}${URLS.directory.artisans}${qs ? `?${qs}` : ''}`,
-			{ next: { revalidate: 60 } },
-		);
-		const json = await safeJson(res);
-		return json?.data ?? { artisans: [], total: 0, page: 1, totalPages: 0 };
-	} catch {
-		return { artisans: [], total: 0, page: 1, totalPages: 0 };
-	}
+  try {
+    const searchParams = new URLSearchParams();
+    if (filters?.category) searchParams.set("category", filters.category);
+    if (filters?.search) searchParams.set("search", filters.search);
+    if (filters?.location) searchParams.set("location", filters.location);
+    if (filters?.minRating)
+      searchParams.set("minRating", String(filters.minRating));
+    if (filters?.page) searchParams.set("page", String(filters.page));
+    if (filters?.limit) searchParams.set("limit", String(filters.limit));
+    if (filters?.sortBy) searchParams.set("sortBy", filters.sortBy);
+    const qs = searchParams.toString();
+    const res = await fetch(
+      `${BASE()}${URLS.directory.artisans}${qs ? `?${qs}` : ""}`,
+      { next: { revalidate: 60 } },
+    );
+    const json = await safeJson(res);
+    return json?.data ?? { artisans: [], total: 0, page: 1, totalPages: 0 };
+  } catch {
+    return { artisans: [], total: 0, page: 1, totalPages: 0 };
+  }
 }
 
 export async function getFeaturedArtisans(
-	limit = 10,
+  limit = 10,
 ): Promise<ArtisanDirectoryCard[]> {
-	try {
-		const res = await fetch(
-			`${BASE()}${URLS.directory.featured}?limit=${limit}`,
-			{ next: { revalidate: 300 } },
-		);
-		const json = await safeJson(res);
-		return json?.data ?? [];
-	} catch {
-		return [];
-	}
+  try {
+    const res = await fetch(
+      `${BASE()}${URLS.directory.featured}?limit=${limit}`,
+      { next: { revalidate: 300 } },
+    );
+    const json = await safeJson(res);
+    return json?.data ?? [];
+  } catch {
+    return [];
+  }
 }
 
 export async function getArtisanPublicProfile(
-	artisanId: string,
+  artisanId: string,
 ): Promise<ArtisanProfile | null> {
-	try {
-		const url = buildUrl(URLS.directory.artisan_profile, { artisanId });
-		const res = await fetch(`${BASE()}${url}`, {
-			next: { revalidate: 60 },
-		});
-		const json = await safeJson(res);
-		return json?.data ?? null;
-	} catch {
-		return null;
-	}
+  try {
+    const url = buildUrl(URLS.directory.artisan_profile, { artisanId });
+    const res = await fetch(`${BASE()}${url}`, {
+      next: { revalidate: 60 },
+    });
+    const json = await safeJson(res);
+    return json?.data ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export async function getArtisanPublicReviews(
-	artisanId: string,
-	page = 1,
-	limit = 20,
+  artisanId: string,
+  page = 1,
+  limit = 20,
 ): Promise<{
-	reviews: Review[];
-	total: number;
-	page: number;
-	totalPages: number;
+  reviews: Review[];
+  total: number;
+  page: number;
+  totalPages: number;
 }> {
-	try {
-		const url = buildUrl(URLS.directory.artisan_reviews, { artisanId });
-		const res = await fetch(`${BASE()}${url}?page=${page}&limit=${limit}`, {
-			next: { revalidate: 60 },
-		});
-		const json = await safeJson(res);
-		return json?.data ?? { reviews: [], total: 0, page: 1, totalPages: 0 };
-	} catch {
-		return { reviews: [], total: 0, page: 1, totalPages: 0 };
-	}
+  try {
+    const url = buildUrl(URLS.directory.artisan_reviews, { artisanId });
+    const res = await fetch(`${BASE()}${url}?page=${page}&limit=${limit}`, {
+      cache: "no-store",
+    });
+    const json = await safeJson(res);
+    console.log(
+      "[getArtisanPublicReviews] raw response:",
+      JSON.stringify(json),
+    );
+    // Backend returns { success, data: Review[], meta: { total, page, totalPages } }
+    const reviews: Review[] = Array.isArray(json?.data) ? json.data : [];
+    const meta = json?.meta ?? {};
+    return {
+      reviews,
+      total: meta.total ?? reviews.length,
+      page: meta.page ?? 1,
+      totalPages: meta.totalPages ?? 1,
+    };
+  } catch (err) {
+    console.error("[getArtisanPublicReviews] error:", err);
+    return { reviews: [], total: 0, page: 1, totalPages: 0 };
+  }
 }
 
 export async function getDirectoryCategories(): Promise<ArtisanCategory[]> {

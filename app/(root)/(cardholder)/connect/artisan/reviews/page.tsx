@@ -20,6 +20,7 @@ export default async function ArtisanReviewsPage() {
 	if (!artisan) redirect('/connect/artisan/setup');
 
 	const reviewsData = await getArtisanPublicReviews(artisan.id, 1, 50);
+	console.log("[ArtisanReviewsPage] reviewsData:", JSON.stringify(reviewsData));
 
 	return (
 		<ArtisanReviewsClient
