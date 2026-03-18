@@ -5,165 +5,164 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { MessageSquare } from 'lucide-react';
 import type {
-	ArtisanCategoryMap,
-	ArtisanService,
-	PortfolioItem,
-	Review,
-	WorkingHoursEntry,
-} from '@/lib/types/artisan';
+  ArtisanCategoryMap,
+  ArtisanService,
+  PortfolioItem,
+  Review,
+  WorkingHoursEntry,
+} from "@/lib/types/artisan";
 
 export interface PublicArtisanData {
-	id: string;
-	bio: string | null;
-	averageRating: number | string;
-	totalReviews: number;
-	totalBookings: number;
-	workingHours: WorkingHoursEntry[] | null;
-	categories: ArtisanCategoryMap[];
-	services: ArtisanService[];
-	portfolio: PortfolioItem[];
+  id: string;
+  bio: string | null;
+  averageRating: number | string;
+  totalReviews: number;
+  totalBookings: number;
+  workingHours: WorkingHoursEntry[] | null;
+  categories: ArtisanCategoryMap[];
+  services: ArtisanService[];
+  portfolio: PortfolioItem[];
 }
 
 /* ── Star renderer ── */
 
 function Stars({ rating }: { rating: number }) {
-	return (
-		<span className='inline-flex gap-0.5'>
-			{[1, 2, 3, 4, 5].map((s) => (
-				<svg
-					key={s}
-					className={`h-3.5 w-3.5 ${s <= Math.round(rating) ? 'text-yellow-400' : 'text-white/20'}`}
-					fill='currentColor'
-					viewBox='0 0 20 20'
-				>
-					<path d='M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z' />
-				</svg>
-			))}
-		</span>
-	);
+  return (
+    <span className="inline-flex gap-0.5">
+      {[1, 2, 3, 4, 5].map((s) => (
+        <svg
+          key={s}
+          className={`h-3.5 w-3.5 ${s <= Math.round(rating) ? "text-yellow-400" : "text-white/20"}`}
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+        </svg>
+      ))}
+    </span>
+  );
 }
 
 /* ── Price display ── */
 
 function PriceLabel({
-	price,
-	currency,
+  price,
+  currency,
 }: {
-	price: number | string | null;
-	currency: string;
+  price: number | string | null;
+  currency: string;
 }) {
-	if (!price || Number(price) === 0) {
-		return (
-			<span className='text-purple-300 text-xs font-medium'>
-				Get a quote
-			</span>
-		);
-	}
-	const formatted = Number(price).toLocaleString();
-	return (
-		<span className='text-purple-300 text-xs font-medium'>
-			{currency} {formatted}
-		</span>
-	);
+  if (!price || Number(price) === 0) {
+    return (
+      <span className="text-purple-300 text-xs font-medium">Get a quote</span>
+    );
+  }
+  const formatted = Number(price).toLocaleString();
+  return (
+    <span className="text-purple-300 text-xs font-medium">
+      {currency} {formatted}
+    </span>
+  );
 }
 
 /* ── Portfolio lightbox ── */
 
 function PortfolioGallery({ items }: { items: PortfolioItem[] }) {
-	const [selected, setSelected] = useState<string | null>(null);
-	const imageItems = items.filter((p) => p.type === 'image' && p.url);
+  const [selected, setSelected] = useState<string | null>(null);
+  const imageItems = items.filter((p) => p.type === "image" && p.url);
 
-	if (imageItems.length === 0) return null;
+  if (imageItems.length === 0) return null;
 
-	return (
-		<>
-			<div className='grid grid-cols-3 gap-1.5'>
-				{imageItems.slice(0, 9).map((img, i) => (
-					<button
-						key={img.id}
-						onClick={() => setSelected(img.url)}
-						className='aspect-square rounded-lg overflow-hidden relative group'
-					>
-						<Image
-							src={img.url}
-							alt={img.caption || 'Portfolio'}
-							fill
-							className='object-cover group-hover:scale-105 transition-transform'
-							unoptimized
-						/>
-						{i === 8 && imageItems.length > 9 && (
-							<div className='absolute inset-0 bg-black/60 flex items-center justify-center'>
-								<span className='text-white font-semibold text-sm'>
-									+{imageItems.length - 9}
-								</span>
-							</div>
-						)}
-					</button>
-				))}
-			</div>
+  return (
+    <>
+      <div className="grid grid-cols-3 gap-1.5">
+        {imageItems.slice(0, 9).map((img, i) => (
+          <button
+            key={img.id}
+            onClick={() => setSelected(img.url)}
+            className="aspect-square rounded-lg overflow-hidden relative group"
+          >
+            <Image
+              src={img.url}
+              alt={img.caption || "Portfolio"}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform"
+              unoptimized
+            />
+            {i === 8 && imageItems.length > 9 && (
+              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                <span className="text-white font-semibold text-sm">
+                  +{imageItems.length - 9}
+                </span>
+              </div>
+            )}
+          </button>
+        ))}
+      </div>
 
-			{/* Lightbox */}
-			{selected && (
-				<div
-					className='fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4'
-					onClick={() => setSelected(null)}
-				>
-					<button
-						className='absolute top-4 right-4 text-white/70 hover:text-white text-2xl'
-						onClick={() => setSelected(null)}
-					>
-						✕
-					</button>
-					<Image
-						src={selected}
-						alt='Portfolio image'
-						width={800}
-						height={600}
-						className='max-h-[80vh] w-auto rounded-lg object-contain'
-						unoptimized
-					/>
-				</div>
-			)}
-		</>
-	);
+      {/* Lightbox */}
+      {selected && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setSelected(null)}
+        >
+          <button
+            className="absolute top-4 right-4 text-white/70 hover:text-white text-2xl"
+            onClick={() => setSelected(null)}
+          >
+            ✕
+          </button>
+          <Image
+            src={selected}
+            alt="Portfolio image"
+            width={800}
+            height={600}
+            className="max-h-[80vh] w-auto rounded-lg object-contain"
+            unoptimized
+          />
+        </div>
+      )}
+    </>
+  );
 }
 
 /* ── Reviews section ── */
 
 function ReviewCard({ review }: { review: Review }) {
-	const name =
-		`${review.reviewer?.firstName ?? ''} ${review.reviewer?.lastName ?? ''}`.trim();
-	return (
-		<div className='bg-white/5 rounded-xl p-3 border border-white/5'>
-			<div className='flex items-center gap-2 mb-1.5'>
-				{review.reviewer?.displayPicture ?
-					<Image
-						src={review.reviewer.displayPicture}
-						alt={name}
-						width={28}
-						height={28}
-						className='rounded-full object-cover'
-						unoptimized
-					/>
-				:	<div className='w-7 h-7 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-300 text-xs font-bold'>
-						{name.charAt(0)}
-					</div>
-				}
-				<div className='flex-1 min-w-0'>
-					<p className='text-xs font-medium truncate'>{name}</p>
-					<Stars rating={review.rating} />
-				</div>
-				<span className='text-[10px] text-white/40'>
-					{new Date(review.createdAt).toLocaleDateString()}
-				</span>
-			</div>
-			{review.comment && (
-				<p className='text-xs text-white/60 leading-relaxed'>
-					{review.comment}
-				</p>
-			)}
-		</div>
-	);
+  const name =
+    review.reviewer?.name?.trim() || review.reviewerName || "Anonymous";
+  return (
+    <div className="bg-white/5 rounded-xl p-3 border border-white/5">
+      <div className="flex items-center gap-2 mb-1.5">
+        {review.reviewer?.profilePhoto ? (
+          <Image
+            src={review.reviewer.profilePhoto}
+            alt={name}
+            width={28}
+            height={28}
+            className="rounded-full object-cover"
+            unoptimized
+          />
+        ) : (
+          <div className="w-7 h-7 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-300 text-xs font-bold">
+            {name.charAt(0)}
+          </div>
+        )}
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-medium truncate">{name}</p>
+          <Stars rating={review.rating} />
+        </div>
+        <span className="text-[10px] text-white/40">
+          {new Date(review.createdAt).toLocaleDateString()}
+        </span>
+      </div>
+      {review.comment && (
+        <p className="text-xs text-white/60 leading-relaxed">
+          {review.comment}
+        </p>
+      )}
+    </div>
+  );
 }
 
 /* ── Main component ── */
