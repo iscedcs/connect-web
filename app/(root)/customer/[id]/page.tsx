@@ -405,12 +405,12 @@ export default async function CustomerProfilePage({
         )}
 
         <div className="px-4 mt-4 flex items-center font-medium gap-3 flex-wrap">
-          <Link
-            href={`/customer/${id}/save-contact?download=1`}
+          <a
+            href={`/api/vcf/c/${id}`}
             className="px-5 py-2 bg-white/5 border border-[#868686] rounded-full text-xs"
           >
             Save Contact
-          </Link>
+          </a>
           {walletProfile?.canReceive && userId && (
             <SendMoneyButton
               recipientName={profile.name}
