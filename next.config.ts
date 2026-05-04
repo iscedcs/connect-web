@@ -1,12 +1,12 @@
-import type { NextConfig } from 'next';
+import type { NextConfig } from "next";
 
 function domain(url?: string) {
-	if (!url) return '';
-	try {
-		return new URL(url).origin;
-	} catch {
-		return '';
-	}
+  if (!url) return "";
+  try {
+    return new URL(url).origin;
+  } catch {
+    return "";
+  }
 }
 
 function wsDomain(url?: string) {
@@ -66,6 +66,20 @@ const nextConfig: NextConfig = {
         hostname: "hebbkx1anhila5yf.public.blob.vercel-storage.com",
       },
     ],
+  },
+  async redirects() {
+    return [
+      {
+        source: "/store",
+        destination: "https://store.isce.tech/",
+        permanent: false,
+      },
+      {
+        source: "/store/:path*",
+        destination: "https://store.isce.tech/:path*",
+        permanent: false,
+      },
+    ];
   },
   async headers() {
     return [
