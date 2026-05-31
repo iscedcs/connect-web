@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from 'next';
+import type { Metadata, Viewport } from "next";
 import { Inter_Tight, Syne } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
@@ -46,7 +46,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -59,7 +59,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Connect" />
       </head>
       <body
-        className={`${interTight} ${syne.variable} antialiased min-h-svh bg-black`}
+        className={`${interTight} ${syne.variable} antialiased min-h-svh bg-background text-foreground`}
       >
         <NextTopLoader color="#ffffff" showSpinner={false} />
         {children}

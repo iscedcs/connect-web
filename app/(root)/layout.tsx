@@ -1,14 +1,14 @@
-import { NotificationsListener } from '@/components/shared/notifications-listener';
+import { NotificationsListener } from "@/components/shared/notifications-listener";
 
 export default function DashboardLayout({
-	children,
+  children,
 }: Readonly<{
-	children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-	return (
-		<div className={`max-w-md mx-auto`}>
-			<NotificationsListener />
-			{children}
-		</div>
-	);
+  return (
+    <>
+      <NotificationsListener />
+      {children}
+    </>
+  );
 }
