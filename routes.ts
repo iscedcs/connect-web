@@ -32,4 +32,5 @@ export const protectedRoutes = [
 	'/notifications',
 	'/analytics',
 	'/manage-account',
+	'/cp',
 ];
