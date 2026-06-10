@@ -1,9 +1,11 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Bell, Search } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useCpWorkspaceStore } from '@/stores/cp-workspace.store'
+import { getCurrentUser } from '@/actions/auth'
 
 const routeTitles: Record<string, string> = {
   dashboard:    'Dashboard',
@@ -21,6 +23,11 @@ const routeTitles: Record<string, string> = {
 export function CpTopbar() {
   const pathname = usePathname()
   const { workspaceName } = useCpWorkspaceStore()
+  const [user, setUser] = useState<UserInfo | null>(null)
+
+  useEffect(() => {
+    getCurrentUser().then(setUser)
+  }, [])
 
   const segments = pathname?.split('/').filter(Boolean) ?? []
   const last     = segments[segments.length - 1] ?? ''
@@ -63,8 +70,20 @@ export function CpTopbar() {
         </button>
 
         {/* User avatar */}
-        <div className="w-9 h-9 rounded-full bg-[var(--cp-primary)] flex items-center justify-center cursor-pointer">
-          <span className="text-sm font-bold text-white">U</span>
+        <div className="w-9 h-9 rounded-full overflow-hidden bg-[var(--cp-primary)] flex items-center justify-center cursor-pointer flex-shrink-0">
+          {user?.displayPicture ? (
+            <img
+              src={user.displayPicture}
+              alt={user.firstName ?? 'User'}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <span className="text-sm font-bold text-white">
+              {user?.firstName?.[0]?.toUpperCase() ??
+                user?.email?.[0]?.toUpperCase() ??
+                'U'}
+            </span>
+          )}
         </div>
       </div>
     </header>

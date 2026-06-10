@@ -110,7 +110,7 @@ export function CpSidebar() {
         ) : (
           <div className="w-8 h-8 rounded-full bg-[var(--cp-primary)] flex items-center justify-center flex-shrink-0">
             <span className="text-xs font-bold text-white">
-              {workspaceName?.[0] ?? 'W'}
+              {workspaceName?.[0]?.toUpperCase() ?? 'W'}
             </span>
           </div>
         )}

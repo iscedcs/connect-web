@@ -180,7 +180,7 @@ export default function DesktopSidebar({ user }: DesktopSidebarProps) {
         <div className="flex items-center gap-3">
           {/* Avatar */}
           <div className="w-8 h-8 rounded-full overflow-hidden bg-muted flex items-center justify-center shrink-0">
-            {user?.displayPicture ? (
+            {user?.displayPicture?.startsWith('http') ? (
               <Image
                 src={user.displayPicture}
                 alt={displayName}
