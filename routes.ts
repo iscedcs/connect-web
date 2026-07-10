@@ -6,6 +6,7 @@ export const publicRoutes = [
 	'/',
 	'/customer',
 	'/p',
+	'/r',
 	'/terms',
 	'/privacy',
 	'/support',
@@ -32,4 +33,5 @@ export const protectedRoutes = [
 	'/notifications',
 	'/analytics',
 	'/manage-account',
+	'/referral',
 ];

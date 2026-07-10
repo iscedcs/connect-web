@@ -39,6 +39,7 @@ const ROUTE_LABELS: Record<string, string> = {
   contacts: "Contacts",
   analytics: "Analytics",
   wearables: "Wearables",
+  referral: "Referral",
   wallet: "Wallet",
   transactions: "Transactions",
   send: "Send Money",
