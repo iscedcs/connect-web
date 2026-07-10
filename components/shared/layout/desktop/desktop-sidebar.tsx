@@ -18,6 +18,7 @@ import {
   Watch,
   Palette,
   Contact2,
+  Gift,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -82,6 +83,7 @@ const NAV_GROUPS: NavGroup[] = [
       { label: "Contacts", href: "/contacts", icon: Contact2 },
       { label: "Analytics", href: "/analytics", icon: BarChart2 },
       { label: "Wearables", href: "/wearables", icon: Watch },
+      { label: "Referral", href: "/referral", icon: Gift },
     ],
   },
   {
