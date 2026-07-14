@@ -2,6 +2,7 @@ import React from "react";
 import { cookies } from "next/headers";
 import { generateMetadata } from "@/lib/metadata";
 import { getAuthUserProfile } from "@/lib/services/wallet";
+import { getReferralSummary } from "@/lib/services/referral";
 import SubpageHeader from "@/components/shared/subpage-header";
 import ReferralClient from "@/components/cardholder/referral/referral-client";
 
@@ -25,14 +26,19 @@ export default async function ReferralPage() {
 	const accessToken = cookieStore.get("accessToken")?.value;
 
 	let username: string | null = null;
+	let summary: Awaited<ReturnType<typeof getReferralSummary>> = null;
 	if (accessToken) {
 		try {
-			const profile = await getAuthUserProfile(accessToken);
+			const [profile, referralSummary] = await Promise.all([
+				getAuthUserProfile(accessToken),
+				getReferralSummary(accessToken),
+			]);
 			if (profile?.username) {
 				username = profile.username;
 			}
+			summary = referralSummary;
 		} catch {
-			// Fall back to default dummy username
+			// Fall back to default/zero state
 		}
 	}
 
@@ -40,7 +46,7 @@ export default async function ReferralPage() {
 		<main className="min-h-screen bg-black text-white">
 			<SubpageHeader title="Referrals" backHref="/dashboard" />
 			<div className="p-4 md:p-6">
-				<ReferralClient username={username} />
+				<ReferralClient username={username} summary={summary} />
 			</div>
 		</main>
 	);
