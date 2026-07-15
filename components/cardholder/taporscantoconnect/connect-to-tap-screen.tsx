@@ -133,7 +133,7 @@ export default function ConnectTapScreen({
       </div>
 
       {/* center content */}
-      <div className="relative mx-auto w-full max-w-screen-sm px-4 flex-1 flex items-center justify-center">
+      <div className="relative mx-auto w-full max-w-screen-sm px-4 flex-1 grid items-center justify-center">
         <div>
           <div className="text-center">
             <h1

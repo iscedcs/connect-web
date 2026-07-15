@@ -30,7 +30,8 @@ export async function proxy(req: NextRequest) {
 		pathname.startsWith('/auth/callback') ||
 		pathname.startsWith('/auth/logout') ||
 		pathname.startsWith('/auth/login') ||
-		pathname.startsWith('/api/auth')
+		pathname.startsWith('/api/auth') ||
+		pathname.startsWith('/cp/public/')  // Connect Plus public pages — no auth required
 	) {
 		const response = NextResponse.next();
 		setCsrfCookie(response, req.cookies.get('csrf_token')?.value);

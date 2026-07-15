@@ -82,6 +82,7 @@ export async function GET(req: Request) {
 	}
 
 	let maxAge = 60 * 60; // 1 hour — matches short-lived access token
+	let finalRedirect = safe;
 	try {
 		const payload = JSON.parse(atob(accessToken.split('.')[1]));
 		if (payload?.exp) {
@@ -89,9 +90,18 @@ export async function GET(req: Request) {
 			const remaining = Math.max(0, payload.exp - nowSec);
 			maxAge = Math.min(remaining, 60 * 60 * 24 * 7);
 		}
+		// Business users are routed to Connect Plus; the org page
+		// handles the workspace lookup after cookies are set.
+		if (payload?.userType === 'BUSINESS_USER') {
+			finalRedirect = '/cp/org';
+			authLogger.log(
+				'CALLBACK',
+				'Business user → redirecting to /cp/org',
+			);
+		}
 	} catch {}
 
-	const absoluteRedirect = new URL(safe, appBase).toString();
+	const absoluteRedirect = new URL(finalRedirect, appBase).toString();
 
 	const isProduction = process.env.NODE_ENV === 'production';
 	const res = NextResponse.redirect(absoluteRedirect, { status: 302 });

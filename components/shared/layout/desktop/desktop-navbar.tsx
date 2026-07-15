@@ -174,7 +174,7 @@ export default function DesktopNavbar({ user }: DesktopNavbarProps) {
               className="w-8 h-8 rounded-full overflow-hidden bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground hover:ring-2 hover:ring-border transition-all"
               aria-label="Account menu"
             >
-              {user?.displayPicture ? (
+              {user?.displayPicture?.startsWith('http') ? (
                 <Image
                   src={user.displayPicture}
                   alt={displayName}

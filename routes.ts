@@ -3,15 +3,15 @@
  * @type {string[]}
  */
 export const publicRoutes = [
-	'/',
-	'/customer',
-	'/p',
-	'/r',
-	'/terms',
-	'/privacy',
-	'/support',
-	'/card/connect',
-	'/artisans',
+  "/",
+  "/customer",
+  "/p",
+  "/r",
+  "/terms",
+  "/privacy",
+  "/support",
+  "/card/connect",
+  "/artisans",
 ];
 
 /**
@@ -19,19 +19,20 @@ export const publicRoutes = [
  * @type {string[]}
  */
 export const protectedRoutes = [
-	'/dashboard',
-	'/bvn',
-	'/connect',
-	'/devices',
-	'/otp',
-	'/profile',
-	'/profiles',
-	'/device',
-	'/settings',
-	'/wallet',
-	'/wearables',
-	'/notifications',
-	'/analytics',
-	'/manage-account',
-	'/referral',
+  "/dashboard",
+  "/bvn",
+  "/connect",
+  "/devices",
+  "/otp",
+  "/profile",
+  "/profiles",
+  "/device",
+  "/settings",
+  "/wallet",
+  "/wearables",
+  "/notifications",
+  "/analytics",
+  "/manage-account",
+  "/referral",
+  "/cp",
 ];
