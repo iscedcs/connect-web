@@ -9,10 +9,18 @@ import { toast } from 'sonner';
 interface ReferralCardProps {
 	username?: string | null;
 	slug?: string | null;
+	code?: string | null;
 }
 
-export default function ReferralCard({ username, slug }: ReferralCardProps) {
-	const referralCode = (username || slug || 'alex_connect').replace(/^@/, '');
+export default function ReferralCard({
+	username,
+	slug,
+	code,
+}: ReferralCardProps) {
+	const referralCode = (username || code || slug || 'alex_connect').replace(
+		/^@/,
+		'',
+	);
 	const baseUrl =
 		process.env.NEXT_PUBLIC_URL ||
 		(typeof window !== 'undefined' ? window.location.origin : '');
