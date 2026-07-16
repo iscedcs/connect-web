@@ -180,6 +180,7 @@ export default function DesktopNavbar({ user }: DesktopNavbarProps) {
                   alt={displayName}
                   width={32}
                   height={32}
+                  unoptimized
                   className="w-full h-full object-cover"
                 />
               ) : (

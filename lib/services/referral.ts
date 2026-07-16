@@ -1,65 +1,85 @@
-import { getAuthInfo } from '@/actions/auth';
-import { BASE_URLS, URLS } from '../const';
+/**
+ * Referral service — calls connect-nest's referral proxy routes.
+ * connect-web never talks to ISCE Auth Service directly for referrals.
+ */
 
-export interface ReferralEarnings {
-	pending: number;
-	available: number;
-	cashedOut: number;
-}
+const CONNECT_API_URL =
+	process.env.CONNECT_API_URL || process.env.NEXT_PUBLIC_CONNECT_API_URL || '';
 
-export interface ReferralData {
+export interface ReferralSummary {
 	code: string | null;
-	earnings: ReferralEarnings;
+	earnings: { pending: number; available: number; cashedOut: number };
 	referralCount: number;
 }
 
-export interface ReferralResponse {
-	success: boolean;
-	statusCode: number;
-	data?: ReferralData;
-	message?: string;
-}
-
-async function safeJson(res: Response): Promise<any | null> {
-	const contentType = res.headers.get('content-type') || '';
-	if (!contentType.toLowerCase().includes('application/json')) {
-		return null;
-	}
+/** Fetch the authenticated user's referral code, earnings breakdown, and referral count. */
+export async function getReferralSummary(
+	accessToken: string,
+): Promise<ReferralSummary | null> {
+	if (!CONNECT_API_URL || !accessToken) return null;
 	try {
-		return await res.json();
+		const res = await fetch(`${CONNECT_API_URL}/referral/me`, {
+			headers: { Authorization: `Bearer ${accessToken}` },
+			cache: 'no-store',
+		});
+		if (!res.ok) return null;
+		const json = await res.json();
+		return json?.data ?? null;
 	} catch {
 		return null;
 	}
 }
 
-export async function getReferralMe(
-	accessToken?: string,
-): Promise<ReferralData | null> {
-	let token = accessToken;
-	if (!token) {
-		const auth = await getAuthInfo();
-		if ('error' in auth || auth.isExpired) return null;
-		token = auth.accessToken;
-	}
-
-	const base = BASE_URLS.CONNECT_API || '';
-	if (!base || !token) return null;
-
+/** Apply for Business Referrer status (negotiated reward rate, admin-approved). */
+export async function applyForBusinessReferrer(
+	accessToken: string,
+): Promise<{ success: boolean; message: string }> {
+	if (!CONNECT_API_URL || !accessToken)
+		return { success: false, message: 'Service unavailable' };
 	try {
-		const res = await fetch(`${base}${URLS.referral.me}`, {
-			headers: { Authorization: `Bearer ${token}` },
+		const res = await fetch(`${CONNECT_API_URL}/referral/business/apply`, {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				'Content-Type': 'application/json',
+			},
 			cache: 'no-store',
 		});
-		if (!res.ok) return null;
-		const json = await safeJson(res);
-		if (json?.data) {
-			return json.data as ReferralData;
-		}
-		return null;
-	} catch (error) {
-		if (process.env.NODE_ENV !== 'production') {
-			console.error('[getReferralMe] failed to fetch referral data', error);
-		}
-		return null;
+		const json = await res.json();
+		return {
+			success: res.ok && json?.success,
+			message:
+				json?.message ??
+				(res.ok ? 'Application submitted' : 'Failed to submit application'),
+		};
+	} catch {
+		return { success: false, message: 'Network error. Please try again.' };
+	}
+}
+
+/** Cash out available referral earnings to the user's wallet. */
+export async function requestReferralCashOut(
+	accessToken: string,
+): Promise<{ success: boolean; message: string; data?: { amount: number } }> {
+	if (!CONNECT_API_URL || !accessToken)
+		return { success: false, message: 'Service unavailable' };
+	try {
+		const res = await fetch(`${CONNECT_API_URL}/referral/cash-out`, {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				'Content-Type': 'application/json',
+			},
+			cache: 'no-store',
+		});
+		const json = await res.json();
+		return {
+			success: res.ok && json?.success,
+			message:
+				json?.message ?? (res.ok ? 'Cash out successful' : 'Cash out failed'),
+			data: json?.data,
+		};
+	} catch {
+		return { success: false, message: 'Network error. Please try again.' };
 	}
 }

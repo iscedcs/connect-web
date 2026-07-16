@@ -1,21 +1,20 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
 	Copy,
 	Check,
 	Share2,
 	Wallet,
-	Gift,
-	/* Users, */
+	Users,
 	Clock,
 	CheckCircle2,
 	DollarSign,
-	/* Search, */
 	Sparkles,
 	ArrowUpRight,
-	ExternalLink,
 	Loader2,
+	Briefcase,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -28,122 +27,15 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog';
 
-import { ReferralData } from '@/lib/services/referral';
+interface ReferralSummaryProps {
+	earnings: { pending: number; available: number; cashedOut: number };
+	referralCount: number;
+}
 
 interface ReferralClientProps {
 	username?: string | null;
-	initialData?: ReferralData | null;
+	summary?: ReferralSummaryProps | null;
 }
-
-/* Commented out referrals table for the mean time
-interface ReferredUser {
-	id: string;
-	name: string;
-	username: string;
-	date: string;
-	status: 'AVAILABLE' | 'PENDING' | 'CASHED_OUT';
-	reward: number;
-}
-
-const DUMMY_REFERRED_USERS: ReferredUser[] = [
-	{
-		id: '1',
-		name: 'Amaka Okafor',
-		username: '@amaka_o',
-		date: '10 Jul 2026',
-		status: 'AVAILABLE',
-		reward: 5000,
-	},
-	{
-		id: '2',
-		name: 'Tunde Adeleke',
-		username: '@tunde_connect',
-		date: '08 Jul 2026',
-		status: 'AVAILABLE',
-		reward: 5000,
-	},
-	{
-		id: '3',
-		name: 'Grace Nwosu',
-		username: '@grace_n',
-		date: '07 Jul 2026',
-		status: 'PENDING',
-		reward: 5000,
-	},
-	{
-		id: '4',
-		name: 'Emmanuel Johnson',
-		username: '@emmanuel_j',
-		date: '05 Jul 2026',
-		status: 'AVAILABLE',
-		reward: 5000,
-	},
-	{
-		id: '5',
-		name: 'Fatima Bello',
-		username: '@fatima_b',
-		date: '03 Jul 2026',
-		status: 'PENDING',
-		reward: 5000,
-	},
-	{
-		id: '6',
-		name: 'David Eze',
-		username: '@david_eze',
-		date: '01 Jul 2026',
-		status: 'AVAILABLE',
-		reward: 5000,
-	},
-	{
-		id: '7',
-		name: 'Zainab Balogun',
-		username: '@zainab_b',
-		date: '28 Jun 2026',
-		status: 'AVAILABLE',
-		reward: 5000,
-	},
-	{
-		id: '8',
-		name: 'Chijioke Williams',
-		username: '@chijioke_w',
-		date: '25 Jun 2026',
-		status: 'CASHED_OUT',
-		reward: 5000,
-	},
-	{
-		id: '9',
-		name: 'Kemi Adebayo',
-		username: '@kemi_ade',
-		date: '20 Jun 2026',
-		status: 'CASHED_OUT',
-		reward: 5000,
-	},
-	{
-		id: '10',
-		name: 'Samuel Okon',
-		username: '@sammie_ok',
-		date: '18 Jun 2026',
-		status: 'PENDING',
-		reward: 5000,
-	},
-	{
-		id: '11',
-		name: 'Blessing Udoh',
-		username: '@blessing_u',
-		date: '15 Jun 2026',
-		status: 'CASHED_OUT',
-		reward: 5000,
-	},
-	{
-		id: '12',
-		name: 'Ibrahim Sani',
-		username: '@ibrahim_s',
-		date: '12 Jun 2026',
-		status: 'AVAILABLE',
-		reward: 5000,
-	},
-];
-*/
 
 function formatNaira(amount: number): string {
 	return `₦${amount.toLocaleString('en-NG', {
@@ -152,11 +44,9 @@ function formatNaira(amount: number): string {
 	})}`;
 }
 
-export default function ReferralClient({
-	username,
-	initialData,
-}: ReferralClientProps) {
-	const displayUsername = username || initialData?.code || 'alex_connect';
+export default function ReferralClient({ username, summary }: ReferralClientProps) {
+	const router = useRouter();
+	const displayUsername = username || 'alex_connect';
 	const referralCode = displayUsername.replace(/^@/, '');
 	const baseUrl =
 		process.env.NEXT_PUBLIC_URL ||
@@ -165,22 +55,16 @@ export default function ReferralClient({
 
 	const [copiedCode, setCopiedCode] = useState(false);
 	const [copiedLink, setCopiedLink] = useState(false);
-	/* Commented out referrals table for the mean time
-	const [searchQuery, setSearchQuery] = useState('');
-	const [statusFilter, setStatusFilter] = useState<
-		'ALL' | 'AVAILABLE' | 'PENDING' | 'CASHED_OUT'
-	>('ALL');
-	*/
 
-	// Earnings state initialized from API response or fallback dummy
-	const [earnings, setEarnings] = useState({
-		pending: initialData?.earnings?.pending ?? 15000,
-		available: initialData?.earnings?.available ?? 45000,
-		cashedOut: initialData?.earnings?.cashedOut ?? 65000,
-	});
+	const [earnings, setEarnings] = useState(
+		summary?.earnings ?? { pending: 0, available: 0, cashedOut: 0 },
+	);
+	const totalReferredCount = summary?.referralCount ?? 0;
 
 	const [isCashOutOpen, setIsCashOutOpen] = useState(false);
 	const [isCashingOut, setIsCashingOut] = useState(false);
+	const [isApplyOpen, setIsApplyOpen] = useState(false);
+	const [isApplying, setIsApplying] = useState(false);
 
 	const totalEarnings =
 		earnings.pending + earnings.available + earnings.cashedOut;
@@ -223,44 +107,61 @@ export default function ReferralClient({
 		}
 	};
 
-	const handleConfirmCashOut = () => {
+	const handleConfirmCashOut = async () => {
 		if (earnings.available <= 0) {
 			toast.error('No available balance to cash out.');
 			return;
 		}
 
 		setIsCashingOut(true);
-		setTimeout(() => {
-			const cashedAmount = earnings.available;
+		try {
+			const res = await fetch('/api/referral/cash-out', { method: 'POST' });
+			const result = await res.json();
+
+			if (!result.success) {
+				toast.error(result.message || 'Cash out failed. Please try again.');
+				return;
+			}
+
+			const cashedAmount = result.data?.amount ?? earnings.available;
 			setEarnings((prev) => ({
 				...prev,
 				available: 0,
 				cashedOut: prev.cashedOut + cashedAmount,
 			}));
-			setIsCashingOut(false);
 			setIsCashOutOpen(false);
 			toast.success(
 				`Successfully cashed out ${formatNaira(cashedAmount)} to your wallet!`,
 			);
-		}, 1200);
+			router.refresh();
+		} catch {
+			toast.error('Network error. Please try again.');
+		} finally {
+			setIsCashingOut(false);
+		}
 	};
 
-	/* Commented out referrals table for the mean time
-	const filteredUsers = useMemo(() => {
-		return DUMMY_REFERRED_USERS.filter((user) => {
-			const matchesSearch =
-				user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				user.username.toLowerCase().includes(searchQuery.toLowerCase());
+	const handleApplyBusinessReferrer = async () => {
+		setIsApplying(true);
+		try {
+			const res = await fetch('/api/referral/business/apply', {
+				method: 'POST',
+			});
+			const result = await res.json();
 
-			const matchesStatus =
-				statusFilter === 'ALL' || user.status === statusFilter;
+			if (!result.success) {
+				toast.error(result.message || 'Could not submit application.');
+				return;
+			}
 
-			return matchesSearch && matchesStatus;
-		});
-	}, [searchQuery, statusFilter]);
-
-	const totalReferredCount = initialData?.referralCount ?? 24;
-	*/
+			toast.success(result.message || 'Application submitted!');
+			setIsApplyOpen(false);
+		} catch {
+			toast.error('Network error. Please try again.');
+		} finally {
+			setIsApplying(false);
+		}
+	};
 
 	return (
 		<div className='max-w-6xl mx-auto space-y-8 pb-12'>
@@ -449,8 +350,7 @@ export default function ReferralClient({
 				</div>
 			</div>
 
-			{/* Referred Users Section (commented out for the mean time) */}
-			{/*
+			{/* Referred Users Section */}
 			<div className='rounded-3xl border border-white/10 bg-neutral-900/80 p-6 space-y-6'>
 				<div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
 					<div>
@@ -472,130 +372,82 @@ export default function ReferralClient({
 						</div>
 					</div>
 
-					{/* Search & Filter Controls - inner comment * /}
-					<div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-3'>
-						{/* Search Input - inner comment * /}
-						<div className='relative'>
-							<Search className='absolute left-3 top-1/2 -translate-y-1/2 size-4 text-neutral-400' />
-							<input
-								type='text'
-								placeholder='Search referred friends...'
-								value={searchQuery}
-								onChange={(e) => setSearchQuery(e.target.value)}
-								className='w-full sm:w-60 h-9 rounded-xl border border-white/10 bg-black/50 pl-9 pr-3 text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:border-white/30 transition'
-							/>
-						</div>
+				</div>
+				<p className='text-sm text-neutral-400'>
+					Every friend who verifies their account and makes a purchase adds to
+					your earnings above. Individual referral activity isn&apos;t broken
+					down per-person yet — check your earnings breakdown for the totals.
+				</p>
+			</div>
 
-						{/* Status Filter Pills - inner comment * /}
-						<div className='flex items-center gap-1.5 overflow-x-auto p-1 rounded-xl bg-black/40 border border-white/5'>
-							{(
-								['ALL', 'AVAILABLE', 'PENDING', 'CASHED_OUT'] as const
-							).map((status) => (
-								<button
-									key={status}
-									type='button'
-									onClick={() => setStatusFilter(status)}
-									className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition ${
-										statusFilter === status
-											? 'bg-neutral-800 text-white shadow-sm'
-											: 'text-neutral-400 hover:text-white'
-									}`}
-								>
-									{status === 'ALL'
-										? 'All'
-										: status === 'AVAILABLE'
-											? 'Available'
-											: status === 'PENDING'
-												? 'Pending'
-												: 'Cashed Out'}
-								</button>
-							))}
+			{/* Business Referrer Section */}
+			<div className='rounded-3xl border border-white/10 bg-neutral-900/80 p-6'>
+				<div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
+					<div className='flex items-center gap-2.5'>
+						<div className='rounded-xl bg-primary/10 p-2.5 text-primary'>
+							<Briefcase className='size-5' />
+						</div>
+						<div>
+							<h3 className='text-lg font-semibold text-white'>
+								Business Referrer
+							</h3>
+							<p className='text-xs text-neutral-400 max-w-md'>
+								Organizations and high-volume promoters can apply for a
+								negotiated per-unit reward rate, subject to admin approval.
+							</p>
 						</div>
 					</div>
-				</div>
-
-				{/* Referred Users Table / List - inner comment * /}
-				<div className='overflow-x-auto'>
-					<table className='w-full border-collapse text-left'>
-						<thead>
-							<tr className='border-b border-white/10 text-xs font-medium text-neutral-400 uppercase tracking-wider'>
-								<th className='py-3 px-4'>User</th>
-								<th className='py-3 px-4'>Date Referred</th>
-								<th className='py-3 px-4'>Status</th>
-								<th className='py-3 px-4 text-right'>Reward</th>
-							</tr>
-						</thead>
-						<tbody className='divide-y divide-white/5 text-sm'>
-							{filteredUsers.length === 0 ? (
-								<tr>
-									<td colSpan={4} className='py-12 text-center text-neutral-500'>
-										No referred users match your search criteria.
-									</td>
-								</tr>
-							) : (
-								filteredUsers.map((user) => (
-									<tr
-										key={user.id}
-										className='hover:bg-white/[0.02] transition-colors'
-									>
-										<td className='py-3.5 px-4'>
-											<div className='flex items-center gap-3'>
-												<div className='h-9 w-9 rounded-full bg-neutral-800 border border-white/10 flex items-center justify-center font-semibold text-xs text-neutral-300'>
-													{user.name
-														.split(' ')
-														.map((n) => n[0])
-														.join('')}
-												</div>
-												<div>
-													<p className='font-medium text-white'>
-														{user.name}
-													</p>
-													<p className='text-xs text-neutral-400'>
-														{user.username}
-													</p>
-												</div>
-											</div>
-										</td>
-										<td className='py-3.5 px-4 text-xs text-neutral-400'>
-											{user.date}
-										</td>
-										<td className='py-3.5 px-4'>
-											<span
-												className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium ${
-													user.status === 'AVAILABLE'
-														? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-														: user.status === 'PENDING'
-															? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-															: 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
-												}`}
-											>
-												<span
-													className={`size-1.5 rounded-full ${
-														user.status === 'AVAILABLE'
-															? 'bg-emerald-400'
-															: user.status === 'PENDING'
-																? 'bg-amber-400'
-																: 'bg-blue-400'
-													}`}
-												/>
-												{user.status === 'AVAILABLE'
-													? 'Available'
-													: user.status === 'PENDING'
-														? 'Pending'
-														: 'Cashed Out'}
-											</span>
-										</td>
-										<td className='py-3.5 px-4 text-right font-medium text-white'>
-											+{formatNaira(user.reward)}
-										</td>
-									</tr>
-								))
-							)}
-						</tbody>
-					</table>
+					<Button
+						variant='secondary'
+						onClick={() => setIsApplyOpen(true)}
+						className='shrink-0'
+					>
+						Apply for Business Referrer status
+					</Button>
 				</div>
 			</div>
-			*/}
+
+			{/* Business Referrer Apply Modal */}
+			<Dialog open={isApplyOpen} onOpenChange={setIsApplyOpen}>
+				<DialogContent className='bg-neutral-900 border border-white/10 text-white max-w-md rounded-2xl'>
+					<DialogHeader>
+						<DialogTitle className='text-xl font-bold flex items-center gap-2'>
+							<Briefcase className='size-5 text-primary' />
+							<span>Apply for Business Referrer Status</span>
+						</DialogTitle>
+						<DialogDescription className='text-neutral-400 text-sm'>
+							Submit an application to become a Business Referrer with a
+							negotiated reward rate. Our team will review it and reach out
+							with next steps.
+						</DialogDescription>
+					</DialogHeader>
+
+					<DialogFooter className='flex items-center justify-end gap-2 sm:gap-2'>
+						<Button
+							variant='ghost'
+							onClick={() => setIsApplyOpen(false)}
+							disabled={isApplying}
+							className='text-neutral-400 hover:text-white'
+						>
+							Cancel
+						</Button>
+						<Button
+							onClick={handleApplyBusinessReferrer}
+							disabled={isApplying}
+							className='font-semibold'
+						>
+							{isApplying ? (
+								<>
+									<Loader2 className='size-4 animate-spin mr-1.5' />
+									<span>Submitting...</span>
+								</>
+							) : (
+								<span>Submit Application</span>
+							)}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 
 			{/* Cash Out Modal */}
 			<Dialog open={isCashOutOpen} onOpenChange={setIsCashOutOpen}>
