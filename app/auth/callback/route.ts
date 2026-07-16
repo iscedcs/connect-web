@@ -91,7 +91,15 @@ export async function GET(req: Request) {
 		}
 	} catch {}
 
-	const absoluteRedirect = new URL(safe, appBase).toString();
+	const targetUrl = new URL(safe, appBase);
+	const callbackReferral =
+		searchParams.get('referralCode') ||
+		searchParams.get('referral') ||
+		searchParams.get('ref');
+	if (callbackReferral && !targetUrl.searchParams.has('referralCode')) {
+		targetUrl.searchParams.set('referralCode', callbackReferral);
+	}
+	const absoluteRedirect = targetUrl.toString();
 
 	const isProduction = process.env.NODE_ENV === 'production';
 	const res = NextResponse.redirect(absoluteRedirect, { status: 302 });

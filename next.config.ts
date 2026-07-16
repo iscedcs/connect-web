@@ -65,6 +65,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "hebbkx1anhila5yf.public.blob.vercel-storage.com",
       },
+      {
+        protocol: "https",
+        hostname: "api.dicebear.com",
+      },
     ],
   },
   async redirects() {
@@ -126,8 +130,8 @@ const nextConfig: NextConfig = {
               "worker-src 'self' blob:",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com data:",
-              "img-src 'self' data: https://cdn.sanity.io https://*.digitaloceanspaces.com https://*.s3.amazonaws.com https://*.amazonaws.com https://i.ytimg.com https://*.blob.vercel-storage.com https://*.gstatic.com https://www.google.com blob:",
-              `connect-src 'self' ${API_DOMAINS} ${WS_DOMAINS} https://*.googleapis.com https://maps.googleapis.com https://open.spotify.com https://*.s3.amazonaws.com https://*.digitaloceanspaces.com https://cdn.sanity.io https://*.blob.vercel-storage.com https://fcm.googleapis.com https://firebaseinstallations.googleapis.com blob:`,
+              "img-src 'self' data: https://cdn.sanity.io https://*.digitaloceanspaces.com https://*.s3.amazonaws.com https://*.amazonaws.com https://i.ytimg.com https://*.blob.vercel-storage.com https://*.gstatic.com https://www.google.com https://api.dicebear.com https://*.dicebear.com blob:",
+              `connect-src 'self' ${API_DOMAINS} ${WS_DOMAINS} https://*.googleapis.com https://maps.googleapis.com https://open.spotify.com https://*.s3.amazonaws.com https://*.digitaloceanspaces.com https://cdn.sanity.io https://*.blob.vercel-storage.com https://fcm.googleapis.com https://firebaseinstallations.googleapis.com https://api.dicebear.com https://*.dicebear.com blob:`,
               "frame-src 'self' https://*.google.com https://*.googleapis.com https://www.youtube.com https://open.spotify.com https://fra1.digitaloceanspaces.com",
               "object-src 'none'",
               "base-uri 'self'",

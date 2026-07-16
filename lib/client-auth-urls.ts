@@ -12,14 +12,34 @@ function buildCallbackUrl(redirectAfterAuth: string): string {
 	return `${appBase}/auth/callback?redirect=${encodeURIComponent(redirectAfterAuth)}`;
 }
 
-export function getSignInUrl(redirectAfterAuth = '/dashboard'): string {
-	const authBase = process.env.NEXT_PUBLIC_AUTH_WEB_URL || '';
-	const callback = buildCallbackUrl(redirectAfterAuth);
+export function getSignInUrl(
+	redirectAfterAuth = '/dashboard',
+	referralCode?: string,
+): string {
+	const authBase =
+		process.env.NEXT_PUBLIC_AUTH_WEB_URL || 'https://test-auth.isce.app';
+	const redirectTarget = referralCode
+		? `${redirectAfterAuth}${redirectAfterAuth.includes('?') ? '&' : '?'}referralCode=${encodeURIComponent(referralCode)}`
+		: redirectAfterAuth;
+	const callback = buildCallbackUrl(redirectTarget);
+	if (referralCode) {
+		return `${authBase}/sign-in?referralCode=${encodeURIComponent(referralCode)}&redirect_uri=${encodeURIComponent(callback)}&prompt=login`;
+	}
 	return `${authBase}/sign-in?redirect_uri=${encodeURIComponent(callback)}&prompt=login`;
 }
 
-export function getSignUpUrl(redirectAfterAuth = '/dashboard'): string {
-	const authBase = process.env.NEXT_PUBLIC_AUTH_WEB_URL || '';
-	const callback = buildCallbackUrl(redirectAfterAuth);
+export function getSignUpUrl(
+	redirectAfterAuth = '/dashboard',
+	referralCode?: string,
+): string {
+	const authBase =
+		process.env.NEXT_PUBLIC_AUTH_WEB_URL || 'https://test-auth.isce.app';
+	const redirectTarget = referralCode
+		? `${redirectAfterAuth}${redirectAfterAuth.includes('?') ? '&' : '?'}referralCode=${encodeURIComponent(referralCode)}`
+		: redirectAfterAuth;
+	const callback = buildCallbackUrl(redirectTarget);
+	if (referralCode) {
+		return `${authBase}/sign-up?referralCode=${encodeURIComponent(referralCode)}&redirect_uri=${encodeURIComponent(callback)}&prompt=login`;
+	}
 	return `${authBase}/sign-up?redirect_uri=${encodeURIComponent(callback)}&prompt=login`;
 }

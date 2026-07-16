@@ -7,11 +7,11 @@ import {
 	Share2,
 	Wallet,
 	Gift,
-	Users,
+	/* Users, */
 	Clock,
 	CheckCircle2,
 	DollarSign,
-	Search,
+	/* Search, */
 	Sparkles,
 	ArrowUpRight,
 	ExternalLink,
@@ -28,10 +28,14 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog';
 
+import { ReferralData } from '@/lib/services/referral';
+
 interface ReferralClientProps {
 	username?: string | null;
+	initialData?: ReferralData | null;
 }
 
+/* Commented out referrals table for the mean time
 interface ReferredUser {
 	id: string;
 	name: string;
@@ -139,6 +143,7 @@ const DUMMY_REFERRED_USERS: ReferredUser[] = [
 		reward: 5000,
 	},
 ];
+*/
 
 function formatNaira(amount: number): string {
 	return `₦${amount.toLocaleString('en-NG', {
@@ -147,8 +152,11 @@ function formatNaira(amount: number): string {
 	})}`;
 }
 
-export default function ReferralClient({ username }: ReferralClientProps) {
-	const displayUsername = username || 'alex_connect';
+export default function ReferralClient({
+	username,
+	initialData,
+}: ReferralClientProps) {
+	const displayUsername = initialData?.code || username || 'alex_connect';
 	const referralCode = displayUsername.replace(/^@/, '');
 	const baseUrl =
 		process.env.NEXT_PUBLIC_URL ||
@@ -157,16 +165,18 @@ export default function ReferralClient({ username }: ReferralClientProps) {
 
 	const [copiedCode, setCopiedCode] = useState(false);
 	const [copiedLink, setCopiedLink] = useState(false);
+	/* Commented out referrals table for the mean time
 	const [searchQuery, setSearchQuery] = useState('');
 	const [statusFilter, setStatusFilter] = useState<
 		'ALL' | 'AVAILABLE' | 'PENDING' | 'CASHED_OUT'
 	>('ALL');
+	*/
 
-	// Dummy Earnings state (interactive so cashing out updates balance)
+	// Earnings state initialized from API response or fallback dummy
 	const [earnings, setEarnings] = useState({
-		pending: 15000,
-		available: 45000,
-		cashedOut: 65000,
+		pending: initialData?.earnings?.pending ?? 15000,
+		available: initialData?.earnings?.available ?? 45000,
+		cashedOut: initialData?.earnings?.cashedOut ?? 65000,
 	});
 
 	const [isCashOutOpen, setIsCashOutOpen] = useState(false);
@@ -235,6 +245,7 @@ export default function ReferralClient({ username }: ReferralClientProps) {
 		}, 1200);
 	};
 
+	/* Commented out referrals table for the mean time
 	const filteredUsers = useMemo(() => {
 		return DUMMY_REFERRED_USERS.filter((user) => {
 			const matchesSearch =
@@ -248,7 +259,8 @@ export default function ReferralClient({ username }: ReferralClientProps) {
 		});
 	}, [searchQuery, statusFilter]);
 
-	const totalReferredCount = 24; // Dummy overall count
+	const totalReferredCount = initialData?.referralCount ?? 24;
+	*/
 
 	return (
 		<div className='max-w-6xl mx-auto space-y-8 pb-12'>
@@ -437,7 +449,8 @@ export default function ReferralClient({ username }: ReferralClientProps) {
 				</div>
 			</div>
 
-			{/* Referred Users Section */}
+			{/* Referred Users Section (commented out for the mean time) */}
+			{/*
 			<div className='rounded-3xl border border-white/10 bg-neutral-900/80 p-6 space-y-6'>
 				<div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
 					<div>
@@ -459,9 +472,9 @@ export default function ReferralClient({ username }: ReferralClientProps) {
 						</div>
 					</div>
 
-					{/* Search & Filter Controls */}
+					{/* Search & Filter Controls - inner comment * /}
 					<div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-3'>
-						{/* Search Input */}
+						{/* Search Input - inner comment * /}
 						<div className='relative'>
 							<Search className='absolute left-3 top-1/2 -translate-y-1/2 size-4 text-neutral-400' />
 							<input
@@ -473,7 +486,7 @@ export default function ReferralClient({ username }: ReferralClientProps) {
 							/>
 						</div>
 
-						{/* Status Filter Pills */}
+						{/* Status Filter Pills - inner comment * /}
 						<div className='flex items-center gap-1.5 overflow-x-auto p-1 rounded-xl bg-black/40 border border-white/5'>
 							{(
 								['ALL', 'AVAILABLE', 'PENDING', 'CASHED_OUT'] as const
@@ -501,7 +514,7 @@ export default function ReferralClient({ username }: ReferralClientProps) {
 					</div>
 				</div>
 
-				{/* Referred Users Table / List */}
+				{/* Referred Users Table / List - inner comment * /}
 				<div className='overflow-x-auto'>
 					<table className='w-full border-collapse text-left'>
 						<thead>
@@ -582,6 +595,7 @@ export default function ReferralClient({ username }: ReferralClientProps) {
 					</table>
 				</div>
 			</div>
+			*/}
 
 			{/* Cash Out Modal */}
 			<Dialog open={isCashOutOpen} onOpenChange={setIsCashOutOpen}>

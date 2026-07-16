@@ -37,6 +37,89 @@ export async function proxy(req: NextRequest) {
 		return response;
 	}
 
+	// Prevent logged-in users from accessing the /r folder (referral invites)
+	if (pathname === '/r' || pathname.startsWith('/r/')) {
+		const token = req.cookies.get('accessToken')?.value;
+		const refreshToken = req.cookies.get('refreshToken')?.value;
+
+		if (token) {
+			const { valid, payload } = await verifyToken(token);
+			if (valid && payload) {
+				authLogger.log(
+					'PROXY',
+					`Logged-in user ${(payload as any)?.id || 'unknown'} accessing ${pathname} — redirecting to dashboard`,
+				);
+				const response = NextResponse.redirect(
+					new URL('/dashboard', req.nextUrl),
+				);
+				setCsrfCookie(response, req.cookies.get('csrf_token')?.value);
+				return response;
+			}
+		}
+
+		if (refreshToken) {
+			try {
+				const authApiBase =
+					process.env.AUTH_API_URL ||
+					process.env.NEXT_PUBLIC_AUTH_API_URL;
+				const refreshRes = await fetch(`${authApiBase}/auth/refresh`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ refreshToken }),
+				});
+
+				if (refreshRes.ok) {
+					authLogger.log(
+						'PROXY',
+						`Token refresh successful on ${pathname} — redirecting to dashboard`,
+					);
+					const data = await refreshRes.json();
+					const isProduction = process.env.NODE_ENV === 'production';
+
+					let accessMaxAge = 60 * 60;
+					try {
+						const payload = JSON.parse(
+							atob(data.accessToken.split('.')[1]),
+						);
+						if (payload?.exp) {
+							const nowSec = Math.floor(Date.now() / 1000);
+							accessMaxAge = Math.max(payload.exp - nowSec, 0);
+						}
+					} catch {}
+
+					const response = NextResponse.redirect(
+						new URL('/dashboard', req.nextUrl),
+					);
+					response.cookies.set('accessToken', data.accessToken, {
+						httpOnly: true,
+						secure: isProduction,
+						sameSite: 'lax',
+						path: '/',
+						maxAge: accessMaxAge,
+					});
+					response.cookies.set('refreshToken', data.refreshToken, {
+						httpOnly: true,
+						secure: isProduction,
+						sameSite: 'lax',
+						path: '/',
+						maxAge: 60 * 60 * 24 * 7,
+					});
+					setCsrfCookie(response, req.cookies.get('csrf_token')?.value);
+					return response;
+				}
+			} catch (error) {
+				authLogger.error(
+					'PROXY',
+					`Token refresh error on ${pathname}: ${error instanceof Error ? error.message : 'unknown'}`,
+				);
+			}
+		}
+
+		const response = NextResponse.next();
+		setCsrfCookie(response, req.cookies.get('csrf_token')?.value);
+		return response;
+	}
+
 	// Only guard protected paths
 	if (!isProtectedPath(pathname)) {
 		const response = NextResponse.next();
