@@ -22,6 +22,7 @@ import { fetchPublicUserEvent } from "@/lib/services/events";
 import { getConnectProfile } from "@/lib/services/profile";
 import { fetchNotificationStats } from "@/lib/services/notification";
 import { getReferralMe } from "@/lib/services/referral";
+import { getAuthUserProfile } from "@/lib/services/wallet";
 import { generateMetadata } from "@/lib/metadata";
 import WalletCard from "@/components/pages/cardholder/home/contact-wallet";
 import Link from "next/link";
@@ -73,6 +74,7 @@ export default async function DashboardPage({
 		cardStats,
 		contactStats,
 		referralData,
+		userProfile,
 	] = await Promise.all([
 		userId && accessToken ?
 			getUserDevices(userId, accessToken).catch(() => [] as DeviceInterface[])
@@ -96,6 +98,9 @@ export default async function DashboardPage({
 		:	Promise.resolve(null),
 		accessToken ?
 			getReferralMe(accessToken).catch(() => null)
+		:	Promise.resolve(null),
+		accessToken ?
+			getAuthUserProfile(accessToken).catch(() => null)
 		:	Promise.resolve(null),
 	]);
 
@@ -227,6 +232,7 @@ export default async function DashboardPage({
 								/>
 							:	<DevicesCard compact />}
 							<ReferralCard
+								username={userProfile?.username}
 								slug={connectProfile?.slug}
 								code={referralData?.code}
 							/>

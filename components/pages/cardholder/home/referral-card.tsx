@@ -17,7 +17,7 @@ export default function ReferralCard({
 	slug,
 	code,
 }: ReferralCardProps) {
-	const referralCode = (code || username || slug || 'alex_connect').replace(
+	const referralCode = (username || code || slug || 'alex_connect').replace(
 		/^@/,
 		'',
 	);

@@ -156,7 +156,7 @@ export default function ReferralClient({
 	username,
 	initialData,
 }: ReferralClientProps) {
-	const displayUsername = initialData?.code || username || 'alex_connect';
+	const displayUsername = username || initialData?.code || 'alex_connect';
 	const referralCode = displayUsername.replace(/^@/, '');
 	const baseUrl =
 		process.env.NEXT_PUBLIC_URL ||
