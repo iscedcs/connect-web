@@ -21,7 +21,7 @@ import { getUserDevices } from "@/lib/services/device";
 import { fetchPublicUserEvent } from "@/lib/services/events";
 import { getConnectProfile } from "@/lib/services/profile";
 import { fetchNotificationStats } from "@/lib/services/notification";
-import { getReferralMe } from "@/lib/services/referral";
+import { getReferralSummary } from "@/lib/services/referral";
 import { getAuthUserProfile } from "@/lib/services/wallet";
 import { generateMetadata } from "@/lib/metadata";
 import WalletCard from "@/components/pages/cardholder/home/contact-wallet";
@@ -97,7 +97,7 @@ export default async function DashboardPage({
 			)
 		:	Promise.resolve(null),
 		accessToken ?
-			getReferralMe(accessToken).catch(() => null)
+			getReferralSummary(accessToken).catch(() => null)
 		:	Promise.resolve(null),
 		accessToken ?
 			getAuthUserProfile(accessToken).catch(() => null)
