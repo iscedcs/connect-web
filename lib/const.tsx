@@ -370,6 +370,12 @@ export const URLS = {
     categories: "/api/directory/categories",
   },
 
+  referral: {
+    me: "/api/referral/me",
+    business_apply: "/api/referral/business/apply",
+    cash_out_request: "/api/referral/cash-out",
+  },
+
   //BUSINESS ENDPOINTS
   organization: {
     create: "/api/cp/organizations",

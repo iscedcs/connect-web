@@ -21,12 +21,15 @@ import { getUserDevices } from "@/lib/services/device";
 import { fetchPublicUserEvent } from "@/lib/services/events";
 import { getConnectProfile } from "@/lib/services/profile";
 import { fetchNotificationStats } from "@/lib/services/notification";
+import { getReferralSummary } from "@/lib/services/referral";
+import { getAuthUserProfile } from "@/lib/services/wallet";
 import { generateMetadata } from "@/lib/metadata";
 import WalletCard from "@/components/pages/cardholder/home/contact-wallet";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import ReferralCard from "@/components/pages/cardholder/home/referral-card";
+import ReferralStoreCard from "@/components/pages/cardholder/home/referral-store-card";
 
 export const metadata = generateMetadata({
 	title: "Dashboard",
@@ -35,7 +38,21 @@ export const metadata = generateMetadata({
 	keywords: ["dashboard", "connect", "devices", "profile"],
 });
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+	searchParams,
+}: {
+	searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+	const resolvedSearchParams = searchParams ? await searchParams : {};
+	const referralCodeParam =
+		typeof resolvedSearchParams?.referralCode === "string"
+			? resolvedSearchParams.referralCode
+			: typeof resolvedSearchParams?.ref === "string"
+			? resolvedSearchParams.ref
+			: typeof resolvedSearchParams?.referral === "string"
+			? resolvedSearchParams.referral
+			: null;
+
 	// Stage 1: Auth + profile (must resolve first — everything else depends on these)
 	const [connectProfile, authInfo] = await Promise.all([
 		getConnectProfile(),
@@ -56,9 +73,11 @@ export default async function DashboardPage() {
 		connectModules,
 		cardStats,
 		contactStats,
+		referralData,
+		userProfile,
 	] = await Promise.all([
 		userId && accessToken ?
-			getUserDevices(userId, accessToken)
+			getUserDevices(userId, accessToken).catch(() => [] as DeviceInterface[])
 		:	Promise.resolve([] as DeviceInterface[]),
 		userId ? fetchPublicUserEvent(userId) : Promise.resolve([]),
 		profileId ? getMyArtisanProfile(profileId) : Promise.resolve(null),
@@ -76,6 +95,12 @@ export default async function DashboardPage() {
 			fetchReceivedContactStats({ profileId, accessToken }).catch(
 				() => null,
 			)
+		:	Promise.resolve(null),
+		accessToken ?
+			getReferralSummary(accessToken).catch(() => null)
+		:	Promise.resolve(null),
+		accessToken ?
+			getAuthUserProfile(accessToken).catch(() => null)
 		:	Promise.resolve(null),
 	]);
 
@@ -192,6 +217,7 @@ export default async function DashboardPage() {
 					{/* Feature cards: 1-col mobile → 2-col desktop grid */}
 					<section className="p-4 lg:p-0">
 						<div className="space-y-4 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0 lg:items-start">
+							<ReferralStoreCard referralCode={referralCodeParam} />
 							<ArtisanCard
 								artisanProfile={artisanProfile}
 								profileId={profileId}
@@ -205,7 +231,11 @@ export default async function DashboardPage() {
 									compact
 								/>
 							:	<DevicesCard compact />}
-							<ReferralCard slug={connectProfile?.slug} />
+							<ReferralCard
+								username={userProfile?.username}
+								slug={connectProfile?.slug}
+								code={referralData?.code}
+							/>
 						</div>
 					</section>
 

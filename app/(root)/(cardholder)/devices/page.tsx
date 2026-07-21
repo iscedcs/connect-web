@@ -34,7 +34,7 @@ export default async function DevicesPage() {
 
 	// Fetch devices and bindings + profiles in parallel
 	const [devices, bindingsData, profilesRes] = await Promise.all([
-		getUserDevices(userId!, accessToken),
+		getUserDevices(userId!, accessToken).catch(() => []),
 		getDeviceBindings(accessToken),
 		fetch(`${CONNECT_API}${URLS.multi_profile.all}`, {
 			headers: { authorization: `Bearer ${accessToken}` },

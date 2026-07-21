@@ -75,22 +75,27 @@ export async function removeDevice(deviceId: string, accessToken: string) {
 }
 
 export async function getUserDevices(userId: string, accessToken: string) {
-	const res = await fetch(
-		`${BASE_URLS.AUTH_API}${URLS.device.user.replace('{userId}', userId)}`,
-		{
-			headers: {
-				accept: 'application/json',
-				authorization: `Bearer ${accessToken}`,
+	try {
+		const res = await fetch(
+			`${BASE_URLS.AUTH_API}${URLS.device.user.replace('{userId}', userId)}`,
+			{
+				headers: {
+					accept: 'application/json',
+					authorization: `Bearer ${accessToken}`,
+				},
+				cache: 'no-store',
 			},
-			cache: 'no-store',
-		},
-	);
+		);
 
-	if (!res.ok) {
-		if (res.status === 404) return [];
-		throw new Error('Failed to load user devices');
+		if (!res.ok) {
+			console.error(`[getUserDevices] non-OK status: ${res.status}`);
+			return [];
+		}
+
+		const json = await res.json();
+		return json?.data ?? json ?? [];
+	} catch (error) {
+		console.error('[getUserDevices] fetch error:', error);
+		return [];
 	}
-
-	const json = await res.json();
-	return json?.data ?? json ?? [];
 }

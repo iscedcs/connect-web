@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { getSignInUrl, getSignUpUrl } from "@/lib/client-auth-urls";
 
 interface ReferralInviteClientProps {
 	slug: string;
@@ -78,7 +79,7 @@ export default function ReferralInviteClient({
 						</span>
 					</Link>
 
-					<Link href={`/auth/login?ref=${cleanUsername}`}>
+					<a href={getSignInUrl('/dashboard', cleanUsername)}>
 						<Button
 							size="sm"
 							variant="secondary"
@@ -86,7 +87,7 @@ export default function ReferralInviteClient({
 						>
 							Sign In
 						</Button>
-					</Link>
+					</a>
 				</div>
 			</header>
 
@@ -162,15 +163,15 @@ export default function ReferralInviteClient({
 
 					{/* Main CTAs */}
 					<div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-						<Link
-							href={`/card/connect?ref=${cleanUsername}`}
+						<a
+							href={getSignUpUrl('/dashboard', cleanUsername)}
 							className="w-full sm:w-auto"
 						>
 							<Button className="w-full sm:w-auto h-12 px-8 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm shadow-xl shadow-primary/25 gap-2">
 								<span>Accept Invite & Sign Up</span>
 								<ArrowRight className="size-4" />
 							</Button>
-						</Link>
+						</a>
 						<Link href="/" className="w-full sm:w-auto">
 							<Button
 								variant="outline"
