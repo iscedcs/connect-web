@@ -21,6 +21,7 @@ export const ICONS: Record<string, string> = {
 	whatsapp: "/svgs/icons8-whatsapp.svg",
 	xing: "/svgs/icons8-xing.svg",
 	youtube: "/svgs/icons8-youtube.svg",
+	twitter: "/assets/socials/prime_twitter.svg",
 
 	// App-specific icons from /assets
 	spotify: "/assets/logos_spotify-icon.svg",
