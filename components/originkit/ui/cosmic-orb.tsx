@@ -44,7 +44,7 @@ interface OrbProps {
 }
 
 function toRGB(color: string): [number, number, number] {
-    const value = (color ?? "").trim();
+    const value = (color ?? "").trim(); 
     if (value.startsWith("#")) {
         let hex = value.slice(1);
         if (hex.length === 3)
