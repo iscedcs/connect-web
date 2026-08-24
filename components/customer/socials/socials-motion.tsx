@@ -1,23 +1,20 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { getFaviconFromUrl } from "@/lib/connect-links/get-favicon";
-import { InlineRenderer } from "@/components/customer/inline-renderers/inline-renderer";
 
 export default function SocialsMotion({ socials }: { socials: any[] }) {
-  const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
 
   return (
     <>
       {/* ICON GRID */}
       <div className="grid grid-cols-4 gap-5">
         {socials.map((item) => (
-          <motion.button
+          <motion.a
             key={item.id}
-            onClick={() =>
-              setExpandedItemId(expandedItemId === item.id ? null : item.id)
-            }
+            href={item.url}
+            target="_blank"
+            rel="noopener noreferrer"
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.95 }}
             initial={{ opacity: 0, y: 6 }}
@@ -31,20 +28,9 @@ export default function SocialsMotion({ socials }: { socials: any[] }) {
                 className="w-8 h-8 object-contain"
               />
             </div>
-          </motion.button>
+          </motion.a>
         ))}
       </div>
-
-      {/* INLINE PREVIEW */}
-      {expandedItemId && (
-        <div className="mt-6">
-          {socials
-            .filter((item) => item.id === expandedItemId)
-            .map((item) => (
-              <InlineRenderer key={item.id} item={item} />
-            ))}
-        </div>
-      )}
     </>
   );
 }
