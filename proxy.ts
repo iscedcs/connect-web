@@ -159,10 +159,29 @@ export async function proxy(req: NextRequest) {
 	if (token) {
 		const { valid, payload } = await verifyToken(token);
 		if (valid && payload) {
+			const userType = (payload as any)?.userType;
 			authLogger.log(
 				'PROXY',
-				`Access token valid for user ${(payload as any)?.id || 'unknown'}`,
+				`Access token valid for user ${(payload as any)?.id || 'unknown'} (type: ${userType || 'INDIVIDUAL'})`,
 			);
+
+			// Route protection by account type:
+			// Business users are restricted to Connect Plus (/cp/*)
+			if (userType === 'BUSINESS_USER' && !pathname.startsWith('/cp')) {
+				authLogger.log('PROXY', `Business user accessing ${pathname} -> redirecting to /cp/org`);
+				const response = NextResponse.redirect(new URL('/cp/org', req.nextUrl));
+				setCsrfCookie(response, req.cookies.get('csrf_token')?.value);
+				return response;
+			}
+
+			// Non-business users cannot access protected Connect Plus routes
+			if (userType !== 'BUSINESS_USER' && pathname.startsWith('/cp') && !pathname.startsWith('/cp/public')) {
+				authLogger.log('PROXY', `Non-business user accessing ${pathname} -> redirecting to /dashboard`);
+				const response = NextResponse.redirect(new URL('/dashboard', req.nextUrl));
+				setCsrfCookie(response, req.cookies.get('csrf_token')?.value);
+				return response;
+			}
+
 			const response = NextResponse.next();
 			setCsrfCookie(response, req.cookies.get('csrf_token')?.value);
 			return response;

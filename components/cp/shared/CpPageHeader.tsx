@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils'
 
 interface CpPageHeaderProps {
   title: string
+  subtitle?: string
+  description?: string
   backHref?: string
   rightAction?: React.ReactNode
   className?: string
@@ -13,37 +15,40 @@ interface CpPageHeaderProps {
 
 export function CpPageHeader({
   title,
+  subtitle,
+  description,
   backHref,
   rightAction,
   className,
 }: CpPageHeaderProps) {
   const router = useRouter()
+  const subText = subtitle || description
 
   return (
-    <header
-      className={cn(
-        'flex items-center gap-3 px-4 lg:hidden',
-        'sticky top-0 z-20',
-        className,
-      )}
-      style={{
-        height: 56,
-        background: 'var(--cp-bg)',
-        borderBottom: '1px solid var(--cp-border)',
-      }}
-    >
-      {backHref && (
-        <button
-          onClick={() => (backHref ? router.push(backHref) : router.back())}
-          className="p-1.5 -ml-1 rounded-lg hover:bg-[var(--cp-surface-2)] text-[var(--cp-text-2)]"
-        >
-          <ArrowLeft size={20} />
-        </button>
-      )}
-      <h1 className="flex-1 text-base font-semibold text-[var(--cp-text-1)] truncate">
-        {title}
-      </h1>
-      {rightAction && <div className="flex-shrink-0">{rightAction}</div>}
+    <header className={cn('space-y-1', className)}>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          {backHref && (
+            <button
+              onClick={() => (backHref ? router.push(backHref) : router.back())}
+              className="p-1.5 -ml-1 rounded-lg hover:bg-[var(--cp-surface-2,#1A1A1A)] text-[var(--cp-text-2,#888)]"
+            >
+              <ArrowLeft size={20} />
+            </button>
+          )}
+          <div>
+            <h1 className="text-xl lg:text-2xl font-bold text-[var(--cp-text-1,#FFF)] tracking-tight">
+              {title}
+            </h1>
+            {subText && (
+              <p className="text-xs text-[var(--cp-text-2,#888888)] mt-0.5 font-normal">
+                {subText}
+              </p>
+            )}
+          </div>
+        </div>
+        {rightAction && <div className="flex-shrink-0">{rightAction}</div>}
+      </div>
     </header>
   )
 }

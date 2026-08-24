@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { fadeInUp, staggerContainer, fadeIn } from '@/lib/animations';
+import { motion } from "framer-motion";
+import { fadeInUp, staggerContainer, fadeIn } from "@/lib/animations";
 import { ArrowRight, ChevronDown, Sparkles } from "lucide-react";
 import { getSignUpUrl } from "@/lib/client-auth-urls";
 
@@ -36,18 +36,15 @@ export function Hero() {
         variants={staggerContainer}
         initial="hidden"
         animate="visible"
-        className="relative z-10 text-center max-w-5xl mx-auto"
-      >
+        className="relative z-10 text-center max-w-5xl mx-auto">
         {/* Badge */}
-        <motion.div variants={fadeInUp} className="mb-6 md:mb-8">
+        <motion.div variants={fadeInUp} className="mb-6 md:mb-8 lg:pt-28 pt-16">
           <span
             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs md:text-sm text-[#A5B8FF]"
             style={{
               border: "1px solid rgba(123,147,255,0.25)",
               background: "rgba(123,147,255,0.06)",
-            }}
-          >
-            <Sparkles size={12} className="text-[#7B93FF]" />
+            }}>
             ISCE Ecosystem · Digital Identity Platform
           </span>
         </motion.div>
@@ -56,8 +53,7 @@ export function Hero() {
         <motion.h1
           variants={fadeInUp}
           className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[1.05] text-balance"
-          style={{ fontFamily: "var(--font-syne), sans-serif" }}
-        >
+          style={{ fontFamily: "var(--font-syne), sans-serif" }}>
           <span className="text-white">Your Identity.</span>
           <br />
           <span
@@ -67,8 +63,7 @@ export function Hero() {
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
-            }}
-          >
+            }}>
             One Tap. One Scan.
           </span>
         </motion.h1>
@@ -76,8 +71,7 @@ export function Hero() {
         {/* Subheadline */}
         <motion.p
           variants={fadeInUp}
-          className="mt-5 md:mt-8 text-base md:text-lg lg:text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed text-pretty"
-        >
+          className="mt-5 md:mt-8 text-base md:text-lg lg:text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed text-pretty">
           Connect replaces paper business cards with a powerful digital profile.
           Share via NFC smart devices, QR codes, or a simple link — no app
           needed on their end.
@@ -86,15 +80,13 @@ export function Hero() {
         {/* CTA Buttons */}
         <motion.div
           variants={fadeInUp}
-          className="mt-8 md:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4"
-        >
+          className="mt-8 md:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
           <a
             href={getSignUpUrl()}
             className="group relative w-full sm:w-auto inline-flex items-center justify-center gap-2 text-[#030014] px-7 py-3.5 rounded-xl text-sm md:text-base font-semibold overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(123,147,255,0.4)]"
             style={{
               background: "linear-gradient(135deg, #7B93FF 0%, #A5B8FF 100%)",
-            }}
-          >
+            }}>
             <span className="relative z-10 flex items-center gap-2">
               Create Your Profile Free
               <ArrowRight
@@ -105,8 +97,7 @@ export function Hero() {
           </a>
           <a
             href="#features"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/10 bg-white/[0.03] text-white px-7 py-3.5 rounded-xl text-sm md:text-base font-medium hover:bg-white/[0.07] hover:border-white/20 transition-all duration-200"
-          >
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/10 bg-white/[0.03] text-white px-7 py-3.5 rounded-xl text-sm md:text-base font-medium hover:bg-white/[0.07] hover:border-white/20 transition-all duration-200">
             See How It Works
           </a>
         </motion.div>
@@ -114,8 +105,7 @@ export function Hero() {
         {/* Stats row */}
         <motion.div
           variants={fadeIn}
-          className="mt-16 md:mt-20 flex items-center justify-center gap-0 max-w-xs sm:max-w-lg mx-auto"
-        >
+          className="mt-16 md:mt-20 flex items-center justify-center gap-0 max-w-xs sm:max-w-lg mx-auto">
           {[
             { value: "10K+", label: "Active Users" },
             { value: "50K+", label: "Connections Made" },
@@ -125,8 +115,7 @@ export function Hero() {
               <div className="text-center px-4 sm:px-8 md:px-10">
                 <div
                   className="text-2xl md:text-3xl lg:text-4xl font-black text-white"
-                  style={{ fontFamily: "var(--font-syne), sans-serif" }}
-                >
+                  style={{ fontFamily: "var(--font-syne), sans-serif" }}>
                   {stat.value}
                 </div>
                 <div className="text-xs md:text-sm text-zinc-500 mt-1">
@@ -144,12 +133,10 @@ export function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5, duration: 0.8 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
-      >
+        className="absolute bottom-8 left-1/2 -translate-x-1/2">
         <motion.div
           animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        >
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}>
           <ChevronDown size={20} className="text-zinc-500" />
         </motion.div>
       </motion.div>

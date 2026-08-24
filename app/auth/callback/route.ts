@@ -95,7 +95,7 @@ export async function GET(req: Request) {
     }
   } catch {}
 
-  const targetUrl = new URL(safe, appBase);
+  const targetUrl = new URL(finalRedirect, appBase);
   const callbackReferral =
     searchParams.get("referralCode") ||
     searchParams.get("referral") ||

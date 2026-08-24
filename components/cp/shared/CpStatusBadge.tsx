@@ -1,37 +1,42 @@
 import { cn } from '@/lib/utils'
 
-type Status =
+export type Status =
   | 'ACTIVE' | 'INACTIVE'
-  | 'DRAFT' | 'SENT' | 'PAID' | 'OVERDUE' | 'CANCELLED'
-  | 'PENDING' | 'CONFIRMED' | 'COMPLETED'
+  | 'DRAFT' | 'SENT' | 'PAID' | 'UNPAID' | 'OVERDUE' | 'CANCELLED'
+  | 'PENDING' | 'CONFIRMED' | 'SCHEDULED' | 'COMPLETED'
   | 'SUSPENDED' | 'NEW' | 'CONTACTED' | 'VALIDATED' | 'REJECTED'
-  | 'ON_TIME' | 'LATE' | 'ABSENT' | 'AUTO'
+  | 'ON_TIME' | 'LATE' | 'ABSENT' | 'AUTO' | 'CHECKED_IN' | 'CHECKED_OUT'
   | 'UNASSIGNED' | 'LOST'
+  | (string & {})
 
 const statusConfig: Record<
-  Status,
+  string,
   { label: string; bg: string; text: string }
 > = {
-  ACTIVE:     { label: 'Active',      bg: 'bg-[var(--cp-primary)]/15', text: 'text-[var(--cp-primary)]' },
-  INACTIVE:   { label: 'Inactive',    bg: 'bg-[var(--cp-text-3)]/15',  text: 'text-[var(--cp-text-3)]' },
-  DRAFT:      { label: 'Draft',       bg: 'bg-[var(--cp-text-3)]/15',  text: 'text-[var(--cp-text-3)]' },
+  ACTIVE:     { label: 'Active',      bg: 'bg-[var(--cp-primary,#10B981)]/15', text: 'text-[var(--cp-primary,#10B981)]' },
+  INACTIVE:   { label: 'Inactive',    bg: 'bg-[var(--cp-text-3,#555)]/15',  text: 'text-[var(--cp-text-3,#555)]' },
+  DRAFT:      { label: 'Draft',       bg: 'bg-[var(--cp-text-3,#555)]/15',  text: 'text-[var(--cp-text-3,#555)]' },
   SENT:       { label: 'Sent',        bg: 'bg-blue-500/15',             text: 'text-blue-400' },
-  PAID:       { label: 'Paid',        bg: 'bg-[var(--cp-primary)]/15', text: 'text-[var(--cp-primary)]' },
-  OVERDUE:    { label: 'Overdue',     bg: 'bg-[var(--cp-accent)]/15',  text: 'text-[var(--cp-accent)]' },
-  CANCELLED:  { label: 'Cancelled',   bg: 'bg-[var(--cp-text-3)]/15',  text: 'text-[var(--cp-text-3)]' },
+  PAID:       { label: 'Paid',        bg: 'bg-[var(--cp-primary,#10B981)]/15', text: 'text-[var(--cp-primary,#10B981)]' },
+  UNPAID:     { label: 'Unpaid',      bg: 'bg-amber-500/15',            text: 'text-amber-400' },
+  OVERDUE:    { label: 'Overdue',     bg: 'bg-red-500/15',              text: 'text-red-400' },
+  CANCELLED:  { label: 'Cancelled',   bg: 'bg-[var(--cp-text-3,#555)]/15',  text: 'text-[var(--cp-text-3,#555)]' },
   PENDING:    { label: 'Pending',     bg: 'bg-amber-500/15',            text: 'text-amber-400' },
-  CONFIRMED:  { label: 'Confirmed',   bg: 'bg-[var(--cp-primary)]/15', text: 'text-[var(--cp-primary)]' },
-  COMPLETED:  { label: 'Completed',   bg: 'bg-[var(--cp-primary)]/15', text: 'text-[var(--cp-primary)]' },
+  CONFIRMED:  { label: 'Confirmed',   bg: 'bg-[var(--cp-primary,#10B981)]/15', text: 'text-[var(--cp-primary,#10B981)]' },
+  SCHEDULED:  { label: 'Scheduled',   bg: 'bg-[var(--cp-primary,#10B981)]/15', text: 'text-[var(--cp-primary,#10B981)]' },
+  COMPLETED:  { label: 'Completed',   bg: 'bg-[var(--cp-primary,#10B981)]/15', text: 'text-[var(--cp-primary,#10B981)]' },
   SUSPENDED:  { label: 'Suspended',   bg: 'bg-red-500/15',              text: 'text-red-400' },
   NEW:        { label: 'New',         bg: 'bg-blue-500/15',             text: 'text-blue-400' },
   CONTACTED:  { label: 'Contacted',   bg: 'bg-amber-500/15',            text: 'text-amber-400' },
-  VALIDATED:  { label: 'Validated',   bg: 'bg-[var(--cp-primary)]/15', text: 'text-[var(--cp-primary)]' },
+  VALIDATED:  { label: 'Validated',   bg: 'bg-[var(--cp-primary,#10B981)]/15', text: 'text-[var(--cp-primary,#10B981)]' },
   REJECTED:   { label: 'Rejected',    bg: 'bg-red-500/15',              text: 'text-red-400' },
-  ON_TIME:    { label: 'On time',     bg: 'bg-[var(--cp-primary)]/15', text: 'text-[var(--cp-primary)]' },
+  ON_TIME:    { label: 'On time',     bg: 'bg-[var(--cp-primary,#10B981)]/15', text: 'text-[var(--cp-primary,#10B981)]' },
+  CHECKED_IN: { label: 'Checked In',  bg: 'bg-[var(--cp-primary,#10B981)]/15', text: 'text-[var(--cp-primary,#10B981)]' },
+  CHECKED_OUT:{ label: 'Checked Out', bg: 'bg-[var(--cp-text-3,#555)]/15',  text: 'text-[var(--cp-text-3,#555)]' },
   LATE:       { label: 'Late',        bg: 'bg-amber-500/15',            text: 'text-amber-400' },
-  ABSENT:     { label: 'Absent',      bg: 'bg-[var(--cp-accent)]/15',  text: 'text-[var(--cp-accent)]' },
-  AUTO:       { label: 'Auto',        bg: 'bg-[var(--cp-text-3)]/15',  text: 'text-[var(--cp-text-3)]' },
-  UNASSIGNED: { label: 'Unassigned',  bg: 'bg-[var(--cp-text-3)]/15',  text: 'text-[var(--cp-text-3)]' },
+  ABSENT:     { label: 'Absent',      bg: 'bg-red-500/15',              text: 'text-red-400' },
+  AUTO:       { label: 'Auto',        bg: 'bg-[var(--cp-text-3,#555)]/15',  text: 'text-[var(--cp-text-3,#555)]' },
+  UNASSIGNED: { label: 'Unassigned',  bg: 'bg-[var(--cp-text-3,#555)]/15',  text: 'text-[var(--cp-text-3,#555)]' },
   LOST:       { label: 'Lost',        bg: 'bg-red-500/15',              text: 'text-red-400' },
 }
 
@@ -43,8 +48,8 @@ interface Props {
 export function CpStatusBadge({ status, className }: Props) {
   const cfg = statusConfig[status] ?? {
     label: status,
-    bg:    'bg-[var(--cp-text-3)]/15',
-    text:  'text-[var(--cp-text-3)]',
+    bg:    'bg-[var(--cp-text-3,#555)]/15',
+    text:  'text-[var(--cp-text-3,#555)]',
   }
 
   return (

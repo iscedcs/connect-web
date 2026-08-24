@@ -466,7 +466,7 @@ export const URLS = {
     reassign: "/api/cp/clients/{clientId}/assign",
     invite: "/api/cp/clients/{clientId}/invite",
   },
-  appoinments: {
+  appointment: {
     my_appointment: "/api/cp/appointments/me",
     create_my_appointment: "/api/cp/appointments/me",
     reschedule_my_appointment: "/api/cp/appointments/me/{id}",
@@ -494,7 +494,7 @@ export const URLS = {
   },
   company: {
     one: "/api/cp/public/{workspaceSlug}",
-    public: "/api/cp/public/{workspaceSlug}/appointments}",
+    public: "/api/cp/public/{workspaceSlug}/appointments",
     save: "/api/cp/public/{workspaceSlug}/contacts/save",
   },
   webhooks: {

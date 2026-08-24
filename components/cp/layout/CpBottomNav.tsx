@@ -28,7 +28,7 @@ const primaryTabs = [
 export function CpBottomNav() {
   const params  = useParams()
   const pathname = usePathname()
-  const slug    = params?.slug as string
+  const slug    = (params?.workspaceSlug || params?.slug) as string
 
   return (
     <nav
