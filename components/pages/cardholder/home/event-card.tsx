@@ -3,6 +3,7 @@
 import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import Orb from "@/components/originkit/ui/cosmic-orb";
 
 interface EventItem {
   id: string;
@@ -93,11 +94,7 @@ function EventRow({ event }: { event: EventItem }) {
 function EmptyEventsCard() {
   return (
     <div className="bg-neutral-900 rounded-3xl p-8 flex flex-col gap-8">
-      <img
-        src="/assets/91d6f749cf29b08243e458824c8229e483783de4.gif"
-        alt="Event Icon"
-        className="w-20 h-20"
-      />
+      <Orb size={80} />
       <div>
         <p className="text-[12px] text-white/60">
           Virtual & Offline bookings available

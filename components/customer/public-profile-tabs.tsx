@@ -188,15 +188,11 @@ export default function PublicProfileTabs({
 
 							<div className='grid grid-cols-4 gap-4'>
 								{socialItems.map((item) => (
-									<button
+									<a
 										key={item.id}
-										onClick={() =>
-											setExpandedItemId(
-												expandedItemId === item.id ?
-													null
-												:	item.id,
-											)
-										}
+										href={item.url}
+										target='_blank'
+										rel='noopener noreferrer'
 										className='flex flex-col items-center justify-center gap-1'
 									>
 										<div className='w-14 h-14 rounded-full bg-black/60 flex items-center justify-center'>
@@ -211,28 +207,13 @@ export default function PublicProfileTabs({
 												alt={item.title}
 												className='w-7 h-7 object-contain'
 											/>
-										</div>
-										<span className='text-2.5 text-white/60 truncate max-w-[60px]'>
+										</div>	
+										<span className='text-[10px] text-white/60 truncate max-w-[60px]'>
 											{item.title}
 										</span>
-									</button>
+									</a>
 								))}
 							</div>
-							{expandedItemId && (
-								<div className='mt-4'>
-									{socialItems
-										.filter(
-											(item) =>
-												item.id === expandedItemId,
-										)
-										.map((item) => (
-											<InlineRenderer
-												key={item.id}
-												item={item}
-											/>
-										))}
-								</div>
-							)}
 						</section>
 					)}
 
