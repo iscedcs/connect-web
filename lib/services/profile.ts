@@ -51,3 +51,35 @@ export async function getConnectProfile(): Promise<ConnectProfile | null> {
 
 	return null;
 }
+
+export async function getAllConnectProfiles(
+	accessToken?: string,
+): Promise<ConnectProfile[] | null> {
+	let token = accessToken;
+	if (!token) {
+		const auth = await getAuthInfo();
+		if ('error' in auth || auth.isExpired) return null;
+		token = auth.accessToken;
+	}
+
+	const base = BASE_URLS.CONNECT_API;
+	if (!base) return null;
+
+	try {
+		const res = await fetch(`${base}${URLS.multi_profile.all}`, {
+			headers: { Authorization: `Bearer ${token}` },
+			cache: 'no-store',
+		});
+		const json = await safeJson(res);
+		if (json?.data?.profiles) {
+			return json.data.profiles;
+		}
+	} catch (error) {
+		if (process.env.NODE_ENV !== 'production') {
+			console.error('[getAllConnectProfiles] failed to fetch profiles', error);
+		}
+	}
+
+	return null;
+}
+
