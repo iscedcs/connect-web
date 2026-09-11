@@ -182,11 +182,12 @@ App-like navigation transitions using CSS view transitions API
 
 When adding a new future UI idea, include:
 
-### Feature Title  
+### Feature Title
+
 [Short Description]  
 [Where it applies: Links/Socials/Meetings/Global]  
 [Priority: low/medium/high]  
-[Requires backend? Yes/No]  
+[Requires backend? Yes/No]
 
 🟩 8. Version Tracking
 
@@ -196,28 +197,17 @@ V3 (Planned) — Motion, glow, parallax, elevation system
 
 V4+ — Reordering, swipe actions, AI suggestions
 
-
-
 V2 For Forms:
 ✅ Add “submissions count” on the card
 ✅ Add swipe actions on mobile (delete / edit / visibility)
 ✅ Add mini form preview on hover
 ✅ Add animations like Videos module
 
-
-
 ✔ Rewrite the wrapper to dynamically read keys
 ✔ Add a reusable module-mapping system
 ✔ Make badges (e.g. “3 files”, “5 socials”)
 ✔ Show icons based on the platform automatically
-✔ Add smooth animation for the filled state    
-
-
-
-
-
-
-
+✔ Add smooth animation for the filled state
 
 // PUBLIC
 ✅ Desktop version
@@ -226,7 +216,6 @@ V2 For Forms:
 ✅ Events & Store tab full UI
 ✅ CTA: send WhatsApp message
 ✅ Smart deep links (Open Spotify app, etc.)
-
 
 ✅ Add CTA for “Add to Contacts (VCF download)”
 ✅ Add analytics tracking (tap count)
