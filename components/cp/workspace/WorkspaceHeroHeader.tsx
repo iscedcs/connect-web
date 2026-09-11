@@ -16,8 +16,10 @@ interface WorkspaceHeroHeaderProps {
   onClientsClick?: () => void
 }
 
+const FALLBACK_COVER = '/cover-image.png'
+
 export function WorkspaceHeroHeader({
-  coverImage = 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=1600&auto=format&fit=crop',
+  coverImage,
   logoImage,
   name,
   location = 'California, United States',
@@ -29,7 +31,13 @@ export function WorkspaceHeroHeader({
   const params = useParams()
   const pathname = usePathname()
   const slug = (params?.workspaceSlug || params?.slug) as string
-  const { workspaceName, workspaceLogo } = useCpWorkspaceStore()
+  const { workspaceName, workspaceLogo, workspaceCover } = useCpWorkspaceStore()
+
+  // Prop wins (page already fetched the profile), then the workspace-wide
+  // branding resolved in the layout, then the bundled placeholder. Remote
+  // hosts other than our own Spaces bucket are blocked by CSP, so the
+  // fallback has to be a local asset.
+  const resolvedCover = coverImage || workspaceCover || FALLBACK_COVER
 
   const tabs = [
     { label: 'Overview', href: `/cp/${slug}/dashboard`, key: 'overview' },
@@ -50,9 +58,14 @@ export function WorkspaceHeroHeader({
       <div className="relative">
         <div className="h-44 sm:h-60 w-full rounded-2xl sm:rounded-3xl overflow-hidden relative border border-[var(--cp-border,#222)] bg-neutral-900">
           <img
-            src={coverImage}
-            alt={workspaceName || 'Store Banner'}
+            src={resolvedCover}
+            alt={name || workspaceName || 'Workspace cover'}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              const img = e.currentTarget
+              if (img.src.endsWith(FALLBACK_COVER)) return
+              img.src = FALLBACK_COVER
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
         </div>

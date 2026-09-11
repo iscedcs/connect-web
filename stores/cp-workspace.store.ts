@@ -11,10 +11,16 @@ export interface CpContext {
   clientId?: string
   workspaceName?: string
   workspaceLogo?: string
+  workspaceCover?: string
 }
 
 interface CpWorkspaceState extends Partial<CpContext> {
   setContext: (ctx: CpContext) => void
+  setBranding: (branding: {
+    workspaceName?: string
+    workspaceLogo?: string
+    workspaceCover?: string
+  }) => void
   clear: () => void
 }
 
@@ -28,7 +34,14 @@ export const useCpWorkspaceStore = create<CpWorkspaceState>((set) => ({
   clientId: undefined,
   workspaceName: undefined,
   workspaceLogo: undefined,
+  workspaceCover: undefined,
   setContext: (ctx) => set({ ...ctx }),
+  setBranding: (branding) =>
+    set((state) => ({
+      workspaceName: branding.workspaceName ?? state.workspaceName,
+      workspaceLogo: branding.workspaceLogo ?? state.workspaceLogo,
+      workspaceCover: branding.workspaceCover ?? state.workspaceCover,
+    })),
   clear: () =>
     set({
       workspaceId: undefined,
@@ -40,5 +53,6 @@ export const useCpWorkspaceStore = create<CpWorkspaceState>((set) => ({
       clientId: undefined,
       workspaceName: undefined,
       workspaceLogo: undefined,
+      workspaceCover: undefined,
     }),
 }))

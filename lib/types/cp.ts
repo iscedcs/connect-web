@@ -274,3 +274,17 @@ export interface CpTalent {
   rating?: number
   avatar?: string
 }
+
+export interface AuditLog {
+  id: string
+  action: string
+  actor: string
+  actorEmail?: string
+  targetResource: string
+  ipAddress?: string
+  createdAt: string
+  status: 'SUCCESS' | 'FAILURE'
+  title?: string
+  description?: string
+  workspaceId?: string
+}

@@ -47,6 +47,9 @@ export default function CompanySettingsPage() {
             ...prev,
             ...rawData,
             name: rawData.name || workspaceName || prev.name || '',
+            logo: rawData.logo || rawData.logoUrl || prev.logo || '',
+            coverImage:
+              rawData.coverImage || rawData.coverPhoto || rawData.bannerImage || prev.coverImage || '',
             description: rawData.description || rawData.aboutText || prev.description || '',
             contactEmail: rawData.contactEmail || prev.contactEmail || '',
             contactPhone: rawData.contactPhone || prev.contactPhone || '',

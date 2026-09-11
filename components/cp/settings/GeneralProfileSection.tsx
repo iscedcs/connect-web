@@ -2,7 +2,7 @@
 
 import { Building, MapPin } from 'lucide-react'
 import type { FullCompanyProfile } from './types'
-import { CompanyLogoUploader } from './CompanyLogoUploader'
+import { CompanyImageUploader } from './CompanyImageUploader'
 
 interface Props {
   profile: FullCompanyProfile
@@ -18,10 +18,19 @@ export function GeneralProfileSection({ profile, setProfile }: Props) {
       </h3>
 
       {/* Logo Uploader Box */}
-      <CompanyLogoUploader
-        logoUrl={profile.logo}
+      <CompanyImageUploader
+        variant="logo"
+        imageUrl={profile.logo}
         onChangeUrl={(url) => setProfile((p) => ({ ...p, logo: url }))}
         folderPrefix="connect-plus-company-logos"
+      />
+
+      {/* Cover Banner Uploader Box */}
+      <CompanyImageUploader
+        variant="cover"
+        imageUrl={profile.coverImage}
+        onChangeUrl={(url) => setProfile((p) => ({ ...p, coverImage: url }))}
+        folderPrefix="connect-plus-company-covers"
       />
 
       <div>

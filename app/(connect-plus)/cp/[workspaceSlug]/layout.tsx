@@ -18,6 +18,7 @@ export default function WorkspaceSlugLayout({
   const slug = params?.workspaceSlug as string
   const [loading, setLoading] = useState(true)
   const setContext = useCpWorkspaceStore((s) => s.setContext)
+  const setBranding = useCpWorkspaceStore((s) => s.setBranding)
 
   useEffect(() => {
     if (!slug) return
@@ -28,8 +29,9 @@ export default function WorkspaceSlugLayout({
     Promise.all([
       cpApi.get<any>(URLS.workspaces.my_workspaces).catch(() => ({ data: [] })),
       cpApi.get<any>(URLS.organization.one).catch(() => ({ data: {} })),
+      cpApi.get<any>(URLS.company_profile.get).catch(() => ({ data: {} })),
     ])
-      .then(([wsRes, orgRes]) => {
+      .then(([wsRes, orgRes, profileRes]) => {
         if (!isMounted) return
 
         const map = new Map<string, CpWorkspace>()
@@ -97,6 +99,25 @@ export default function WorkspaceSlugLayout({
             workspaceLogo: first.logo,
           })
         }
+
+        // Company profile owns the branding the user edits in Settings ->
+        // Company, so it wins over whatever the workspace record carries.
+        const rawProfile =
+          profileRes.data?.data ||
+          profileRes.data?.companyProfile ||
+          profileRes.data?.profile ||
+          profileRes.data
+        if (rawProfile && typeof rawProfile === 'object') {
+          setBranding({
+            workspaceName: rawProfile.name || undefined,
+            workspaceLogo: rawProfile.logo || rawProfile.logoUrl || undefined,
+            workspaceCover:
+              rawProfile.coverImage ||
+              rawProfile.coverPhoto ||
+              rawProfile.bannerImage ||
+              undefined,
+          })
+        }
       })
       .catch((err) => {
         console.error('Failed to resolve workspace context:', err)
@@ -108,7 +129,7 @@ export default function WorkspaceSlugLayout({
     return () => {
       isMounted = false
     }
-  }, [slug, setContext])
+  }, [slug, setContext, setBranding])
 
   if (loading) {
     return (

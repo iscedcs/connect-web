@@ -45,6 +45,7 @@ export interface NotificationPrefs {
 export interface FullCompanyProfile {
   name: string
   logo: string
+  coverImage: string
   description: string
   contactEmail: string
   contactPhone: string
@@ -69,6 +70,7 @@ export const defaultHours: BusinessHour[] = [
 export const emptyProfile: FullCompanyProfile = {
   name: '',
   logo: '',
+  coverImage: '',
   description: '',
   contactEmail: '',
   contactPhone: '',
