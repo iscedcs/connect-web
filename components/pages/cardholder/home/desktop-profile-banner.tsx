@@ -10,20 +10,24 @@ import { BarChart2, MessageSquare, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useNotificationSocket } from "@/hooks/useNotificationSocket";
+import ProfileQuickSwitch from "./profile-quick-switch";
 
 type ConnectProfileShape = {
+  id?: string;
   profilePhoto: string | null;
   coverPhoto: string | null;
   name: string | null;
   position: string | null;
   description: string | null;
   slug?: string | null;
+  is_default?: boolean;
 };
 
 interface DesktopProfileBannerProps {
   connectProfile?: ConnectProfileShape | null;
   user?: UserInfo | null;
   firstName?: string | null;
+  profiles?: ConnectProfileShape[] | null;
   contactData?: {
     primary?: { email?: string; phone_number?: string };
   };
@@ -45,6 +49,7 @@ export default function DesktopProfileBanner({
   user,
   connectProfile,
   firstName,
+  profiles,
   contactData,
   linksData,
   socialsData,
@@ -114,17 +119,32 @@ export default function DesktopProfileBanner({
       {/* Info bar below cover */}
       <div className="bg-[#0a0a0a] px-5 pb-4 flex items-end gap-4">
         {/* Avatar: overlaps cover */}
-        <div className="-mt-7 shrink-0">
-          <Avatar className="w-14 h-14 ring-2 ring-[#0a0a0a] overflow-hidden">
-            <AvatarImage
-              src={avatarUrl}
-              alt={name}
-              className="object-cover w-full h-full"
+        <div className="-mt-7 shrink-0 relative z-20">
+          <div className="relative">
+            <Link
+              href={connectProfile?.id ? `/settings/account/edit/${connectProfile.id}` : "/settings/account"}
+              title="Edit Profile"
+              className="block rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            >
+              <Avatar className="w-14 h-14 ring-2 ring-[#0a0a0a] overflow-hidden hover:opacity-90 transition-opacity">
+                <AvatarImage
+                  src={avatarUrl}
+                  alt={name}
+                  className="object-cover w-full h-full"
+                />
+                <AvatarFallback className="bg-white/10 text-white text-sm font-bold">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+            </Link>
+
+            <ProfileQuickSwitch
+              currentProfileId={connectProfile?.id}
+              profiles={profiles}
+              accessToken={accessToken}
+              triggerSize="sm"
             />
-            <AvatarFallback className="bg-white/10 text-white text-sm font-bold">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
+          </div>
         </div>
 
         {/* Name + role */}
