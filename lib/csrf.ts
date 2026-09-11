@@ -10,6 +10,7 @@ const EXEMPT_PATHS = [
 	'/auth/callback',
 	'/api/auth/refresh',
 	'/api/connect/card-interactions/record',
+	'/api/cp',
 ];
 
 /**

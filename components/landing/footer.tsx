@@ -2,14 +2,44 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import Link from "next/link";
 import { fadeIn } from "@/lib/animations";
 import { Twitter, Linkedin, Instagram } from "lucide-react";
 
-const footerLinks = {
-  Product: ["Features", "Pricing", "Integrations", "API"],
-  Company: ["About ISCE", "Careers", "Blog", "Press"],
-  Resources: ["Documentation", "Help Center", "Community", "Status"],
-  Legal: ["Privacy Policy", "Terms of Service", "Cookie Policy"],
+interface FooterLinkItem {
+  label: string;
+  href: string;
+  external?: boolean;
+}
+
+const footerLinks: Record<string, FooterLinkItem[]> = {
+  Product: [
+    { label: "Features", href: "#features" },
+    { label: "Pricing", href: "#pricing" },
+    { label: "Integrations", href: "#" },
+    { label: "API", href: "#" },
+  ],
+  Company: [
+    { label: "About ISCE", href: "https://isce.tech", external: true },
+    {
+      label: "Careers",
+      href: "https://www.palmtechniq.com/courses",
+      external: true,
+    },
+    { label: "Blog", href: "#" },
+    { label: "Press", href: "#" },
+  ],
+  Resources: [
+    { label: "Documentation", href: "#" },
+    { label: "Help Center", href: "#" },
+    { label: "Community", href: "#" },
+    { label: "Status", href: "#" },
+  ],
+  Legal: [
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Terms of Service", href: "/terms" },
+    { label: "Cookie Policy", href: "/privacy" },
+  ],
 };
 
 const socialLinks = [
@@ -36,8 +66,7 @@ export function Footer() {
       variants={fadeIn}
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
-      className="relative px-5 md:px-10 pt-12 md:pt-16 pb-8"
-    >
+      className="relative px-5 md:px-10 pt-12 md:pt-16 pb-8">
       {/* Gradient top divider */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#7B93FF]/30 to-transparent" />
 
@@ -61,8 +90,7 @@ export function Footer() {
                   background:
                     "linear-gradient(135deg, rgba(123,147,255,0.25), rgba(199,125,255,0.15))",
                   border: "1px solid rgba(123,147,255,0.2)",
-                }}
-              >
+                }}>
                 <div
                   className="w-2.5 h-2.5 rounded-full"
                   style={{
@@ -74,8 +102,7 @@ export function Footer() {
                 className="text-white font-semibold text-base tracking-tight"
                 style={{
                   fontFamily: "var(--font-syne), sans-serif",
-                }}
-              >
+                }}>
                 Connect
               </span>
             </div>
@@ -108,8 +135,7 @@ export function Footer() {
                     e.currentTarget.style.borderColor =
                       "rgba(255,255,255,0.08)";
                     e.currentTarget.style.background = "rgba(255,255,255,0.02)";
-                  }}
-                >
+                  }}>
                   <Icon size={13} />
                 </a>
               ))}
@@ -124,13 +150,14 @@ export function Footer() {
               </h4>
               <ul className="flex flex-col gap-2.5">
                 {links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href="#"
-                      className="text-sm text-zinc-500 hover:text-zinc-200 transition-colors duration-200"
-                    >
-                      {link}
-                    </a>
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      target={link.external ? "_blank" : undefined}
+                      rel={link.external ? "noreferrer" : undefined}
+                      className="text-sm text-zinc-500 hover:text-zinc-200 transition-colors duration-200">
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -162,8 +189,7 @@ export function Footer() {
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
                   fontWeight: 500,
-                }}
-              >
+                }}>
                 ISCE Ecosystem
               </span>
             </span>
