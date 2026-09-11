@@ -3,7 +3,7 @@
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { useEffect, useMemo, useState } from "react";
-import { X } from "lucide-react";
+import { X, CreditCard, Zap, CalendarDays, Wallet, UserCircle } from "lucide-react";
 import Link from "next/link";
 
 interface PromoBannerProps {
@@ -12,7 +12,12 @@ interface PromoBannerProps {
   profileComplete: boolean;
 }
 
-interface ContextualSlide extends Slide {
+interface ContextualSlide {
+  id: number;
+  icon: React.ReactNode;
+  href: string;
+  title: string;
+  subtitle: string;
   showWhen: (ctx: PromoBannerProps) => boolean;
 }
 
@@ -37,7 +42,7 @@ function persistDismissal(id: number) {
 const allSlides: ContextualSlide[] = [
   {
     id: 1,
-    icon: "/assets/rainbow_95231491.svg",
+    icon: <CreditCard className="w-8 h-8 text-blue-500" />,
     href: "https://www.isce.tech/store",
     title: "Request for your contactless device!",
     subtitle: "Make an order request",
@@ -45,7 +50,7 @@ const allSlides: ContextualSlide[] = [
   },
   {
     id: 2,
-    icon: "/assets/rainbow_95231491.svg",
+    icon: <Zap className="w-8 h-8 text-yellow-500" />,
     href: "/connect",
     title: "Activate a new device",
     subtitle: "By scanning or tapping",
@@ -53,7 +58,7 @@ const allSlides: ContextualSlide[] = [
   },
   {
     id: 3,
-    icon: "/assets/rainbow_95231491.svg",
+    icon: <CalendarDays className="w-8 h-8 text-green-500" />,
     href: "https://www.gada.isce.tech",
     title: "Virtual & Offline bookings",
     subtitle: "Host, Attend & Bookmark events",
@@ -61,7 +66,7 @@ const allSlides: ContextualSlide[] = [
   },
   {
     id: 4,
-    icon: "/assets/rainbow_95231491.svg",
+    icon: <Wallet className="w-8 h-8 text-purple-500" />,
     href: "/wallet",
     title: "Contactless Wallet",
     subtitle: "Free & fast transactions",
@@ -69,7 +74,7 @@ const allSlides: ContextualSlide[] = [
   },
   {
     id: 5,
-    icon: "/assets/rainbow_95231491.svg",
+    icon: <UserCircle className="w-8 h-8 text-orange-500" />,
     href: "/profile",
     title: "Complete your profile",
     subtitle: "Add your details to stand out",
@@ -108,17 +113,18 @@ export default function PromoBanner({
   useEffect(() => {
     setCurrentSlide(0);
     instanceRef.current?.update({ loop: visibleSlides.length > 1 });
+    instanceRef.current?.moveToIdx(0, true, { duration: 0 });
   }, [visibleSlides.length, instanceRef]);
 
   useEffect(() => {
-    if (!instanceRef.current || visibleSlides.length <= 1) return;
+    if (visibleSlides.length <= 1) return;
     const interval = setInterval(() => {
-      if (!paused) {
-        instanceRef.current?.next();
+      if (!paused && instanceRef.current) {
+        instanceRef.current.next();
       }
     }, 3000);
     return () => clearInterval(interval);
-  }, [paused, instanceRef, visibleSlides.length]);
+  }, [paused, visibleSlides.length, instanceRef]);
 
   const handleDismiss = (id: number) => {
     persistDismissal(id);
@@ -141,7 +147,7 @@ export default function PromoBanner({
             className="keen-slider__slide bg-neutral-900 p-4 flex items-center gap-3 relative"
           >
             <div className="w-8 h-8 flex items-center justify-center">
-              <img src={slide.icon} alt="" className="w-8 h-8" />
+              {slide.icon}
             </div>
 
             <div className="flex flex-col">

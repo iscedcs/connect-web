@@ -3,15 +3,16 @@
  * @type {string[]}
  */
 export const publicRoutes = [
-  "/",
-  "/customer",
-  "/p",
-  "/r",
-  "/terms",
-  "/privacy",
-  "/support",
-  "/card/connect",
-  "/artisans",
+	'/',
+	'/customer',
+	'/p',
+	'/r',
+	'/terms',
+	'/privacy',
+	'/support',
+	'/card/connect',
+	'/onboarding',
+	'/artisans',
 ];
 
 /**

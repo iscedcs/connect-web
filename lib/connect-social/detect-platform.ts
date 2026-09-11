@@ -42,7 +42,7 @@ const PLATFORM_PATTERNS: Record<string, RegExp> = {
 export const PLATFORM_ICONS: Record<string, string> = {
 	instagram: ICONS.instagram,
 	facebook: ICONS.facebook,
-	twitter: ICONS.facebook, // fallback - add twitter svg later
+	twitter: ICONS.twitter,
 	linkedin: ICONS.linkedin,
 	tiktok: ICONS.tiktok,
 	youtube: ICONS.youtube,

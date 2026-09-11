@@ -37,18 +37,6 @@ export function Hero() {
         initial="hidden"
         animate="visible"
         className="relative z-10 text-center max-w-5xl mx-auto">
-        {/* Badge */}
-        <motion.div variants={fadeInUp} className="mb-6 md:mb-8 lg:pt-28 pt-16">
-          <span
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs md:text-sm text-[#A5B8FF]"
-            style={{
-              border: "1px solid rgba(123,147,255,0.25)",
-              background: "rgba(123,147,255,0.06)",
-            }}>
-            ISCE Ecosystem · Digital Identity Platform
-          </span>
-        </motion.div>
-
         {/* Main headline */}
         <motion.h1
           variants={fadeInUp}
@@ -115,7 +103,9 @@ export function Hero() {
               <div className="text-center px-4 sm:px-8 md:px-10">
                 <div
                   className="text-2xl md:text-3xl lg:text-4xl font-black text-white"
-                  style={{ fontFamily: "var(--font-syne), sans-serif" }}>
+                  style={{
+                    fontFamily: "var(--font-syne), sans-serif",
+                  }}>
                   {stat.value}
                 </div>
                 <div className="text-xs md:text-sm text-zinc-500 mt-1">
@@ -136,7 +126,11 @@ export function Hero() {
         className="absolute bottom-8 left-1/2 -translate-x-1/2">
         <motion.div
           animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}>
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}>
           <ChevronDown size={20} className="text-zinc-500" />
         </motion.div>
       </motion.div>

@@ -19,7 +19,7 @@ import { getConnectModules } from "@/lib/services/connect-modules";
 import { fetchReceivedContactStats } from "@/lib/services/contact";
 import { getUserDevices } from "@/lib/services/device";
 import { fetchPublicUserEvent } from "@/lib/services/events";
-import { getConnectProfile } from "@/lib/services/profile";
+import { getConnectProfile, getAllConnectProfiles } from "@/lib/services/profile";
 import { fetchNotificationStats } from "@/lib/services/notification";
 import { getReferralSummary } from "@/lib/services/referral";
 import { getAuthUserProfile } from "@/lib/services/wallet";
@@ -75,6 +75,7 @@ export default async function DashboardPage({
 		contactStats,
 		referralData,
 		userProfile,
+		allProfiles,
 	] = await Promise.all([
 		userId && accessToken ?
 			getUserDevices(userId, accessToken).catch(() => [] as DeviceInterface[])
@@ -101,6 +102,9 @@ export default async function DashboardPage({
 		:	Promise.resolve(null),
 		accessToken ?
 			getAuthUserProfile(accessToken).catch(() => null)
+		:	Promise.resolve(null),
+		accessToken ?
+			getAllConnectProfiles(accessToken).catch(() => null)
 		:	Promise.resolve(null),
 	]);
 
@@ -134,6 +138,7 @@ export default async function DashboardPage({
 						connectProfile={connectProfile}
 						user={authInfo.user}
 						profileId={connectProfile?.id}
+						profiles={allProfiles ?? []}
 						unreadThreadCount={unreadThreadCount}
 						unreadNotificationCount={unreadNotificationCount}
 						accessToken={accessToken || undefined}
@@ -161,6 +166,7 @@ export default async function DashboardPage({
 					connectProfile={connectProfile}
 					user={!("error" in authInfo) ? authInfo.user : null}
 					firstName={firstName}
+					profiles={allProfiles ?? []}
 					contactData={
 						connectModules?.contact?.contacts?.[0] ?
 							{
