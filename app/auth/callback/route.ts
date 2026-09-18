@@ -54,7 +54,7 @@ export async function GET(req: Request) {
     const tokenRes = await fetch(`${authApiBase}/auth/token`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code }),
+      body: JSON.stringify({ code, ...(process.env.ISCE_AUTH_CLIENT_ID && process.env.ISCE_AUTH_CLIENT_SECRET ? { clientId: process.env.ISCE_AUTH_CLIENT_ID, clientSecret: process.env.ISCE_AUTH_CLIENT_SECRET } : (process.env.OAUTH_CLIENT_ID && process.env.OAUTH_CLIENT_SECRET ? { clientId: process.env.OAUTH_CLIENT_ID, clientSecret: process.env.OAUTH_CLIENT_SECRET } : {})) }),
     });
 
     if (!tokenRes.ok) {
