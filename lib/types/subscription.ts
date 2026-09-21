@@ -16,23 +16,23 @@ export type SubscriptionStatus =
 export type ThemeCustomization = 'none' | 'basic' | 'full';
 
 /**
- * Numeric limits use -1 for "unlimited" — the API serializes Infinity that
- * way. Always run counts through `isUnlimited`/`formatLimit` rather than
- * comparing directly, or -1 reads as a smaller cap than 0.
+ * Numeric limits are never compared directly — see `isUnlimited` for the
+ * three shapes "unlimited" arrives in. Comparing raw values treats -1 as a
+ * smaller cap than 0, and null throws.
  */
 export interface PlanLimits {
-	profiles: number;
-	tapsPerDay: number;
-	socialLinks: number;
-	videos: number;
-	files: number;
-	storageBytes: number;
-	meetingLinks: number;
-	customForms: number;
-	analyticsHistoryDays: number;
-	spotifyItems: number;
-	cryptoWallets: number;
-	serviceCategories: number;
+	profiles: LimitValue;
+	tapsPerDay: LimitValue;
+	socialLinks: LimitValue;
+	videos: LimitValue;
+	files: LimitValue;
+	storageBytes: LimitValue;
+	meetingLinks: LimitValue;
+	customForms: LimitValue;
+	analyticsHistoryDays: LimitValue;
+	spotifyItems: LimitValue;
+	cryptoWallets: LimitValue;
+	serviceCategories: LimitValue;
 	contactExport: boolean;
 	removeIsceBranding: boolean;
 	moduleReordering: boolean;
@@ -68,18 +68,45 @@ export interface MySubscription {
 
 export const UNLIMITED = -1;
 
-export function isUnlimited(value: number): boolean {
-	return value === UNLIMITED;
+/**
+ * "Unlimited" reaches us in three different shapes, so every read of a
+ * numeric limit has to go through here:
+ *
+ * - `-1` from `GET /subscriptions/plans`, which returns the stored value.
+ * - `null` from `GET /subscriptions/limits`, which resolves limits through
+ *   the backend's `resolvePlanLimits` and ends up holding `Infinity` —
+ *   and `JSON.stringify(Infinity)` is `null`.
+ * - `Infinity` itself, if a caller ever hands us an unserialized value.
+ *
+ * A missing key counts as unlimited rather than zero: treating an absent
+ * limit as "none" would wrongly tell a paying user they have no quota.
+ */
+export function isUnlimited(value: LimitValue): boolean {
+	return (
+		value === UNLIMITED ||
+		value === null ||
+		value === undefined ||
+		!Number.isFinite(value)
+	);
 }
 
-/** Format a numeric plan limit for display, honouring the -1 sentinel. */
-export function formatLimit(value: number): string {
-	return isUnlimited(value) ? 'Unlimited' : value.toLocaleString();
+/** A numeric limit as it can actually arrive over the wire. */
+export type LimitValue = number | null | undefined;
+
+/** True when the limit is a real number and that number is zero. */
+export function isNone(value: LimitValue): boolean {
+	return !isUnlimited(value) && value === 0;
+}
+
+/** Format a numeric plan limit for display. */
+export function formatLimit(value: LimitValue): string {
+	if (isUnlimited(value)) return 'Unlimited';
+	return (value as number).toLocaleString();
 }
 
 /** Kobo → a display string like "₦1,000". */
-export function formatPrice(kobo: number): string {
-	if (kobo === 0) return 'Free';
+export function formatPrice(kobo: number | null | undefined): string {
+	if (!kobo) return 'Free';
 	return new Intl.NumberFormat('en-NG', {
 		style: 'currency',
 		currency: 'NGN',
@@ -88,10 +115,10 @@ export function formatPrice(kobo: number): string {
 }
 
 /** Bytes → "25MB" / "100MB" / "Unlimited", with 0 meaning none. */
-export function formatStorage(bytes: number): string {
+export function formatStorage(bytes: LimitValue): string {
 	if (isUnlimited(bytes)) return 'Unlimited';
 	if (bytes === 0) return 'None';
-	const mb = bytes / (1024 * 1024);
+	const mb = (bytes as number) / (1024 * 1024);
 	return mb >= 1024 ? `${(mb / 1024).toFixed(1)}GB` : `${Math.round(mb)}MB`;
 }
 

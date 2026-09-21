@@ -16,6 +16,7 @@ import {
   formatLimit,
   formatPrice,
   formatStorage,
+  isNone,
   isUnlimited,
   planRank,
   type MySubscription,
@@ -24,6 +25,7 @@ import {
   type PlanLimits,
   type SubscriptionStatus,
 } from "@/lib/types/subscription";
+import { BellIcon } from "@/lib/icons";
 
 interface Props {
   subscription: MySubscription | null;
@@ -70,16 +72,19 @@ function headlineFeatures(
     },
     {
       label: `${formatLimit(limits.socialLinks)} social links`,
-      on: limits.socialLinks !== 0,
+      on: !isNone(limits.socialLinks),
     },
-    { label: `${formatLimit(limits.videos)} videos`, on: limits.videos !== 0 },
+    {
+      label: `${formatLimit(limits.videos)} videos`,
+      on: !isNone(limits.videos),
+    },
     {
       label: `${formatLimit(limits.files)} files · ${formatStorage(limits.storageBytes)}`,
-      on: limits.files !== 0,
+      on: !isNone(limits.files),
     },
     {
       label: `${formatLimit(limits.customForms)} custom forms`,
-      on: limits.customForms !== 0,
+      on: !isNone(limits.customForms),
     },
     {
       label: isUnlimited(limits.analyticsHistoryDays)
@@ -248,7 +253,7 @@ export default function SubscriptionClient({
                   {subscription.plan.key === "PRO_PLUS" ? (
                     <Crown className="h-4 w-4 text-amber-400 shrink-0" />
                   ) : subscription.plan.key === "PRO_LITE" ? (
-                    <Sparkles className="h-4 w-4 text-sky-400 shrink-0" />
+                    <BellIcon className="h-4 w-4 text-sky-400 shrink-0" />
                   ) : null}
                   <p className="text-base font-semibold truncate">
                     {subscription.plan.name}
