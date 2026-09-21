@@ -1,6 +1,36 @@
 import { NextResponse } from "next/server";
 import { authLogger } from "@/lib/auth-logger";
 
+// Server-side only. Both values unset = legacy exchange (no client auth);
+// exactly one set is a misconfiguration and sends nothing rather than half.
+function getClientCredentials(): { clientId?: string; clientSecret?: string } {
+  const clientId = process.env.ISCE_AUTH_CLIENT_ID?.trim();
+  const clientSecret = process.env.ISCE_AUTH_CLIENT_SECRET?.trim();
+  if (clientId && clientSecret) return { clientId, clientSecret };
+  if (clientId || clientSecret) {
+    authLogger.error(
+      "CALLBACK",
+      "ISCE_AUTH_CLIENT_ID and ISCE_AUTH_CLIENT_SECRET must be set together; sending no client credentials",
+    );
+  }
+  return {};
+}
+
+// Relative paths, or absolute URLs whose origin is exactly one of ours.
+// "//evil.com" and "/\evil.com" start with "/" but resolve to another site, and a
+// prefix check would accept "https://app.example.com.evil.com".
+function isSafeRedirect(target: string, allowedBases: string[]): boolean {
+  if (target.startsWith("/")) {
+    return !target.startsWith("//") && !target.startsWith("/\\");
+  }
+  try {
+    const origin = new URL(target).origin;
+    return allowedBases.some((base) => new URL(base).origin === origin);
+  } catch {
+    return false;
+  }
+}
+
 function buildSignInRedirect(callbackUrl: URL): string {
   const base = (process.env.NEXT_PUBLIC_AUTH_WEB_URL || "").trim();
   const signInUrl = new URL("/sign-in", base);
@@ -28,10 +58,7 @@ export async function GET(req: Request) {
   const authApiBase =
     process.env.AUTH_API_URL || process.env.NEXT_PUBLIC_AUTH_API_URL;
 
-  const safeRedirect =
-    redirectTo.startsWith("/") ||
-    redirectTo.startsWith(appBase) ||
-    redirectTo.startsWith(requestOrigin);
+  const safeRedirect = isSafeRedirect(redirectTo, [appBase, requestOrigin]);
   const safe = safeRedirect ? redirectTo : "/";
 
   const callbackUrl = new URL("/auth/callback", appBase);
@@ -54,7 +81,7 @@ export async function GET(req: Request) {
     const tokenRes = await fetch(`${authApiBase}/auth/token`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code, ...(process.env.ISCE_AUTH_CLIENT_ID && process.env.ISCE_AUTH_CLIENT_SECRET ? { clientId: process.env.ISCE_AUTH_CLIENT_ID, clientSecret: process.env.ISCE_AUTH_CLIENT_SECRET } : (process.env.OAUTH_CLIENT_ID && process.env.OAUTH_CLIENT_SECRET ? { clientId: process.env.OAUTH_CLIENT_ID, clientSecret: process.env.OAUTH_CLIENT_SECRET } : {})) }),
+      body: JSON.stringify({ code, ...getClientCredentials() }),
     });
 
     if (!tokenRes.ok) {
