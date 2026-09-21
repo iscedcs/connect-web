@@ -206,16 +206,20 @@ export async function cancelSubscription(
 /**
  * Start a checkout session for a paid plan.
  *
- * NOTE: as of this writing the backend returns `{ success: false, message:
- * 'Payment gateway integration pending' }` — the gateway work is a later
- * phase. The caller is expected to surface `message` verbatim rather than
- * assume a redirect URL comes back, so this starts working on its own once
- * the backend ships.
+ * The gateway returns `data.checkoutUrl` (the provider maps Paystack's
+ * `authorization_url` onto that name before it reaches us) plus a
+ * `reference` we keep so the return leg can be matched to this attempt.
+ * The older `authorizationUrl` spellings are still accepted in case a
+ * different provider surfaces the raw field.
+ *
+ * `callbackUrl` is where the gateway sends the user once they are done;
+ * without it they finish paying and land wherever the gateway defaults to.
  */
 export async function initiatePayment(
 	accessToken: string,
 	planKey: PlanKey,
-): Promise<MutationResult & { authorizationUrl?: string }> {
+	callbackUrl?: string,
+): Promise<MutationResult & { checkoutUrl?: string; reference?: string }> {
 	if (!CONNECT_API_URL || !accessToken) {
 		return { success: false, message: 'Service unavailable' };
 	}
@@ -228,21 +232,39 @@ export async function initiatePayment(
 					Authorization: `Bearer ${accessToken}`,
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({ planKey }),
+				body: JSON.stringify(
+					callbackUrl ? { planKey, callbackUrl } : { planKey },
+				),
 				cache: 'no-store',
 			},
 		);
 		const json = await readEnvelope<Record<string, unknown>>(res);
 		const data = (json.data ?? {}) as Record<string, unknown>;
-		const authorizationUrl =
+		const checkoutUrl =
+			(data.checkoutUrl as string) ||
 			(data.authorizationUrl as string) ||
 			(data.authorization_url as string) ||
 			undefined;
 
+		if (!res.ok || json.success === false) {
+			console.error(
+				`[subscription] POST initiate-payment -> HTTP ${res.status}`,
+				JSON.stringify(json).slice(0, 300),
+			);
+		} else if (!checkoutUrl) {
+			// Succeeded but gave us nowhere to send the user — without this
+			// the UI silently does nothing, which is hard to diagnose.
+			console.error(
+				'[subscription] initiate-payment returned no checkout URL:',
+				JSON.stringify(json.data).slice(0, 300),
+			);
+		}
+
 		return {
 			success: res.ok && json.success !== false,
 			message: json.message || (res.ok ? 'Payment session created' : 'Could not start payment'),
-			authorizationUrl,
+			checkoutUrl,
+			reference: (data.reference as string) || undefined,
 			data: json.data,
 		};
 	} catch (err) {

@@ -21,7 +21,10 @@ export async function POST(req: NextRequest) {
 	}
 
 	const body = await req.json().catch(() => ({}));
-	const { planKey } = body as { planKey?: string };
+	const { planKey, callbackUrl } = body as {
+		planKey?: string;
+		callbackUrl?: string;
+	};
 
 	if (!planKey || !PLAN_ORDER.includes(planKey as PlanKey)) {
 		return NextResponse.json(
@@ -30,7 +33,21 @@ export async function POST(req: NextRequest) {
 		);
 	}
 
-	const result = await initiatePayment(accessToken, planKey as PlanKey);
+	// Build the return URL server-side from this request's own origin rather
+	// than trusting the client's: it is handed to a payment gateway, so an
+	// attacker-supplied value would be an open redirect off the back of a
+	// checkout.
+	const origin = req.nextUrl.origin;
+	const safeCallback =
+		callbackUrl && callbackUrl.startsWith('/')
+			? `${origin}${callbackUrl}`
+			: `${origin}/settings/subscription`;
+
+	const result = await initiatePayment(
+		accessToken,
+		planKey as PlanKey,
+		safeCallback,
+	);
 
 	// 200 even when the gateway is unavailable: the client renders
 	// `message` as an informational state, not a failed request.

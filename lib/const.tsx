@@ -530,6 +530,13 @@ export const URLS = {
     save_artisan: "/api/cp/talent/saved/{artisanId}",
     remove_artisan: "/api/cp/talent/saved/{artisanId}",
   },
+  // Compliance / post-signup KYC (ENG-410, ENG-416).
+  // NOTE: the backend module does not exist yet — these paths are the
+  // frontend's assumption and must be reconciled with ENG-416 when it lands.
+  compliance: {
+    incomplete_requirements: "/api/cp/compliance/incomplete-requirements",
+    submit: "/api/cp/compliance/requirements",
+  },
   lyncon_plus_subscription: {
     organisation_plan: "/api/cp/organizations/me/subscription",
   },
