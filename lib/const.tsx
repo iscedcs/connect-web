@@ -376,7 +376,21 @@ export const URLS = {
     business_apply: "/api/referral/business/apply",
     cash_out_request: "/api/referral/cash-out",
   },
-
+  subscription: {
+    my_plan: "/api/subscriptions/me",
+    plans: "/api/subscriptions/plans",
+    plan_limit: "/api/subscriptions/limits",
+    choose_plan: "/api/subscriptions/select-plan",
+    cancel_plan: "/api/subscriptions/cancel",
+    initiate_payment: "/api/subscriptions/initiate-payment",
+    admin_plans: "/api/subscriptions/admin/plans",
+    admin_plans_control: "/api/subscriptions/admin/plans/{planKey}",
+    admin_plans_broadcast: "/api/subscriptions/admin/broadcast-launch",
+  },
+  lyncon_subscription_webhooks: {
+    paystack: "/api/subscriptions/webhooks/paystack",
+    paydestal: "/api/subscriptions/webhooks/paydestal",
+  },
   //BUSINESS ENDPOINTS
   organization: {
     create: "/api/cp/organizations",
@@ -515,6 +529,16 @@ export const URLS = {
     saved_talent: "/api/cp/talent/saved",
     save_artisan: "/api/cp/talent/saved/{artisanId}",
     remove_artisan: "/api/cp/talent/saved/{artisanId}",
+  },
+  lyncon_plus_subscription: {
+    organisation_plan: "/api/cp/organizations/me/subscription",
+  },
+  lyncon_plus_admin_plans: {
+    active_plans: "/api/cp/plans",
+    admin_plans: "/api/admin/cp/plans",
+    admin_plan_key: "/api/admin/cp/plans/{planKey}",
+    admin_org_plan_override:
+      "/api/admin/cp/organizations/{orgId}/subscription/override",
   },
 };
 

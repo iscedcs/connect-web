@@ -17,6 +17,7 @@ import {
   Wallet,
   AtSign,
   UserX,
+  Crown,
 } from "lucide-react";
 
 export const metadata = generateMetadata({
@@ -86,6 +87,18 @@ const SETTINGS_SECTIONS = [
 				description:
 					'Set your unique @tag so others can find and pay you',
 				Icon: AtSign,
+			},
+		],
+	},
+	{
+		heading: 'Plan & Billing',
+		items: [
+			{
+				href: '/settings/subscription',
+				label: 'Subscription',
+				description:
+					'View your plan, compare upgrades, and manage billing',
+				Icon: Crown,
 			},
 		],
 	},

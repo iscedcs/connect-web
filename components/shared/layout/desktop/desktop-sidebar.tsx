@@ -19,6 +19,7 @@ import {
   Palette,
   Contact2,
   Gift,
+  Crown,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -96,7 +97,10 @@ const NAV_GROUPS: NavGroup[] = [
   },
   {
     label: "Finance",
-    items: [{ label: "Wallet", href: "/wallet", icon: Wallet }],
+    items: [
+      { label: "Wallet", href: "/wallet", icon: Wallet },
+      { label: "Subscription", href: "/settings/subscription", icon: Crown },
+    ],
   },
   {
     label: "Settings",
