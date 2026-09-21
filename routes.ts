@@ -25,7 +25,6 @@ export const protectedRoutes = [
   "/connect",
   "/devices",
   "/otp",
-  "/profile",
   "/profiles",
   "/device",
   "/settings",
