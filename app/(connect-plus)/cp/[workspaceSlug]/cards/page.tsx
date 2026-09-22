@@ -29,7 +29,7 @@ export default function CardsPage() {
     <div className="p-4 lg:p-8 max-w-7xl mx-auto space-y-8">
       {/* Header */}
       <CpPageHeader
-        title="Connect Cards & NFC Hardware"
+        title="LYNCON Cards & NFC Hardware"
         subtitle="Manage active NFC business cards, QR codes, and hardware tap destinations"
       />
 

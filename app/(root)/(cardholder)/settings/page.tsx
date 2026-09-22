@@ -23,7 +23,7 @@ import {
 export const metadata = generateMetadata({
 	title: 'Settings',
 	description:
-		'Manage your Connect account settings, profile, and preferences.',
+		'Manage your LYNCON account settings, profile, and preferences.',
 	keywords: ['settings', 'account', 'preferences'],
 });
 
@@ -78,7 +78,7 @@ const SETTINGS_SECTIONS = [
 				href: '/bvn',
 				label: 'Activate Wallet Payments',
 				description:
-					'Verify your BVN to receive money on your Connect profile',
+					'Verify your BVN to receive money on your LYNCON profile',
 				Icon: Wallet,
 			},
 			{
@@ -158,7 +158,7 @@ export default async function SettingsPage() {
 								Get started
 							</p>
 							<p className='text-xs text-white/50 mt-0.5'>
-								Create your first Connect profile
+								Create your first LYNCON profile
 							</p>
 						</div>
 						<ChevronRight className='h-4 w-4 text-sky-400' />

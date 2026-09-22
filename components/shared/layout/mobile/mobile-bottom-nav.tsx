@@ -26,7 +26,7 @@ const MOBILE_NAV_ITEMS: MobileNavItem[] = [
     matchPrefix: "/dashboard",
   },
   {
-    label: "Connect",
+    label: "LYNCON",
     href: "/connect/links",
     icon: LinkIcon,
     matchPrefix: "/connect",

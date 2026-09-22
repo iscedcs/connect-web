@@ -227,7 +227,7 @@ export default function InvoiceDetailPage() {
               Billed From
             </h4>
             <p className="font-bold text-[var(--cp-text-1,#FFF)]">{workspaceName || 'Workspace'}</p>
-            <p className="text-[var(--cp-text-2,#AAA)] mt-0.5">ISCE Connect Ecosystem Enterprise</p>
+            <p className="text-[var(--cp-text-2,#AAA)] mt-0.5">LYNCON Ecosystem Enterprise</p>
           </div>
 
           <div>

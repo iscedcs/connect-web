@@ -17,15 +17,15 @@ import { headers } from 'next/headers';
 import { verifyToken } from '@/lib/verify-jwt';
 
 export const metadata: Metadata = {
-	title: 'Connect | The Future of Networking - ISCE Digital Concept',
+	title: 'LYNCON | The Future of Networking - ISCE Digital Concept',
 	description:
-		'Connect is a modern digital networking solution. Share your entire professional identity with a single tap. NFC cards, QR codes, and rich digital profiles.',
+		'LYNCON is a modern digital networking solution. Share your entire professional identity with a single tap. NFC cards, QR codes, and rich digital profiles.',
 	keywords: [
 		'digital business card',
 		'NFC networking',
 		'QR code profile',
 		'ISCE',
-		'Connect',
+		'LYNCON',
 		'professional networking',
 	],
 };

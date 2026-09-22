@@ -24,7 +24,7 @@ const routeTitles: Record<string, string> = {
   leads:        'Leads',
   clients:      'Clients',
   attendance:   'Attendance',
-  cards:        'Connect Cards',
+  cards:        'LYNCON Cards',
   settings:     'Settings',
 }
 
@@ -41,7 +41,7 @@ export function CpTopbar() {
 
   const segments = pathname?.split('/').filter(Boolean) ?? []
   const last     = segments[segments.length - 1] ?? ''
-  const title    = routeTitles[last] ?? workspaceName ?? 'Connect Plus'
+  const title    = routeTitles[last] ?? workspaceName ?? 'LYNCON Plus'
 
   const displayName =
     user ?
@@ -158,7 +158,7 @@ export function CpTopbar() {
                 className="flex items-center gap-2 cursor-pointer hover:bg-[var(--cp-surface-2)] text-xs py-2"
               >
                 <ArrowLeft size={14} className="text-[var(--cp-text-3)]" />
-                <span>Back to Connect</span>
+                <span>Back to LYNCON</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-[var(--cp-border,#222)]" />

@@ -4,7 +4,7 @@ import { generateMetadata } from '@/lib/metadata';
 export const metadata = generateMetadata({
 	title: 'Privacy Policy',
 	description:
-		'Read how ISCE Connect collects, uses, and protects your personal data.',
+		'Read how LYNCON collects, uses, and protects your personal data.',
 	keywords: ['privacy', 'policy', 'data protection', 'security'],
 });
 
@@ -20,7 +20,7 @@ export default function PrivacyPage() {
 					<p>
 						This Privacy Policy describes how ISCE Digital Concept (&quot;ISCE&quot;,
 						&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) collects, uses, stores, and
-						safeguards your personal information across our Authentication, Connect,
+						safeguards your personal information across our Authentication, LYNCON,
 						and ecosystem services. We are dedicated to respecting your privacy and protecting
 						your personal data in compliance with the Nigeria Data Protection Act (NDPA)
 						and applicable data protection laws.

@@ -9,7 +9,7 @@ import ReferralClient from "@/components/cardholder/referral/referral-client";
 export const metadata = generateMetadata({
 	title: "Referrals",
 	description:
-		"Invite friends to ISCE Connect, track your referral code, shareable link, referral earnings, and cash out rewards.",
+		"Invite friends to LYNCON, track your referral code, shareable link, referral earnings, and cash out rewards.",
 	keywords: [
 		"referral",
 		"referrals",

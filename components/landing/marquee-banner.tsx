@@ -6,7 +6,7 @@ const words = [
   { text: "Tap", accent: false },
   { text: "Scan", accent: false },
   { text: "Share", accent: true },
-  { text: "Connect", accent: false },
+  { text: "LYNCON", accent: false },
   { text: "Network", accent: true },
   { text: "Grow", accent: false },
   { text: "Link", accent: false },

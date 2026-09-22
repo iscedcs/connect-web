@@ -30,7 +30,7 @@ export async function checkCanReceiveMoney(userId: string): Promise<boolean> {
 	}
 }
 
-/** Public wallet profile returned for the "Send money" modal on a public Connect profile */
+/** Public wallet profile returned for the "Send money" modal on a public LYNCON profile */
 export interface PublicWalletProfile {
 	canReceive: boolean;
 	accountNumber: string | null;
@@ -41,7 +41,7 @@ export interface PublicWalletProfile {
 }
 
 /**
- * Fetch the public wallet profile for a user — used on the Connect public profile page.
+ * Fetch the public wallet profile for a user — used on the LYNCON public profile page.
  * Combines the virtual account details from wallet-nest with the ISCE tag from isce-auth.
  * Returns null on any error so the send-money button is simply hidden.
  */

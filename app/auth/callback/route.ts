@@ -87,7 +87,7 @@ export async function GET(req: Request) {
       const remaining = Math.max(0, payload.exp - nowSec);
       maxAge = Math.min(remaining, 60 * 60 * 24 * 7);
     }
-    // Business users are routed to Connect Plus; the org page
+    // Business users are routed to LYNCON Plus; the org page
     // handles the workspace lookup after cookies are set.
     if (payload?.userType === "BUSINESS_USER") {
       finalRedirect = "/cp/org";

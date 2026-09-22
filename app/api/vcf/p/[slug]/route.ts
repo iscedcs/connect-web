@@ -4,7 +4,7 @@ import { NextRequest } from 'next/server';
 function buildVCard(data: any, slug: string): string {
 	const profile = data?.profile ?? {};
 	const contact = data?.contact?.primary ?? {};
-	const fullName = (profile?.name as string | undefined) ?? 'Connect User';
+	const fullName = (profile?.name as string | undefined) ?? 'LYNCON User';
 	const email = (contact?.email as string | undefined) ?? '';
 	const phone = (contact?.phone_number as string | undefined) ?? '';
 	const title = (profile?.position as string | undefined) ?? '';

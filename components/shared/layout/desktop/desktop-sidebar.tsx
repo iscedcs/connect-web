@@ -4,7 +4,6 @@ import {
   BarChart2,
   CalendarDays,
   ClipboardList,
-  ExternalLink,
   FileText,
   LayoutDashboard,
   Link as LinkIcon,
@@ -61,7 +60,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    label: "Connect",
+    label: "LYNCON",
     items: [
       { label: "Links", href: "/connect/links", icon: LinkIcon, exact: true },
       {
@@ -107,7 +106,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: "Account Settings", href: "/settings/account", icon: Settings },
       {
-        label: "Connect Config",
+        label: "LYNCON Config",
         href: "/settings/connect-config",
         icon: Palette,
       },
@@ -149,13 +148,22 @@ export default function DesktopSidebar({ user }: DesktopSidebarProps) {
     <Sidebar className="border-r border-border bg-background">
       {/* Header — logo / brand */}
       <SidebarHeader className="px-4 py-4 border-b border-border">
-        <Link href="/dashboard" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-            <ExternalLink className="w-4 h-4 text-primary-foreground" />
-          </div>
-          <span className="font-semibold text-sm tracking-tight text-foreground">
-            ISCE Connect
-          </span>
+        <Link
+          href="/dashboard"
+          className="flex items-center"
+          aria-label="LYNCON dashboard"
+        >
+          {/* White variant: the app renders with a hardcoded `dark` class on
+              <html>. If a light theme is ever enabled, this needs the
+              black-transparent variant swapped in under a `dark:` pair. */}
+          <Image
+            src="/assets/logo/white-transparent.png"
+            alt="LYNCON"
+            width={119}
+            height={28}
+            priority
+            className="h-7 w-auto max-w-full"
+          />
         </Link>
       </SidebarHeader>
 

@@ -6,7 +6,7 @@ import SubpageHeader from '@/components/shared/subpage-header';
 export const metadata = generateMetadata({
 	title: 'Notifications',
 	description:
-		'View your Connect notifications — card interactions, shared contacts, and more.',
+		'View your LYNCON notifications — card interactions, shared contacts, and more.',
 	keywords: ['notifications', 'alerts', 'activity'],
 });
 
