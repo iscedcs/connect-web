@@ -23,7 +23,7 @@ export default function DashboardQuickActions({
     try {
       if (typeof navigator !== "undefined" && navigator.share) {
         await navigator.share({
-          title: "My ISCE Connect Card",
+          title: "My LYNCON Card",
           url: cardUrl,
         });
       } else {

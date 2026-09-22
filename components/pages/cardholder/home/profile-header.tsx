@@ -116,7 +116,7 @@ export default function ProfileHeader({
   const name =
     connectProfile?.name ||
     [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
-    "Connect User";
+    "LYNCON User";
 
   const roleOrBio = connectProfile?.position || "";
 

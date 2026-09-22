@@ -75,7 +75,7 @@ export default function ReferralInviteClient({
 							<ExternalLink className="w-4 h-4 text-primary-foreground" />
 						</div>
 						<span className="font-bold text-base tracking-tight text-white">
-							ISCE Connect
+							LYNCON
 						</span>
 					</Link>
 
@@ -126,7 +126,7 @@ export default function ReferralInviteClient({
 
 							<p className="text-sm text-neutral-300 leading-relaxed max-w-sm">
 								{inviterBio ||
-									`"Join me on ISCE Connect to manage your digital cards, contacts, and smart wallet effortlessly."`}
+									`"Join me on LYNCON to manage your digital cards, contacts, and smart wallet effortlessly."`}
 							</p>
 
 							{/* Applied Referral Code Banner */}
@@ -177,7 +177,7 @@ export default function ReferralInviteClient({
 								variant="outline"
 								className="w-full sm:w-auto h-12 px-6 rounded-full border-white/15 bg-white/5 hover:bg-white/10 text-white text-sm font-medium"
 							>
-								Explore ISCE Connect
+								Explore LYNCON
 							</Button>
 						</Link>
 					</div>
@@ -187,7 +187,7 @@ export default function ReferralInviteClient({
 				<div className="space-y-6 pt-6">
 					<div className="text-center space-y-1">
 						<h2 className="text-xl font-semibold text-white">
-							What you get with ISCE Connect
+							What you get with LYNCON
 						</h2>
 						<p className="text-xs text-neutral-400">
 							Everything you need to network and transact in one

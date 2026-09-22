@@ -40,7 +40,7 @@ export function Comparison() {
             variants={fadeInUp}
             className="text-[#7B93FF] text-sm font-medium tracking-widest uppercase mb-3"
           >
-            Why Connect
+            Why LYNCON
           </motion.p>
           <motion.h2
             variants={fadeInUp}
@@ -85,7 +85,7 @@ export function Comparison() {
             </div>
           </motion.div>
 
-          {/* Connect column */}
+          {/* LYNCON column */}
           <motion.div
             variants={fadeInUp}
             className="p-6 md:p-8 rounded-2xl border border-[#7B93FF]/30 bg-[#7B93FF]/5"
@@ -95,7 +95,7 @@ export function Comparison() {
                 <Check size={18} className="text-[#7B93FF]" />
               </div>
               <h3 className="text-lg font-semibold text-white">
-                Connect by ISCE
+                LYNCON by ISCE
               </h3>
             </div>
             <div className="flex flex-col gap-3">

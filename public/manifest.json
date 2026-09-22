@@ -1,6 +1,6 @@
 {
-	"name": "Connect by ISCE",
-	"short_name": "Connect",
+	"name": "LYNCON by ISCE",
+	"short_name": "LYNCON",
 	"start_url": "/",
 	"display": "standalone",
 	"description": "A dynamic digital business card and networking platform for seamless connectivity.",

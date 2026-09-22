@@ -52,7 +52,7 @@ export default function WorkspaceSettingsPage() {
       accent: 'purple',
     },
     {
-      title: 'NFC Connect Cards & Hardware',
+      title: 'NFC LYNCON Cards & Hardware',
       description: 'Manage connected NFC cards, digital badges, and scanner devices',
       icon: CreditCard,
       href: `/cp/${workspaceSlug}/cards`,
@@ -115,7 +115,7 @@ export default function WorkspaceSettingsPage() {
                 Log Out from Device
               </h4>
               <p className="text-xs text-neutral-400 mt-1">
-                Sign out of Connect Plus and redirect to ISCE Auth SSO
+                Sign out of LYNCON Plus and redirect to ISCE Auth SSO
               </p>
             </div>
           </div>

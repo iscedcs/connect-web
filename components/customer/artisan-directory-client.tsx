@@ -331,7 +331,7 @@ export default function ArtisanDirectoryClient({
             href="/"
             className="text-xs text-white/40 hover:text-white/60 transition-colors"
           >
-            Powered by ISCE Connect
+            Powered by LYNCON
           </Link>
         </div>
       </div>

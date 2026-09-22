@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 // Base URL for metadata generation (server-side)
 const baseUrl =
 	process.env.NEXT_PUBLIC_URL || 'https://connect-web-eight.vercel.app';
-const appName = 'Connect by ISCE';
+const appName = 'LYNCON by ISCE';
 const defaultDescription = 'A dynamic digital lifestyle platform.';
 
 interface GenerateMetadataOptions {

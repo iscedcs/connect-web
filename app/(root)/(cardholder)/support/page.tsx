@@ -5,7 +5,7 @@ import SubpageHeader from '@/components/shared/subpage-header';
 
 export const metadata = generateMetadata({
 	title: 'Support',
-	description: 'Get help with your Connect account, profile, or devices.',
+	description: 'Get help with your LYNCON account, profile, or devices.',
 	keywords: ['support', 'help', 'contact'],
 });
 

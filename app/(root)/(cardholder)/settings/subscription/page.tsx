@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic';
 export const metadata = generateMetadata({
 	title: 'Subscription',
 	description:
-		'View your Connect plan, compare plans, and manage your subscription.',
+		'View your LYNCON plan, compare plans, and manage your subscription.',
 	keywords: ['subscription', 'plan', 'billing', 'upgrade', 'pro'],
 });
 

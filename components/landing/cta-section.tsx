@@ -65,15 +65,6 @@ export function CtaSection() {
             />
 
             <motion.div variants={fadeInUp} className="relative">
-              <div
-                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs md:text-sm text-[#7B93FF] mb-6"
-                style={{
-                  border: "1px solid rgba(123,147,255,0.3)",
-                  background: "rgba(123,147,255,0.06)",
-                }}>
-                Join the future of networking
-              </div>
-
               <h2
                 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white text-balance"
                 style={{
@@ -94,8 +85,8 @@ export function CtaSection() {
               </h2>
 
               <p className="mt-5 md:mt-6 text-base md:text-lg text-zinc-400 max-w-lg mx-auto leading-relaxed">
-                Join thousands of professionals who have upgraded to Connect.
-                Create your digital profile in minutes — share via QR code, NFC
+                Join thousands of professionals who have upgraded to LYNCON.
+                Create your digital profile in minutes, share via QR code, NFC
                 smart devices, or a simple link. Start free, no device required.
               </p>
 

@@ -14,12 +14,12 @@ export async function generateMetadata({
 	const profile = profileLookup?.data?.profile;
 
 	const title = profile?.name
-		? `Join ${profile.name} (@${cleanUsername}) on ISCE Connect`
-		: `Join @${cleanUsername} on ISCE Connect`;
+		? `Join ${profile.name} (@${cleanUsername}) on LYNCON`
+		: `Join @${cleanUsername} on LYNCON`;
 
 	const description =
 		profile?.bio ||
-		`You've been invited by @${cleanUsername} to join ISCE Connect. Claim your digital business card, NFC identity, and smart Naira wallet today!`;
+		`You've been invited by @${cleanUsername} to join LYNCON. Claim your digital business card, NFC identity, and smart Naira wallet today!`;
 
 	return {
 		title,
