@@ -20,6 +20,7 @@ import {
   isNone,
   isUnlimited,
   planRank,
+  type CheckoutQuote,
   type MySubscription,
   type Plan,
   type PlanKey,
@@ -35,9 +36,12 @@ import { BellIcon } from "@/lib/icons";
  */
 interface PendingCheckout {
   plan: PlanKey;
+  /** The plan before paying: an upgrade has landed once the plan changes. */
+  previousPlan: PlanKey;
   /**
    * currentPeriodEnd before paying. A renewal keeps the same plan, so the
-   * period end moving is the only sign that its payment has landed.
+   * period end moving is the only sign that its payment has landed. (A
+   * prorated upgrade is the opposite: the plan changes, the date doesn't.)
    */
   previousPeriodEnd: string | null;
   startedAt: number;
@@ -57,7 +61,11 @@ function readPending(): PendingCheckout | null {
     const raw = sessionStorage.getItem(PENDING_KEY);
     if (!raw) return null;
     const pending = JSON.parse(raw) as PendingCheckout;
-    if (!pending?.plan || Date.now() - pending.startedAt > PENDING_MAX_AGE_MS) {
+    if (
+      !pending?.plan ||
+      !pending.previousPlan ||
+      Date.now() - pending.startedAt > PENDING_MAX_AGE_MS
+    ) {
       return null;
     }
     return pending;
@@ -90,7 +98,8 @@ function isConfirmed(
     !!sub &&
     sub.plan.key === pending.plan &&
     sub.status === "ACTIVE" &&
-    sub.currentPeriodEnd !== pending.previousPeriodEnd
+    (pending.previousPlan !== pending.plan ||
+      sub.currentPeriodEnd !== pending.previousPeriodEnd)
   );
 }
 
@@ -185,6 +194,8 @@ export default function SubscriptionClient({
   } | null>(null);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  /** The price shown for confirmation before leaving for Paystack. */
+  const [quote, setQuote] = useState<CheckoutQuote | null>(null);
   const searchParams = useSearchParams();
 
   // Read once, on the first render: removing the params below updates
@@ -385,39 +396,94 @@ export default function SubscriptionClient({
     return { ...json, message, status: res.status };
   }
 
+  /**
+   * First step of paying for a plan: ask connect-nest what it will charge
+   * now (a mid-cycle upgrade is prorated) and show that before the user
+   * leaves for Paystack. The checkout itself starts from the confirmation.
+   */
   async function handleChoose(plan: Plan) {
     if (!subscription) return;
     setNotice(null);
+    setQuote(null);
+
+    // Moving to Free from a paid plan is a cancellation, not a purchase —
+    // the gateway rejects a zero-amount checkout outright.
+    if (plan.priceMonthly === 0) {
+      setNotice({
+        kind: "info",
+        text: "To move to Free, cancel your current plan above. You keep your paid features until the end of the period.",
+      });
+      return;
+    }
+
     setBusyPlan(plan.key);
+    let leaving = false;
     try {
-      // Moving to Free from a paid plan is a cancellation, not a
-      // purchase — the gateway rejects a zero-amount checkout outright.
-      if (plan.priceMonthly === 0) {
-        setNotice({
-          kind: "info",
-          text: "To move to Free, cancel your current plan above. You keep your paid features until the end of the period.",
-        });
+      const res = await csrfFetch(
+        `/api/subscriptions/quote?planKey=${encodeURIComponent(plan.key)}`,
+        { cache: "no-store" },
+      );
+      const json = await res.json().catch(() => ({}));
+      if (res.ok && json?.data) {
+        setQuote(json.data as CheckoutQuote);
         return;
       }
+      const message = Array.isArray(json?.message)
+        ? json.message.join(". ")
+        : json?.message;
+      // An older backend without the quote route: go straight to checkout
+      // at its full price, as before.
+      if (res.status === 404 && String(message ?? "").startsWith("Cannot GET")) {
+        leaving = await startCheckout(plan.key);
+        return;
+      }
+      setNotice({
+        // 409 is connect-nest explaining why (too early to renew, or a
+        // cheaper plan while paid time is left).
+        kind: res.status === 409 ? "info" : "err",
+        text: message || "Could not price this plan. Please try again.",
+      });
+    } catch {
+      setNotice({
+        kind: "err",
+        text: "Something went wrong. Please try again.",
+      });
+    } finally {
+      if (!leaving) setBusyPlan(null);
+    }
+  }
 
+  /**
+   * Second step: start the Paystack checkout and leave the app for it.
+   * Resolves true once the browser is navigating to Paystack.
+   */
+  async function startCheckout(planKey: PlanKey): Promise<boolean> {
+    if (!subscription) return false;
+    setBusyPlan(planKey);
+    let leaving = false;
+    try {
       const result = await post("/api/subscriptions/initiate-payment", {
-        planKey: plan.key,
+        planKey,
       });
 
       if (result.checkoutUrl) {
         // Leaving the app for Paystack; it returns here with ?reference=,
         // and the effect above waits for the payment to be confirmed.
         writePending({
-          plan: plan.key,
+          plan: planKey,
+          previousPlan: subscription.plan.key,
           previousPeriodEnd: subscription.currentPeriodEnd,
           startedAt: Date.now(),
         });
+        // Stay busy while the browser navigates away, so a second click
+        // can't open a second checkout.
+        leaving = true;
         window.location.href = result.checkoutUrl;
-        return;
+        return true;
       }
 
+      setQuote(null);
       setNotice({
-        // 409 is connect-nest explaining why (e.g. too early to renew).
         kind: result.status === 409 ? "info" : "err",
         text: result.message || "Could not start the payment. Please try again.",
       });
@@ -427,8 +493,22 @@ export default function SubscriptionClient({
         text: "Something went wrong. Please try again.",
       });
     } finally {
-      setBusyPlan(null);
+      if (!leaving) setBusyPlan(null);
     }
+    return false;
+  }
+
+  /** What the confirmation says the payment buys. */
+  function quoteSummary(q: CheckoutQuote, planName: string): string {
+    const until = formatDate(q.renewsAt);
+    if (q.kind === "prorated_upgrade") {
+      return (
+        `You'll pay ${formatPrice(q.amountKobo)} now to move to ${planName} ` +
+        `for the rest of your current period, until ${until}. You keep that ` +
+        `date; renewing after it costs ${formatPrice(q.fullPriceKobo)} a month.`
+      );
+    }
+    return `You'll pay ${formatPrice(q.amountKobo)} now for ${planName} until ${until}.`;
   }
 
   async function handleCancel() {
@@ -665,24 +745,47 @@ export default function SubscriptionClient({
                     ))}
                   </ul>
 
-                  <div className="space-y-1.5">
-                    <button
-                      onClick={() => handleChoose(plan)}
-                      disabled={!enabled}
-                      className={`w-full rounded-lg px-3 py-2.5 text-xs font-semibold transition flex items-center justify-center gap-1.5 ${
-                        action.enabled
-                          ? "bg-white text-black hover:bg-white/90 disabled:opacity-50"
-                          : "bg-white/5 text-white/30 cursor-default"
-                      }`}>
-                      {busy && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                      {busy ? "Working…" : action.label}
-                    </button>
-                    {action.hint && (
-                      <p className="text-center text-[11px] text-white/35">
-                        {action.hint}
+                  {quote?.planKey === plan.key ? (
+                    <div className="space-y-2.5 rounded-lg border border-white/10 bg-white/[0.04] p-3">
+                      <p className="text-xs leading-relaxed text-white/70">
+                        {quoteSummary(quote, plan.name)}
                       </p>
-                    )}
-                  </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => startCheckout(plan.key)}
+                          disabled={busyPlan !== null || pending || confirming}
+                          className="flex-1 rounded-lg bg-white px-3 py-2.5 text-xs font-semibold text-black transition hover:bg-white/90 disabled:opacity-50 flex items-center justify-center gap-1.5">
+                          {busy && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                          {busy ? "Working…" : `Pay ${formatPrice(quote.amountKobo)}`}
+                        </button>
+                        <button
+                          onClick={() => setQuote(null)}
+                          disabled={busyPlan !== null}
+                          className="rounded-lg border border-white/10 px-3 py-2.5 text-xs font-medium transition hover:bg-white/5 disabled:opacity-50">
+                          Back
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-1.5">
+                      <button
+                        onClick={() => handleChoose(plan)}
+                        disabled={!enabled}
+                        className={`w-full rounded-lg px-3 py-2.5 text-xs font-semibold transition flex items-center justify-center gap-1.5 ${
+                          action.enabled
+                            ? "bg-white text-black hover:bg-white/90 disabled:opacity-50"
+                            : "bg-white/5 text-white/30 cursor-default"
+                        }`}>
+                        {busy && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                        {busy ? "Working…" : action.label}
+                      </button>
+                      {action.hint && (
+                        <p className="text-center text-[11px] text-white/35">
+                          {action.hint}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               );
             })}
