@@ -233,7 +233,11 @@ export default function SubscriptionClient({
     const check = async () => {
       let sub: MySubscription | null = null;
       try {
-        const res = await fetch("/api/subscriptions/me", { cache: "no-store" });
+        // csrfFetch for its 401 refresh-and-retry: the session can expire
+        // while the user is away on the Paystack page.
+        const res = await csrfFetch("/api/subscriptions/me", {
+          cache: "no-store",
+        });
         if (res.ok) sub = (await res.json())?.data ?? null;
       } catch {
         // A failed check is retried on the next tick.
@@ -444,10 +448,12 @@ export default function SubscriptionClient({
     }
   }
 
+  // Not PAST_DUE: its paid period is already over, so cancelling would end
+  // access at once — contrary to what the confirmation below promises.
   const canCancel =
     subscription != null &&
     subscription.plan.key !== "FREE" &&
-    ["ACTIVE", "TRIALING", "PAST_DUE"].includes(subscription.status);
+    ["ACTIVE", "TRIALING"].includes(subscription.status);
 
   return (
     <div className="max-w-md lg:max-w-4xl mx-auto p-4 space-y-6">
