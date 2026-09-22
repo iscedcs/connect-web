@@ -41,7 +41,7 @@ export default function NFCChecker() {
 			</Badge>
 			<p className='text-sm text-gray-400 mt-2'>
 				(Note: For full NFC capability check, please navigate to the
-				Connect page)
+				LYNCON page)
 			</p>
 		</div>
 	);

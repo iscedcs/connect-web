@@ -7,7 +7,7 @@ import {
 import ArtisanSettingsClient from '@/components/cardholder/artisan/settings/artisan-settings-client';
 import { getConnectProfile } from '@/lib/services/profile';
 
-export const metadata = { title: 'Artisan Settings — ISCE Connect' };
+export const metadata = { title: 'Artisan Settings — LYNCON' };
 
 export default async function ArtisanSettingsPage() {
 	const auth = await getAuthInfo();

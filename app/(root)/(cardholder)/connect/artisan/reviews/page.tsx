@@ -7,7 +7,7 @@ import {
 } from '@/lib/services/artisan';
 import ArtisanReviewsClient from '@/components/cardholder/artisan/reviews/artisan-reviews-client';
 
-export const metadata = { title: 'My Reviews — ISCE Connect' };
+export const metadata = { title: 'My Reviews — LYNCON' };
 
 export default async function ArtisanReviewsPage() {
 	const auth = await getAuthInfo();

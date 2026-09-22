@@ -18,9 +18,9 @@ export default function NfcTapLandingPage() {
           <span className="text-[10px] font-mono uppercase tracking-widest text-[#10B981] font-bold">
             NFC Tap Connected • {cardCode}
           </span>
-          <h2 className="text-xl font-bold text-white mt-1">ISCE Connect Card</h2>
+          <h2 className="text-xl font-bold text-white mt-1">LYNCON Card</h2>
           <p className="text-xs text-[#888] mt-1">
-            Official smart card verified on ISCE Connect Ecosystem.
+            Official smart card verified on LYNCON Ecosystem.
           </p>
         </div>
 

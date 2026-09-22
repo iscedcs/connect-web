@@ -29,7 +29,7 @@ const PLANS = [
   },
   {
     id: 'PRO',
-    name: 'Connect Plus Pro',
+    name: 'LYNCON Plus Pro',
     price: '$29',
     period: 'per month',
     popular: true,
@@ -131,7 +131,7 @@ export default function OrgSubscriptionPage() {
           </span>
           <h3 className="text-xl font-bold text-[var(--cp-text-1,#FFF)]">
             {sub?.plan === 'PRO'
-              ? 'Connect Plus Pro Active'
+              ? 'LYNCON Plus Pro Active'
               : sub?.plan === 'ENTERPRISE'
               ? 'Enterprise Business Tier'
               : 'Starter / Free Plan'}

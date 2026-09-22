@@ -85,7 +85,7 @@ export function UseCases() {
             variants={fadeInUp}
             className="mt-4 md:mt-6 text-base md:text-lg text-zinc-400 max-w-xl mx-auto"
           >
-            From entrepreneurs to enterprise teams, Connect adapts to how you
+            From entrepreneurs to enterprise teams, LYNCON adapts to how you
             work and network.
           </motion.p>
         </motion.div>

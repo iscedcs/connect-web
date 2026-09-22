@@ -4,7 +4,7 @@ import { generateMetadata } from '@/lib/metadata';
 export const metadata = generateMetadata({
 	title: 'Terms of Service',
 	description:
-		'Terms governing your use of ISCE Connect and related services.',
+		'Terms governing your use of LYNCON and related services.',
 	keywords: ['terms', 'service', 'legal'],
 });
 
@@ -19,16 +19,16 @@ export default function TermsPage() {
 					<h2>1. Introduction</h2>
 					<p>
 						These Terms of Service (&quot;Terms&quot;) govern your access to and
-						use of ISCE Connect, our websites, mobile applications, NFC cards,
+						use of LYNCON, our websites, mobile applications, NFC cards,
 						and related services (collectively, the &quot;Service&quot;) provided
 						by ISCE Digital Concept (&quot;ISCE&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;).
 					</p>
 				</div>
 
 				<div>
-					<h2>2. The Connect Service</h2>
+					<h2>2. The LYNCON Service</h2>
 					<p>
-						ISCE Connect allows individuals and businesses to create dynamic
+						LYNCON allows individuals and businesses to create dynamic
 						digital profiles, share contact details, links, files, and media,
 						process digital interactions, and integrate with compatible smart devices
 						and wearables.

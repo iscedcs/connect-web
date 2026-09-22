@@ -3,7 +3,7 @@ import { generateMetadata } from '@/lib/metadata';
 export const metadata = generateMetadata({
 	title: 'Threads',
 	description:
-		'Manage your booking conversations and proposals on ISCE Connect.',
+		'Manage your booking conversations and proposals on LYNCON.',
 	keywords: ['threads', 'artisan', 'bookings', 'conversations'],
 });
 

@@ -10,7 +10,7 @@ const testimonials = [
     name: "Chinedu Eze",
     role: "CEO, TechBridge Africa",
     quote:
-      "Connect has completely transformed how our team networks at events. We went from printing 500 business cards per quarter to zero. The ROI is incredible — our team closes faster, follows up smarter, and our brand looks sharper in every room.",
+      "LYNCON has completely transformed how our team networks at events. We went from printing 500 business cards per quarter to zero. The ROI is incredible — our team closes faster, follows up smarter, and our brand looks sharper in every room.",
     rating: 5,
     accent: "#7B93FF",
   },

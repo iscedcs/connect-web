@@ -10,7 +10,7 @@ import { redirect } from 'next/navigation';
 export const metadata = generateMetadata({
 	title: 'Profile Configuration',
 	description:
-		'Configure the display order, visibility, and theme of your Connect profile modules.',
+		'Configure the display order, visibility, and theme of your LYNCON profile modules.',
 	keywords: ['settings', 'configuration', 'connect', 'modules', 'theme'],
 });
 

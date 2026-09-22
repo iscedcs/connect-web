@@ -13,8 +13,8 @@ import {
 /**
  * Persistent "your compliance details are incomplete" banner (ENG-424).
  *
- * Rendered from `CpShell`, so it follows the user across every Connect for
- * Business screen rather than only the dashboard — compliance stays visible
+ * Rendered from `CpShell`, so it follows the user across every LYNCON Plus
+ * screen rather than only the dashboard — compliance stays visible
  * until it is actually resolved.
  *
  * Dismissal is session-scoped on purpose: `sessionStorage`, never

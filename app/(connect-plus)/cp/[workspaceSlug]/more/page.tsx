@@ -52,7 +52,7 @@ export default function MobileMorePage() {
         { icon: Calendar, label: 'Appointments', href: `/cp/${workspaceSlug}/appointments` },
         { icon: Briefcase, label: 'Team / Staff', href: `/cp/${workspaceSlug}/team` },
         { icon: Clock, label: 'Attendance', href: `/cp/${workspaceSlug}/attendance` },
-        { icon: CreditCard, label: 'Connect Cards', href: `/cp/${workspaceSlug}/cards` },
+        { icon: CreditCard, label: 'LYNCON Cards', href: `/cp/${workspaceSlug}/cards` },
         { icon: MessageSquare, label: 'Chat', href: `/cp/${workspaceSlug}/chat` },
         { icon: Receipt, label: 'Invoices', href: `/cp/${workspaceSlug}/invoices` },
       ],
@@ -62,7 +62,7 @@ export default function MobileMorePage() {
       items: [
         { icon: Settings, label: 'Workspace Settings', href: `/cp/${workspaceSlug}/settings` },
         { icon: Building, label: 'Organization Dashboard', href: '/cp/org' },
-        { icon: ArrowLeft, label: 'Back to Connect Main', href: '/dashboard' },
+        { icon: ArrowLeft, label: 'Back to LYNCON Main', href: '/dashboard' },
       ],
     },
   ]
@@ -71,7 +71,7 @@ export default function MobileMorePage() {
     <div className="p-4 space-y-6 max-w-lg mx-auto pb-24">
       <CpPageHeader
         title="Account & Navigation"
-        subtitle={`Overview for ${workspaceName || 'Connect Plus'}`}
+        subtitle={`Overview for ${workspaceName || 'LYNCON Plus'}`}
       />
 
       {/* User Session Info Card */}
@@ -134,7 +134,7 @@ export default function MobileMorePage() {
           className="w-full flex items-center justify-center gap-2 p-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 font-semibold text-sm hover:bg-red-500/20 transition-colors"
         >
           <LogOut size={18} />
-          <span>Log Out of Connect Plus</span>
+          <span>Log Out of LYNCON Plus</span>
         </Link>
       </div>
     </div>

@@ -36,7 +36,7 @@ import { getMySubscription } from "@/lib/services/subscription";
 export const metadata = generateMetadata({
 	title: "Dashboard",
 	description:
-		"Manage your digital lifestyle, connect with NFC and QR codes, manage devices, and access all your Connect features in one place.",
+		"Manage your digital lifestyle, connect with NFC and QR codes, manage devices, and access all your LYNCON features in one place.",
 	keywords: ["dashboard", "connect", "devices", "profile"],
 });
 
@@ -222,7 +222,7 @@ export default async function DashboardPage({
 						</section>
 					)}
 
-					{/* Connect management strip */}
+					{/* LYNCON management strip */}
 					{accessToken && connectProfile?.id && (
 						<section className="p-4 lg:p-0">
 							<ConnectManagementWrapper
