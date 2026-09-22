@@ -8,6 +8,7 @@ import {
 	getMySubscription,
 	getPlans,
 } from '@/lib/services/subscription';
+import { getWalletStatus } from '@/lib/services/wallet';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,11 +30,19 @@ export default async function SubscriptionPage() {
 
 	// Each of these resolves to null/[] on failure rather than throwing, so a
 	// single unavailable endpoint degrades that section instead of the page.
-	const [subscription, plans, limits] = await Promise.all([
+	const [subscription, plans, limits, walletStatus] = await Promise.all([
 		getMySubscription(accessToken),
 		getPlans(accessToken),
 		getMyLimits(accessToken),
+		getWalletStatus(accessToken),
 	]);
+	// No wallet (or it couldn't be loaded): only card payments are offered.
+	const wallet = walletStatus?.hasWallet
+		? {
+				hasPin: walletStatus.hasPin,
+				balanceKobo: Math.round((walletStatus.balance ?? 0) * 100),
+			}
+		: null;
 
 	return (
 		<main className='min-h-screen bg-black text-white'>
@@ -45,6 +54,7 @@ export default async function SubscriptionPage() {
 				subscription={subscription}
 				plans={plans}
 				limits={limits}
+				wallet={wallet}
 			/>
 		</main>
 	);

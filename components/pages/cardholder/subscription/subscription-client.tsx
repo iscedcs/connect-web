@@ -9,11 +9,14 @@ import {
   AlertCircle,
   Loader2,
   Info,
+  CreditCard,
+  Wallet,
 } from "lucide-react";
 import { csrfFetch } from "@/lib/csrf-client";
 import {
   accessEndsAt,
   formatLimit,
+  formatNaira,
   formatPrice,
   formatStorage,
   hasPlanAccess,
@@ -21,7 +24,9 @@ import {
   isUnlimited,
   planRank,
   type CheckoutQuote,
+  type CheckoutWallet,
   type MySubscription,
+  type PaymentMethod,
   type Plan,
   type PlanKey,
   type PlanLimits,
@@ -97,10 +102,32 @@ function isConfirmed(
   return (
     !!sub &&
     sub.plan.key === pending.plan &&
-    sub.status === "ACTIVE" &&
+    // TRIALING: the payment was the check that starts a free trial.
+    (sub.status === "ACTIVE" || sub.status === "TRIALING") &&
     (pending.previousPlan !== pending.plan ||
       sub.currentPeriodEnd !== pending.previousPeriodEnd)
   );
+}
+
+/** What the plan says it was just paid up to: the trial end for a trial. */
+function confirmedMessage(sub: MySubscription): string {
+  if (sub.status === "TRIALING") {
+    const until = formatDate(sub.trialEndDate);
+    return `Your free trial of ${sub.plan.name} has started${
+      until ? `. It runs until ${until}` : ""
+    }.`;
+  }
+  const until = formatDate(sub.currentPeriodEnd);
+  return `Payment confirmed. You're on ${sub.plan.name}${
+    until ? ` until ${until}` : ""
+  }.`;
+}
+
+/** "visa •••• 4081" or "your wallet": what automatic renewals charge. */
+function instrumentLabel(sub: MySubscription): string {
+  return sub.paymentMethod === "WALLET"
+    ? "your wallet"
+    : (sub.savedCardLabel ?? "your saved card");
 }
 
 interface Props {
@@ -108,6 +135,15 @@ interface Props {
   plans: Plan[];
   /** Effective limits right now — may be FREE even on a paid plan if lapsed. */
   limits: PlanLimits | null;
+  /** The user's wallet, for paying from it; null offers card payment only. */
+  wallet: CheckoutWallet | null;
+}
+
+/** A wallet payment waiting for the user's PIN. */
+interface WalletApproval {
+  paymentId: string;
+  planKey: PlanKey;
+  amountKobo: number;
 }
 
 const STATUS_STYLES: Record<SubscriptionStatus, string> = {
@@ -184,6 +220,7 @@ export default function SubscriptionClient({
   subscription,
   plans,
   limits,
+  wallet,
 }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -194,8 +231,15 @@ export default function SubscriptionClient({
   } | null>(null);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [confirming, setConfirming] = useState(false);
-  /** The price shown for confirmation before leaving for Paystack. */
+  /** The price shown for confirmation before paying. */
   const [quote, setQuote] = useState<CheckoutQuote | null>(null);
+  /** How the quoted plan will be paid for, chosen on the confirmation. */
+  const [method, setMethod] = useState<PaymentMethod>("CARD");
+  /** Keep the card, or allow the wallet, to renew the plan each month. */
+  const [autoRenew, setAutoRenew] = useState(true);
+  const [approval, setApproval] = useState<WalletApproval | null>(null);
+  const [pin, setPin] = useState("");
+  const [pinError, setPinError] = useState<string | null>(null);
   const searchParams = useSearchParams();
 
   // Read once, on the first render: removing the params below updates
@@ -258,13 +302,7 @@ export default function SubscriptionClient({
       if (isConfirmed(sub, pending)) {
         clearPending();
         setConfirming(false);
-        const until = formatDate(sub.currentPeriodEnd);
-        setNotice({
-          kind: "ok",
-          text: `Payment confirmed. You're on ${sub.plan.name}${
-            until ? ` until ${until}` : ""
-          }.`,
-        });
+        setNotice({ kind: "ok", text: confirmedMessage(sub) });
         startTransition(() => router.refresh());
         return;
       }
@@ -336,12 +374,18 @@ export default function SubscriptionClient({
           return {
             label: "Your current plan",
             enabled: false,
-            hint: subscription.renewalOpensAt
-              ? `You can renew from ${formatDate(subscription.renewalOpensAt)}`
-              : undefined,
+            hint: subscription.autoRenew
+              ? undefined
+              : subscription.renewalOpensAt
+                ? `You can renew from ${formatDate(subscription.renewalOpensAt)}`
+                : undefined,
           };
         default:
-          // TRIALING: paying now would end the trial early.
+          // TRIALING: in its last days, paying adds the first month after
+          // the trial (the backend's canRenew). Earlier, nothing to do.
+          if (canRenew && subscription.canRenew !== undefined) {
+            return { label: "Pay for your first month", enabled: true };
+          }
           return { label: "Your current plan", enabled: false };
       }
     }
@@ -362,7 +406,13 @@ export default function SubscriptionClient({
     }
 
     if (planRank(plan.key) > effectiveRank) {
-      return { label: `Upgrade to ${plan.name}`, enabled: true };
+      return subscription.trialEligible
+        ? {
+            label: "Start 6-month free trial",
+            enabled: true,
+            hint: `Then ${formatPrice(plan.priceMonthly)}/month`,
+          }
+        : { label: `Upgrade to ${plan.name}`, enabled: true };
     }
 
     // Moving down to a cheaper paid plan would restart the month and drop
@@ -388,6 +438,9 @@ export default function SubscriptionClient({
       message: string | string[];
       checkoutUrl?: string;
       reference?: string;
+      walletPaymentId?: string;
+      balanceSufficient?: boolean;
+      data?: { delivered?: boolean };
     };
     // Nest validation errors arrive as a list of messages.
     const message = Array.isArray(json.message)
@@ -405,6 +458,9 @@ export default function SubscriptionClient({
     if (!subscription) return;
     setNotice(null);
     setQuote(null);
+    setApproval(null);
+    setMethod("CARD");
+    setAutoRenew(true);
 
     // Moving to Free from a paid plan is a cancellation, not a purchase —
     // the gateway rejects a zero-amount checkout outright.
@@ -454,8 +510,9 @@ export default function SubscriptionClient({
   }
 
   /**
-   * Second step: start the Paystack checkout and leave the app for it.
-   * Resolves true once the browser is navigating to Paystack.
+   * Second step. By card: start the Paystack checkout and leave the app for
+   * it, resolving true once the browser is navigating there. From the
+   * wallet: create the payment and ask for the wallet PIN.
    */
   async function startCheckout(planKey: PlanKey): Promise<boolean> {
     if (!subscription) return false;
@@ -464,7 +521,28 @@ export default function SubscriptionClient({
     try {
       const result = await post("/api/subscriptions/initiate-payment", {
         planKey,
+        method,
+        // A trial always renews; connect-nest ignores a "no" for one.
+        autoRenew: quote?.kind === "trial" ? true : autoRenew,
       });
+
+      if (result.walletPaymentId) {
+        if (result.balanceSufficient === false) {
+          setNotice({
+            kind: "info",
+            text: "Your wallet balance is too low for this payment. Top up your wallet, or pay by card.",
+          });
+          return false;
+        }
+        setApproval({
+          paymentId: result.walletPaymentId,
+          planKey,
+          amountKobo: quote?.amountKobo ?? 0,
+        });
+        setPin("");
+        setPinError(null);
+        return false;
+      }
 
       if (result.checkoutUrl) {
         // Leaving the app for Paystack; it returns here with ?reference=,
@@ -498,17 +576,110 @@ export default function SubscriptionClient({
     return false;
   }
 
-  /** What the confirmation says the payment buys. */
+  /**
+   * Third step for a wallet payment: approve it with the wallet PIN.
+   * wallet-nest applies it to the plan before answering, so on success the
+   * plan has usually changed already.
+   */
+  async function confirmWalletPayment() {
+    // Enter in the PIN field bypasses the disabled button.
+    if (!approval || busyPlan !== null) return;
+    if (!/^\d{4}$/.test(pin)) {
+      setPinError("Enter your 4-digit wallet PIN.");
+      return;
+    }
+    setBusyPlan(approval.planKey);
+    setPinError(null);
+    try {
+      const result = await post("/api/subscriptions/confirm-wallet-payment", {
+        paymentId: approval.paymentId,
+        pin,
+      });
+      if (result.success) {
+        setApproval(null);
+        setQuote(null);
+        setPin("");
+        const delivered = result.data?.delivered !== false;
+        let sub: MySubscription | null = null;
+        if (delivered) {
+          try {
+            const res = await csrfFetch("/api/subscriptions/me", {
+              cache: "no-store",
+            });
+            if (res.ok) sub = (await res.json())?.data ?? null;
+          } catch {
+            // The refresh below still shows the new plan.
+          }
+        }
+        setNotice(
+          sub && sub.plan.key === approval.planKey
+            ? { kind: "ok", text: confirmedMessage(sub) }
+            : {
+                kind: "ok",
+                text: delivered
+                  ? "Payment made from your wallet."
+                  : "Payment made from your wallet. Your plan will update in a few minutes.",
+              },
+        );
+        refresh();
+        return;
+      }
+      // 403: a wrong PIN, or too many of them. The payment is still
+      // waiting, so they can try again (until the lockout).
+      if (result.status === 403 || result.status === 400) {
+        setPin("");
+        setPinError(result.message || "That PIN didn't work.");
+        return;
+      }
+      // 409: the payment expired, or no longer applies (the wallet was not
+      // charged). Anything else: start again.
+      setApproval(null);
+      setQuote(null);
+      setNotice({
+        kind: result.status === 409 ? "info" : "err",
+        text: result.message || "The payment didn't go through. Please try again.",
+      });
+      refresh();
+    } catch {
+      setPinError("Something went wrong. Please try again.");
+    } finally {
+      setBusyPlan(null);
+    }
+  }
+
+  /** Why the wallet can't pay `amountKobo`, or null if it can. */
+  function walletBlocker(amountKobo: number): string | null {
+    if (!wallet) return "You don't have a wallet yet.";
+    if (!wallet.hasPin) return "Set a wallet PIN to pay from your wallet.";
+    if (wallet.balanceKobo < amountKobo) {
+      return `Your wallet has ${formatNaira(wallet.balanceKobo)}. Top it up, or pay by card.`;
+    }
+    return null;
+  }
+
+  /** What the confirmation says the payment buys, and what happens after. */
   function quoteSummary(q: CheckoutQuote, planName: string): string {
     const until = formatDate(q.renewsAt);
+    const monthly = formatPrice(q.fullPriceKobo);
+    const from = method === "WALLET" ? "your wallet" : "this card";
+    if (q.kind === "trial") {
+      return (
+        `Try ${planName} free until ${until}. We charge ${formatPrice(q.amountKobo)} ` +
+        `now to check ${from}; it isn't refunded. From ${until}, ${monthly} a month ` +
+        `is charged to ${from} automatically until you cancel.`
+      );
+    }
+    const renews = autoRenew
+      ? ` Then ${monthly} a month is charged to ${from} automatically until you cancel.`
+      : " It won't renew by itself: you can renew here in the last week.";
     if (q.kind === "prorated_upgrade") {
       return (
         `You'll pay ${formatPrice(q.amountKobo)} now to move to ${planName} ` +
         `for the rest of your current period, until ${until}. You keep that ` +
-        `date; renewing after it costs ${formatPrice(q.fullPriceKobo)} a month.`
+        `date.${renews}`
       );
     }
-    return `You'll pay ${formatPrice(q.amountKobo)} now for ${planName} until ${until}.`;
+    return `You'll pay ${formatPrice(q.amountKobo)} now for ${planName} until ${until}.${renews}`;
   }
 
   async function handleCancel() {
@@ -544,7 +715,7 @@ export default function SubscriptionClient({
         </h2>
 
         {subscription ? (
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 space-y-3">
+          <div className="rounded-xl border border-white/10 bg-white/3 p-4 space-y-3">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
@@ -587,20 +758,37 @@ export default function SubscriptionClient({
                     </span>
                   )}
                 </p>
+                <p className="text-[11px] text-sky-300/60 mt-1">
+                  {subscription.autoRenew && subscription.nextChargeKobo
+                    ? `Then ${formatPrice(subscription.nextChargeKobo)} a month, charged to ${instrumentLabel(
+                        subscription,
+                      )} from ${formatDate(subscription.nextChargeAt ?? null)}.`
+                    : "Your plan's features end with the trial unless you pay for it."}
+                </p>
               </div>
             )}
 
-            {/* Nothing renews on its own yet: every month is paid for
-                separately, so say when it runs out, never "Renews". */}
+            {/* "Renews" only when it renews itself, i.e. a card or wallet
+                permission is on file; otherwise say when it runs out. */}
             {!subscription.isInTrial && isPaidPlan && access && endsAt && (
               <p className="text-xs text-white/40">
                 {subscription.status === "CANCELLED"
                   ? `Cancelled. Your features stay on until ${formatDate(endsAt)}.`
                   : subscription.status === "PAST_DUE"
-                    ? `Your month ended on ${formatDate(
-                        subscription.currentPeriodEnd,
-                      )}. Renew by ${formatDate(endsAt)} to keep your features.`
-                    : `Paid until ${formatDate(endsAt)}.`}
+                    ? subscription.autoRenew
+                      ? `We couldn't take this month's payment from ${instrumentLabel(
+                          subscription,
+                        )} yet. We'll try again, or renew by ${formatDate(endsAt)} to keep your features.`
+                      : `Your month ended on ${formatDate(
+                          subscription.currentPeriodEnd,
+                        )}. Renew by ${formatDate(endsAt)} to keep your features.`
+                    : subscription.autoRenew && subscription.nextChargeKobo
+                      ? `Renews on ${formatDate(
+                          subscription.nextChargeAt ?? null,
+                        )} for ${formatPrice(subscription.nextChargeKobo)}, charged to ${instrumentLabel(
+                          subscription,
+                        )}.`
+                      : `Paid until ${formatDate(endsAt)}. It won't renew by itself.`}
               </p>
             )}
 
@@ -616,10 +804,19 @@ export default function SubscriptionClient({
 
             {canCancel &&
               (confirmCancel ? (
-                <div className="rounded-lg border border-red-500/20 bg-red-500/[0.07] p-3 space-y-2.5">
+                <div className="rounded-lg border border-red-500/20 bg-red-500/7 p-3 space-y-2.5">
                   <p className="text-xs text-white/70">
-                    Cancel your subscription? You keep access until the end of
-                    the current period, then drop to Free limits.
+                    Cancel your subscription? Nothing more will be charged
+                    {subscription.autoRenew
+                      ? `, and ${
+                          subscription.paymentMethod === "WALLET"
+                            ? "the permission to charge your wallet is removed"
+                            : "your saved card is removed"
+                        }`
+                      : ""}
+                    . You keep access until the end of the current{" "}
+                    {subscription.isInTrial ? "trial" : "period"}, then drop to
+                    Free limits.
                   </p>
                   <div className="flex gap-2">
                     <button
@@ -645,7 +842,7 @@ export default function SubscriptionClient({
               ))}
           </div>
         ) : (
-          <div className="rounded-xl border border-red-500/20 bg-red-500/[0.06] p-4">
+          <div className="rounded-xl border border-red-500/20 bg-red-500/6 p-4">
             <p className="text-sm font-medium">We couldn&apos;t load your plan</p>
             <p className="text-xs text-white/40 mt-1">
               Refresh the page to try again. Plan changes are unavailable until
@@ -664,7 +861,7 @@ export default function SubscriptionClient({
               ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-300"
               : notice.kind === "err"
                 ? "border-red-500/25 bg-red-500/10 text-red-300"
-                : "border-white/10 bg-white/[0.04] text-white/70"
+                : "border-white/10 bg-white/4 text-white/70"
           }`}>
           {notice.kind === "ok" ? (
             <Check className="h-4 w-4 mt-0.5 shrink-0" />
@@ -684,7 +881,7 @@ export default function SubscriptionClient({
         </h2>
 
         {plans.length === 0 ? (
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+          <div className="rounded-xl border border-white/10 bg-white/3 p-4">
             <p className="text-sm text-white/60">
               Plans are unavailable right now. Please try again shortly.
             </p>
@@ -706,8 +903,8 @@ export default function SubscriptionClient({
                   key={plan.id}
                   className={`rounded-xl border p-4 flex flex-col gap-3 transition ${
                     isCurrent
-                      ? "border-emerald-500/40 bg-emerald-500/[0.06]"
-                      : "border-white/10 bg-white/[0.03] hover:border-white/20"
+                      ? "border-emerald-500/40 bg-emerald-500/6"
+                      : "border-white/10 bg-white/3 hover:border-white/20"
                   }`}>
                   <div>
                     <div className="flex items-center justify-between gap-2">
@@ -745,8 +942,119 @@ export default function SubscriptionClient({
                     ))}
                   </ul>
 
-                  {quote?.planKey === plan.key ? (
-                    <div className="space-y-2.5 rounded-lg border border-white/10 bg-white/[0.04] p-3">
+                  {approval?.planKey === plan.key ? (
+                    <div className="space-y-2.5 rounded-lg border border-white/10 bg-white/4 p-3">
+                      <p className="text-xs leading-relaxed text-white/70">
+                        Enter your wallet PIN to pay{" "}
+                        {formatPrice(approval.amountKobo)} from your wallet.
+                      </p>
+                      <input
+                        type="password"
+                        inputMode="numeric"
+                        autoComplete="off"
+                        maxLength={4}
+                        value={pin}
+                        onChange={(e) => {
+                          setPin(e.target.value.replace(/\D/g, "").slice(0, 4));
+                          setPinError(null);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") void confirmWalletPayment();
+                        }}
+                        aria-label="Wallet PIN"
+                        placeholder="••••"
+                        autoFocus
+                        className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2.5 text-center text-lg tracking-[0.5em] outline-none focus:border-white/40"
+                      />
+                      {pinError && (
+                        <p role="alert" className="text-[11px] text-red-300">
+                          {pinError}
+                        </p>
+                      )}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => void confirmWalletPayment()}
+                          disabled={busyPlan !== null || pin.length !== 4}
+                          className="flex-1 rounded-lg bg-white px-3 py-2.5 text-xs font-semibold text-black transition hover:bg-white/90 disabled:opacity-50 flex items-center justify-center gap-1.5">
+                          {busy && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                          {busy ? "Paying…" : "Confirm payment"}
+                        </button>
+                        <button
+                          onClick={() => {
+                            // The payment stays unapproved at wallet-nest and
+                            // expires; nothing has been taken.
+                            setApproval(null);
+                            setPin("");
+                            setPinError(null);
+                          }}
+                          disabled={busyPlan !== null}
+                          className="rounded-lg border border-white/10 px-3 py-2.5 text-xs font-medium transition hover:bg-white/5 disabled:opacity-50">
+                          Back
+                        </button>
+                      </div>
+                    </div>
+                  ) : quote?.planKey === plan.key ? (
+                    <div className="space-y-2.5 rounded-lg border border-white/10 bg-white/4 p-3">
+                      {wallet && (
+                        <div
+                          role="radiogroup"
+                          aria-label="Pay with"
+                          className="grid grid-cols-2 gap-2">
+                          {(["CARD", "WALLET"] as const).map((m) => {
+                            const blocked =
+                              m === "WALLET" ? walletBlocker(quote.amountKobo) : null;
+                            const selected = method === m;
+                            return (
+                              <button
+                                key={m}
+                                type="button"
+                                role="radio"
+                                aria-checked={selected}
+                                onClick={() => setMethod(m)}
+                                disabled={!!blocked || busyPlan !== null}
+                                className={`rounded-lg border px-2.5 py-2 text-left transition disabled:opacity-40 ${
+                                  selected
+                                    ? "border-white/50 bg-white/10"
+                                    : "border-white/10 hover:bg-white/5"
+                                }`}>
+                                <span className="flex items-center gap-1.5 text-xs font-semibold">
+                                  {m === "CARD" ? (
+                                    <CreditCard className="h-3.5 w-3.5" />
+                                  ) : (
+                                    <Wallet className="h-3.5 w-3.5" />
+                                  )}
+                                  {m === "CARD" ? "Card" : "Wallet"}
+                                </span>
+                                <span className="block text-[10px] text-white/40 mt-0.5">
+                                  {m === "CARD"
+                                    ? "Paystack"
+                                    : `Balance ${formatNaira(wallet.balanceKobo)}`}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                      {wallet && walletBlocker(quote.amountKobo) && (
+                        <p className="text-[11px] text-white/40">
+                          {walletBlocker(quote.amountKobo)}
+                        </p>
+                      )}
+                      {quote.kind !== "trial" && (
+                        <label className="flex items-start gap-2 text-xs text-white/70 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={autoRenew}
+                            onChange={(e) => setAutoRenew(e.target.checked)}
+                            disabled={busyPlan !== null}
+                            className="mt-0.5 accent-white"
+                          />
+                          <span>
+                            Renew automatically each month from{" "}
+                            {method === "WALLET" ? "my wallet" : "this card"}
+                          </span>
+                        </label>
+                      )}
                       <p className="text-xs leading-relaxed text-white/70">
                         {quoteSummary(quote, plan.name)}
                       </p>
@@ -756,7 +1064,13 @@ export default function SubscriptionClient({
                           disabled={busyPlan !== null || pending || confirming}
                           className="flex-1 rounded-lg bg-white px-3 py-2.5 text-xs font-semibold text-black transition hover:bg-white/90 disabled:opacity-50 flex items-center justify-center gap-1.5">
                           {busy && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                          {busy ? "Working…" : `Pay ${formatPrice(quote.amountKobo)}`}
+                          {busy
+                            ? "Working…"
+                            : quote.kind === "trial"
+                              ? `Start free trial · ${formatPrice(quote.amountKobo)}`
+                              : `Pay ${formatPrice(quote.amountKobo)}${
+                                  method === "WALLET" ? " from wallet" : ""
+                                }`}
                         </button>
                         <button
                           onClick={() => setQuote(null)}

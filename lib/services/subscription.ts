@@ -9,6 +9,7 @@ import { BASE_URLS, URLS } from '@/lib/const';
 import type {
 	CheckoutQuote,
 	MySubscription,
+	PaymentMethod,
 	Plan,
 	PlanKey,
 	PlanLimits,
@@ -216,12 +217,27 @@ export async function cancelSubscription(
  *
  * `callbackUrl` is where the gateway sends the user once they are done;
  * without it they finish paying and land wherever the gateway defaults to.
+ *
+ * With `method: 'WALLET'` there is no checkout page: connect-nest creates a
+ * payment at wallet-nest and returns its `walletPaymentId`, which the user
+ * then approves with their wallet PIN (`confirmServicePayment`).
+ *
+ * `autoRenew` (default on at connect-nest) keeps the card, or grants a
+ * wallet permission, to renew the plan each month. A trial always renews.
  */
 export async function initiatePayment(
 	accessToken: string,
 	planKey: PlanKey,
 	callbackUrl?: string,
-): Promise<MutationResult & { checkoutUrl?: string; reference?: string }> {
+	options: { method?: PaymentMethod; autoRenew?: boolean } = {},
+): Promise<
+	MutationResult & {
+		checkoutUrl?: string;
+		reference?: string;
+		walletPaymentId?: string;
+		balanceSufficient?: boolean;
+	}
+> {
 	if (!CONNECT_API_URL || !accessToken) {
 		return { success: false, status: 503, message: 'Service unavailable' };
 	}
@@ -234,9 +250,14 @@ export async function initiatePayment(
 					Authorization: `Bearer ${accessToken}`,
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify(
-					callbackUrl ? { planKey, callbackUrl } : { planKey },
-				),
+				body: JSON.stringify({
+					planKey,
+					...(callbackUrl && { callbackUrl }),
+					...(options.method && { method: options.method }),
+					...(options.autoRenew !== undefined && {
+						autoRenew: options.autoRenew,
+					}),
+				}),
 				cache: 'no-store',
 			},
 		);
@@ -247,13 +268,14 @@ export async function initiatePayment(
 			(data.authorizationUrl as string) ||
 			(data.authorization_url as string) ||
 			undefined;
+		const walletPaymentId = (data.walletPaymentId as string) || undefined;
 
 		if (!res.ok || json.success === false) {
 			console.error(
 				`[subscription] POST initiate-payment -> HTTP ${res.status}`,
 				JSON.stringify(json).slice(0, 300),
 			);
-		} else if (!checkoutUrl) {
+		} else if (!checkoutUrl && !walletPaymentId) {
 			// Succeeded but gave us nowhere to send the user — without this
 			// the UI silently does nothing, which is hard to diagnose.
 			console.error(
@@ -268,6 +290,11 @@ export async function initiatePayment(
 			message: json.message || (res.ok ? 'Payment session created' : 'Could not start payment'),
 			checkoutUrl,
 			reference: (data.reference as string) || undefined,
+			walletPaymentId,
+			balanceSufficient:
+				typeof data.balanceSufficient === 'boolean'
+					? data.balanceSufficient
+					: undefined,
 			data: json.data,
 		};
 	} catch (err) {

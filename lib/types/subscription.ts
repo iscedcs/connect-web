@@ -73,8 +73,31 @@ export interface MySubscription {
 	accessEndsAt?: string | null;
 	/** Whether paying for this same plan now is accepted (renew/resubscribe). */
 	canRenew?: boolean;
-	/** For an active paid plan: when renewing the same plan opens. */
+	/** For an active paid plan or a trial: when paying for the same plan opens. */
 	renewalOpensAt?: string | null;
+	// Automatic renewal and trials (connect-nest's auto-renew change).
+	/** Whether the plan renews itself by charging the saved card or the wallet. */
+	autoRenew?: boolean;
+	/** What automatic renewals charge, or null when it doesn't renew by itself. */
+	paymentMethod?: PaymentMethod | null;
+	/** e.g. "visa •••• 4081" for a card; null for the wallet. */
+	savedCardLabel?: string | null;
+	/** When the next automatic charge is due (ISO date). */
+	nextChargeAt?: string | null;
+	/** What the next automatic charge takes, in kobo. */
+	nextChargeKobo?: number | null;
+	/** Whether choosing a paid plan starts a free trial instead of charging a month. */
+	trialEligible?: boolean;
+}
+
+/** How a plan is paid for: a Paystack card checkout, or the Fiscus wallet. */
+export type PaymentMethod = 'CARD' | 'WALLET';
+
+/** The wallet as far as paying from it goes; null on the page when there is none. */
+export interface CheckoutWallet {
+	/** Wallet payments are approved with the PIN, so none can be made without one. */
+	hasPin: boolean;
+	balanceKobo: number;
 }
 
 /** Response of `GET /api/subscriptions/quote/:planKey`: what paying now charges. */
@@ -82,16 +105,22 @@ export interface CheckoutQuote {
 	/**
 	 * `prorated_upgrade`: moving mid-cycle to a dearer plan charges only the
 	 * difference for the time left, and the renewal date stays the same.
+	 * `trial`: a first paid plan starts with a free trial; `amountKobo` is the
+	 * card or wallet check, not refunded, and the first month is charged
+	 * automatically at `renewsAt`.
 	 * `full`: one month at the plan's price.
 	 */
-	kind: 'full' | 'prorated_upgrade';
+	kind: 'full' | 'prorated_upgrade' | 'trial';
 	planKey: PlanKey;
 	/** Charged now, in kobo. */
 	amountKobo: number;
 	/** The plan's monthly price, in kobo: what each month after `renewsAt` costs. */
 	fullPriceKobo: number;
 	fromPlanKey: PlanKey | null;
-	/** When the paid period ends once this payment lands (ISO date). */
+	/**
+	 * When the paid period (or, for a trial, the trial) ends once this payment
+	 * lands (ISO date).
+	 */
 	renewsAt: string;
 }
 
@@ -104,6 +133,43 @@ export function hasPlanAccess(sub: MySubscription): boolean {
 export function accessEndsAt(sub: MySubscription): string | null {
 	if (sub.accessEndsAt !== undefined) return sub.accessEndsAt;
 	return sub.isInTrial ? sub.trialEndDate : sub.currentPeriodEnd;
+}
+
+/**
+ * The plan in one line, for places outside the plan page (Settings, the
+ * dashboard): "Pro Plus · renews 22 Oct", "Pro Lite · free trial until
+ * 22 Mar", "Free plan". Dates in Lagos time, since it runs on the server.
+ */
+export function planSummary(sub: MySubscription): string {
+	const name = sub.plan.name;
+	const day = (iso: string | null | undefined) =>
+		iso
+			? new Date(iso).toLocaleDateString('en-NG', {
+					day: 'numeric',
+					month: 'short',
+					timeZone: 'Africa/Lagos',
+				})
+			: null;
+	if (sub.plan.priceMonthly === 0) return 'Free plan';
+	if (!hasPlanAccess(sub)) return `${name} ended · on Free limits`;
+	switch (sub.status) {
+		case 'TRIALING': {
+			const until = day(sub.trialEndDate);
+			return until ? `${name} · free trial until ${until}` : `${name} · free trial`;
+		}
+		case 'PAST_DUE':
+			return `${name} · payment due`;
+		case 'CANCELLED': {
+			const end = day(accessEndsAt(sub));
+			return end ? `${name} · ends ${end}` : name;
+		}
+		default: {
+			const renews = sub.autoRenew ? day(sub.nextChargeAt) : null;
+			if (renews) return `${name} · renews ${renews}`;
+			const until = day(accessEndsAt(sub));
+			return until ? `${name} · paid until ${until}` : name;
+		}
+	}
 }
 
 export const UNLIMITED = -1;
@@ -144,13 +210,23 @@ export function formatLimit(value: LimitValue): string {
 	return (value as number).toLocaleString();
 }
 
-/** Kobo → a display string like "₦1,000". */
+/** Kobo → a display string like "₦1,000", or "Free" for nothing. */
 export function formatPrice(kobo: number | null | undefined): string {
 	if (!kobo) return 'Free';
+	return formatNaira(kobo);
+}
+
+/**
+ * Kobo → "₦1,000", or "₦499.99" when there are kobo: a prorated charge
+ * must show exactly what will be taken, not a rounded figure.
+ */
+export function formatNaira(kobo: number): string {
+	const digits = kobo % 100 === 0 ? 0 : 2;
 	return new Intl.NumberFormat('en-NG', {
 		style: 'currency',
 		currency: 'NGN',
-		maximumFractionDigits: 0,
+		minimumFractionDigits: digits,
+		maximumFractionDigits: digits,
 	}).format(kobo / 100);
 }
 
