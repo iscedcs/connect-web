@@ -77,6 +77,24 @@ export interface MySubscription {
 	renewalOpensAt?: string | null;
 }
 
+/** Response of `GET /api/subscriptions/quote/:planKey`: what paying now charges. */
+export interface CheckoutQuote {
+	/**
+	 * `prorated_upgrade`: moving mid-cycle to a dearer plan charges only the
+	 * difference for the time left, and the renewal date stays the same.
+	 * `full`: one month at the plan's price.
+	 */
+	kind: 'full' | 'prorated_upgrade';
+	planKey: PlanKey;
+	/** Charged now, in kobo. */
+	amountKobo: number;
+	/** The plan's monthly price, in kobo: what each month after `renewsAt` costs. */
+	fullPriceKobo: number;
+	fromPlanKey: PlanKey | null;
+	/** When the paid period ends once this payment lands (ISO date). */
+	renewsAt: string;
+}
+
 /** `hasPlanAccess`, falling back to the status for an older backend. */
 export function hasPlanAccess(sub: MySubscription): boolean {
 	return sub.hasPlanAccess ?? (sub.status === 'ACTIVE' || sub.status === 'TRIALING');

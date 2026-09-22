@@ -6,7 +6,13 @@
  */
 
 import { BASE_URLS, URLS } from '@/lib/const';
-import type { MySubscription, Plan, PlanKey, PlanLimits } from '@/lib/types/subscription';
+import type {
+	CheckoutQuote,
+	MySubscription,
+	Plan,
+	PlanKey,
+	PlanLimits,
+} from '@/lib/types/subscription';
 
 const CONNECT_API_URL = BASE_URLS.CONNECT_API || '';
 
@@ -140,6 +146,38 @@ export interface MutationResult {
 	status: number;
 	message: string;
 	data?: unknown;
+}
+
+/**
+ * What paying for `planKey` would charge right now. A mid-cycle upgrade is
+ * prorated; connect-nest answers 409 (with its reason) when the payment
+ * would not be accepted.
+ */
+export async function getCheckoutQuote(
+	accessToken: string,
+	planKey: PlanKey,
+): Promise<MutationResult & { data?: CheckoutQuote }> {
+	if (!CONNECT_API_URL || !accessToken) {
+		return { success: false, status: 503, message: 'Service unavailable' };
+	}
+	try {
+		const res = await fetch(
+			`${CONNECT_API_URL}${URLS.subscription.quote.replace('{planKey}', planKey)}`,
+			{
+				headers: { Authorization: `Bearer ${accessToken}` },
+				cache: 'no-store',
+			},
+		);
+		const json = await readEnvelope<CheckoutQuote>(res);
+		return {
+			success: res.ok && json.success !== false,
+			status: res.status,
+			message: json.message || (res.ok ? '' : 'Could not price this plan'),
+			data: res.ok ? json.data : undefined,
+		};
+	} catch (err) {
+		return { ...transportFailure('quote', err), data: undefined };
+	}
 }
 
 /** Cancel the current paid subscription; access runs to the period end. */

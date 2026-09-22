@@ -383,6 +383,7 @@ export const URLS = {
     choose_plan: "/api/subscriptions/select-plan",
     cancel_plan: "/api/subscriptions/cancel",
     initiate_payment: "/api/subscriptions/initiate-payment",
+    quote: "/api/subscriptions/quote/{planKey}",
     admin_plans: "/api/subscriptions/admin/plans",
     admin_plans_control: "/api/subscriptions/admin/plans/{planKey}",
     admin_plans_broadcast: "/api/subscriptions/admin/broadcast-launch",
