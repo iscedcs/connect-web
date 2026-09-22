@@ -1,14 +1,22 @@
 /**
  * POST /api/subscriptions/initiate-payment
- * Starts a Paystack checkout for a paid plan (connect-nest creates it through
- * wallet-nest). Answers with connect-nest's own status: 401 lets csrfFetch
- * refresh the session and retry, and 409 carries connect-nest's reason for
- * refusing (e.g. already on this plan outside the renewal window).
+ * Body: { planKey, callbackUrl?, method?: 'CARD' | 'WALLET', autoRenew? }
+ *
+ * CARD starts a Paystack checkout (connect-nest creates it through
+ * wallet-nest). WALLET creates a wallet payment for the user to approve with
+ * their PIN (see ../confirm-wallet-payment). Answers with connect-nest's own
+ * status: 401 lets csrfFetch refresh the session and retry, and 409 carries
+ * connect-nest's reason for refusing (e.g. already on this plan outside the
+ * renewal window).
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { initiatePayment } from '@/lib/services/subscription';
-import { PLAN_ORDER, type PlanKey } from '@/lib/types/subscription';
+import {
+	PLAN_ORDER,
+	type PaymentMethod,
+	type PlanKey,
+} from '@/lib/types/subscription';
 
 export async function POST(req: NextRequest) {
 	const cookieStore = await cookies();
@@ -22,14 +30,28 @@ export async function POST(req: NextRequest) {
 	}
 
 	const body = await req.json().catch(() => ({}));
-	const { planKey, callbackUrl } = body as {
+	const { planKey, callbackUrl, method, autoRenew } = body as {
 		planKey?: string;
 		callbackUrl?: string;
+		method?: unknown;
+		autoRenew?: unknown;
 	};
 
 	if (!planKey || !PLAN_ORDER.includes(planKey as PlanKey) || planKey === 'FREE') {
 		return NextResponse.json(
 			{ success: false, message: 'A valid paid planKey is required' },
+			{ status: 400 },
+		);
+	}
+	if (method !== undefined && method !== 'CARD' && method !== 'WALLET') {
+		return NextResponse.json(
+			{ success: false, message: 'method must be CARD or WALLET' },
+			{ status: 400 },
+		);
+	}
+	if (autoRenew !== undefined && typeof autoRenew !== 'boolean') {
+		return NextResponse.json(
+			{ success: false, message: 'autoRenew must be true or false' },
 			{ status: 400 },
 		);
 	}
@@ -49,6 +71,7 @@ export async function POST(req: NextRequest) {
 		accessToken,
 		planKey as PlanKey,
 		new URL(path, origin).toString(),
+		{ method: method as PaymentMethod | undefined, autoRenew },
 	);
 
 	return NextResponse.json(result, { status: result.status });

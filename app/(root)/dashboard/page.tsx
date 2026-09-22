@@ -30,6 +30,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import ReferralCard from "@/components/pages/cardholder/home/referral-card";
 import ReferralStoreCard from "@/components/pages/cardholder/home/referral-store-card";
+import PlanBadge from "@/components/pages/cardholder/home/plan-badge";
+import { getMySubscription } from "@/lib/services/subscription";
 
 export const metadata = generateMetadata({
 	title: "Dashboard",
@@ -76,6 +78,7 @@ export default async function DashboardPage({
 		referralData,
 		userProfile,
 		allProfiles,
+		subscription,
 	] = await Promise.all([
 		userId && accessToken ?
 			getUserDevices(userId, accessToken).catch(() => [] as DeviceInterface[])
@@ -106,6 +109,7 @@ export default async function DashboardPage({
 		accessToken ?
 			getAllConnectProfiles(accessToken).catch(() => null)
 		:	Promise.resolve(null),
+		accessToken ? getMySubscription(accessToken) : Promise.resolve(null),
 	]);
 
 	const unreadNotificationCount = notifStats?.unreadNotifications ?? 0;
@@ -210,6 +214,13 @@ export default async function DashboardPage({
 							}
 						/>
 					</section>
+
+					{/* The plan the user is on, and a way to change it */}
+					{subscription && (
+						<section className="px-4 lg:p-0">
+							<PlanBadge subscription={subscription} />
+						</section>
+					)}
 
 					{/* Connect management strip */}
 					{accessToken && connectProfile?.id && (

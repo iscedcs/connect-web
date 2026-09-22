@@ -585,6 +585,62 @@ export async function transferToUser(
 }
 
 /**
+ * Approve, with the wallet PIN, a payment another service created from this
+ * user's wallet (e.g. a Connect plan). wallet-nest debits the wallet and
+ * hands the payment to that service before it answers: `data.delivered` is
+ * false only if that service couldn't be reached yet (it retries).
+ *
+ * `status` is wallet-nest's own, passed to the browser as is: a wrong PIN
+ * is a 403, which csrfFetch (unlike a 401) never replays, so one wrong PIN
+ * costs one attempt towards the lockout.
+ */
+export async function confirmServicePayment(
+	accessToken: string,
+	paymentId: string,
+	pin: string,
+): Promise<{
+	success: boolean;
+	status: number;
+	message: string;
+	data?: { delivered?: boolean };
+}> {
+	if (!WALLET_API_URL || !accessToken) {
+		return { success: false, status: 503, message: 'Service unavailable' };
+	}
+	try {
+		const res = await fetch(
+			`${WALLET_API_URL}/api/service-payments/${encodeURIComponent(paymentId)}/confirm`,
+			{
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ pin }),
+				cache: 'no-store',
+			},
+		);
+		const json = await res.json().catch(() => ({}));
+		// Nest validation errors arrive as a list of messages.
+		const message = Array.isArray(json?.message)
+			? json.message.join('. ')
+			: json?.message;
+		return {
+			success: res.ok && json?.success !== false,
+			status: res.status,
+			message: message || (res.ok ? 'Payment made' : 'Payment failed'),
+			data: json?.data,
+		};
+	} catch {
+		return {
+			success: false,
+			status: 502,
+			message: 'Could not reach your wallet. Please try again.',
+		};
+	}
+}
+
+/**
  * Get the authenticated user's KYC verification bank account
  * (the account submitted during BVN verification — the only withdrawal destination).
  */
