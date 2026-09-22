@@ -19,6 +19,7 @@ import {
   Palette,
   Contact2,
   Gift,
+  Crown,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -62,16 +63,24 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: "Connect",
     items: [
-      { label: "Links", href: "/connect/links", icon: LinkIcon },
-      { label: "Social Profiles", href: "/connect/socials", icon: Share2 },
-      { label: "Videos", href: "/connect/videos", icon: Video },
-      { label: "Meetings", href: "/connect/meetings", icon: CalendarDays },
-      { label: "Files", href: "/connect/files", icon: FileText },
-      { label: "Forms", href: "/connect/forms", icon: ClipboardList },
-      { label: "Spotify", href: "/connect/spotify", icon: Music },
+      { label: "Links", href: "/connect/links", icon: LinkIcon, exact: true },
+      {
+        label: "Social Profiles",
+        href: "/connect/links/socials",
+        icon: Share2,
+      },
+      { label: "Videos", href: "/connect/links/videos", icon: Video },
+      {
+        label: "Meetings",
+        href: "/connect/links/meetings",
+        icon: CalendarDays,
+      },
+      { label: "Files", href: "/connect/links/files", icon: FileText },
+      { label: "Forms", href: "/connect/links/forms", icon: ClipboardList },
+      { label: "Spotify", href: "/connect/links/spotify", icon: Music },
       {
         label: "Appointments",
-        href: "/connect/appointments",
+        href: "/connect/links/appointments",
         icon: CalendarDays,
       },
     ],
@@ -88,7 +97,10 @@ const NAV_GROUPS: NavGroup[] = [
   },
   {
     label: "Finance",
-    items: [{ label: "Wallet", href: "/wallet", icon: Wallet }],
+    items: [
+      { label: "Wallet", href: "/wallet", icon: Wallet },
+      { label: "Subscription", href: "/settings/subscription", icon: Crown },
+    ],
   },
   {
     label: "Settings",
