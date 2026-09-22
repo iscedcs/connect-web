@@ -35,16 +35,16 @@ function transportFailure(op: string, err: unknown): MutationResult {
 	);
 	return {
 		success: false,
-		message: `Could not reach the subscription service. ${
-			err instanceof Error ? err.message : 'Unknown transport error'
-		}`,
+		status: 502,
+		message: 'Could not reach the subscription service. Please try again.',
 	};
 }
 
 /**
- * The authenticated user's subscription, or null when they have none.
- * The API 404s rather than returning an empty body for users who have
- * never selected a plan, so that case is normalised to null here.
+ * The authenticated user's subscription, or null if it could not be loaded.
+ * connect-nest gives every user a Free subscription the first time this is
+ * called, so null always means a failure, never "no plan yet": callers must
+ * show an error, not offer a first-time plan choice.
  */
 export async function getMySubscription(
 	accessToken: string,
@@ -56,14 +56,10 @@ export async function getMySubscription(
 			cache: 'no-store',
 		});
 		if (!res.ok) {
-			// 404 is the normal "hasn't picked a plan yet" case; anything else
-			// is a real fault that would otherwise vanish into a null.
-			if (res.status !== 404) {
-				console.error(
-					`[subscription] GET me -> HTTP ${res.status}`,
-					(await res.text().catch(() => '')).slice(0, 300),
-				);
-			}
+			console.error(
+				`[subscription] GET me -> HTTP ${res.status}`,
+				(await res.text().catch(() => '')).slice(0, 300),
+			);
 			return null;
 		}
 		const json = await readEnvelope<MySubscription>(res);
@@ -134,49 +130,16 @@ export async function getMyLimits(
 
 export interface MutationResult {
 	success: boolean;
+	/**
+	 * The HTTP status to answer the browser with: connect-nest's own status
+	 * when it answered, 502 when it could not be reached, 503 when this app
+	 * is not configured. Passing it through (rather than flattening to 200)
+	 * lets the client tell a 401 — which csrfFetch recovers from by
+	 * refreshing the session — from a real refusal.
+	 */
+	status: number;
 	message: string;
 	data?: unknown;
-}
-
-/**
- * Select a plan for the first time. Paid plans start a 3-month trial rather
- * than charging immediately. The backend 409s if a subscription already
- * exists — changing plans afterwards goes through `initiatePayment`.
- */
-export async function selectPlan(
-	accessToken: string,
-	planKey: PlanKey,
-): Promise<MutationResult> {
-	if (!CONNECT_API_URL || !accessToken) {
-		return { success: false, message: 'Service unavailable' };
-	}
-	try {
-		const res = await fetch(`${CONNECT_API_URL}${URLS.subscription.choose_plan}`, {
-			method: 'POST',
-			headers: {
-				Authorization: `Bearer ${accessToken}`,
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({ planKey }),
-			cache: 'no-store',
-		});
-		const json = await readEnvelope<unknown>(res);
-		if (!res.ok) {
-			console.error(
-				`[subscription] POST select-plan -> HTTP ${res.status}`,
-				JSON.stringify(json).slice(0, 300),
-			);
-		}
-		return {
-			success: res.ok && json.success !== false,
-			message:
-				json.message ||
-				(res.ok ? 'Plan selected' : 'Could not select that plan'),
-			data: json.data,
-		};
-	} catch (err) {
-		return transportFailure('select-plan', err);
-	}
 }
 
 /** Cancel the current paid subscription; access runs to the period end. */
@@ -184,7 +147,7 @@ export async function cancelSubscription(
 	accessToken: string,
 ): Promise<MutationResult> {
 	if (!CONNECT_API_URL || !accessToken) {
-		return { success: false, message: 'Service unavailable' };
+		return { success: false, status: 503, message: 'Service unavailable' };
 	}
 	try {
 		const res = await fetch(`${CONNECT_API_URL}${URLS.subscription.cancel_plan}`, {
@@ -195,6 +158,7 @@ export async function cancelSubscription(
 		const json = await readEnvelope<unknown>(res);
 		return {
 			success: res.ok && json.success !== false,
+			status: res.status,
 			message: json.message || (res.ok ? 'Subscription cancelled' : 'Cancel failed'),
 			data: json.data,
 		};
@@ -221,7 +185,7 @@ export async function initiatePayment(
 	callbackUrl?: string,
 ): Promise<MutationResult & { checkoutUrl?: string; reference?: string }> {
 	if (!CONNECT_API_URL || !accessToken) {
-		return { success: false, message: 'Service unavailable' };
+		return { success: false, status: 503, message: 'Service unavailable' };
 	}
 	try {
 		const res = await fetch(
@@ -262,6 +226,7 @@ export async function initiatePayment(
 
 		return {
 			success: res.ok && json.success !== false,
+			status: res.status,
 			message: json.message || (res.ok ? 'Payment session created' : 'Could not start payment'),
 			checkoutUrl,
 			reference: (data.reference as string) || undefined,

@@ -64,6 +64,28 @@ export interface MySubscription {
 	trialEndDate: string | null;
 	daysRemaining: number | null;
 	currentPeriodEnd: string | null;
+	// The fields below come from connect-nest's subscription-lifecycle change.
+	// They are optional so the page still works against an older backend;
+	// see `hasPlanAccess()` and friends for the fallbacks.
+	/** Whether the plan's features are unlocked right now. */
+	hasPlanAccess?: boolean;
+	/** When the features stop unless paid for; null if nothing ends them. */
+	accessEndsAt?: string | null;
+	/** Whether paying for this same plan now is accepted (renew/resubscribe). */
+	canRenew?: boolean;
+	/** For an active paid plan: when renewing the same plan opens. */
+	renewalOpensAt?: string | null;
+}
+
+/** `hasPlanAccess`, falling back to the status for an older backend. */
+export function hasPlanAccess(sub: MySubscription): boolean {
+	return sub.hasPlanAccess ?? (sub.status === 'ACTIVE' || sub.status === 'TRIALING');
+}
+
+/** When the plan's features end, falling back to the period or trial end. */
+export function accessEndsAt(sub: MySubscription): string | null {
+	if (sub.accessEndsAt !== undefined) return sub.accessEndsAt;
+	return sub.isInTrial ? sub.trialEndDate : sub.currentPeriodEnd;
 }
 
 export const UNLIMITED = -1;

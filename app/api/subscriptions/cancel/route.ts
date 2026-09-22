@@ -19,5 +19,5 @@ export async function POST() {
 	}
 
 	const result = await cancelSubscription(accessToken);
-	return NextResponse.json(result, { status: result.success ? 200 : 400 });
+	return NextResponse.json(result, { status: result.status });
 }
