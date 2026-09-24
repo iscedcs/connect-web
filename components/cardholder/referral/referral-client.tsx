@@ -459,6 +459,9 @@ export default function ReferralClient({
                     </div>
 
                     <div className="text-right">
+                      <p className="text-[10px] uppercase tracking-wider text-neutral-500">
+                        Earned to date
+                      </p>
                       <p className="text-sm font-semibold text-white">
                         {formatNaira(person.earned)}
                       </p>
