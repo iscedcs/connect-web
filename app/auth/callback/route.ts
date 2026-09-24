@@ -1,5 +1,29 @@
 import { NextResponse } from "next/server";
 import { authLogger } from "@/lib/auth-logger";
+import { attachReferral } from "@/lib/services/referral";
+
+/**
+ * Recover the referral code from a callback URL.
+ *
+ * getSignUpUrl/getSignInUrl nest it inside the `redirect` param
+ * (`?redirect=%2Fdashboard%3FreferralCode%3Dada`), so it is usually NOT a
+ * top-level param on this callback. Check both shapes.
+ */
+function extractReferralCode(
+  redirectTarget: string,
+  params: URLSearchParams,
+): string | null {
+  const direct =
+    params.get("referralCode") || params.get("referral") || params.get("ref");
+  if (direct) return direct;
+
+  const queryStart = redirectTarget.indexOf("?");
+  if (queryStart === -1) return null;
+  const nested = new URLSearchParams(redirectTarget.slice(queryStart + 1));
+  return (
+    nested.get("referralCode") || nested.get("referral") || nested.get("ref")
+  );
+}
 
 function buildSignInRedirect(callbackUrl: URL): string {
   const base = (process.env.NEXT_PUBLIC_AUTH_WEB_URL || "").trim();
@@ -96,13 +120,33 @@ export async function GET(req: Request) {
   } catch {}
 
   const targetUrl = new URL(finalRedirect, appBase);
-  const callbackReferral =
-    searchParams.get("referralCode") ||
-    searchParams.get("referral") ||
-    searchParams.get("ref");
-  if (callbackReferral && !targetUrl.searchParams.has("referralCode")) {
-    targetUrl.searchParams.set("referralCode", callbackReferral);
+
+  // Read the code off `redirectTo`, not `finalRedirect` — business users are
+  // rewritten to /cp/org above, which would otherwise drop it.
+  const referralCode = extractReferralCode(redirectTo, searchParams);
+  if (referralCode && !targetUrl.searchParams.has("referralCode")) {
+    targetUrl.searchParams.set("referralCode", referralCode);
   }
+
+  // Bind the user to their referrer. Awaited, so it can't be lost to a frozen
+  // serverless instance; bounded, so it can't stall sign-in; non-fatal, so a
+  // referral problem never blocks login — but loudly logged either way, since
+  // silently dropping this is what left the referral ledger empty.
+  if (referralCode) {
+    const attach = await attachReferral(accessToken, referralCode);
+    if (attach.success) {
+      authLogger.log("CALLBACK", "Referral attached", {
+        referralCode,
+        message: attach.message,
+      });
+    } else {
+      authLogger.error("CALLBACK", "Referral attach FAILED", {
+        referralCode,
+        message: attach.message,
+      });
+    }
+  }
+
   const absoluteRedirect = targetUrl.toString();
 
   const isProduction = process.env.NODE_ENV === "production";
