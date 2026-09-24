@@ -32,9 +32,39 @@ interface ReferralSummaryProps {
   referralCount: number;
 }
 
+interface ReferredUser {
+  id: string;
+  username: string | null;
+  name: string | null;
+  joinedAt: string;
+  isVerified: boolean;
+  purchaseCount: number;
+  earned: number;
+}
+
+interface ReferredUsersPage {
+  referrals: ReferredUser[];
+  total: number;
+  page: number;
+  limit: number;
+  hasMore: boolean;
+}
+
 interface ReferralClientProps {
   username?: string | null;
   summary?: ReferralSummaryProps | null;
+  referred?: ReferredUsersPage | null;
+}
+
+function formatJoined(iso: string): string {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime())
+    ? "—"
+    : d.toLocaleDateString("en-NG", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
 }
 
 function formatNaira(amount: number): string {
@@ -47,6 +77,7 @@ function formatNaira(amount: number): string {
 export default function ReferralClient({
   username,
   summary,
+  referred,
 }: ReferralClientProps) {
   const router = useRouter();
   const displayUsername = username || "alex_connect";
@@ -62,7 +93,11 @@ export default function ReferralClient({
   const [earnings, setEarnings] = useState(
     summary?.earnings ?? { pending: 0, available: 0, cashedOut: 0 },
   );
-  const totalReferredCount = summary?.referralCount ?? 0;
+  const referralList = referred?.referrals ?? [];
+  // The summary's count is the source of truth for the headline number; the
+  // list may be a single page of it, and may be null if only that one call
+  // failed.
+  const totalReferredCount = summary?.referralCount ?? referred?.total ?? 0;
 
   const [isCashOutOpen, setIsCashOutOpen] = useState(false);
   const [isCashingOut, setIsCashingOut] = useState(false);
@@ -367,11 +402,90 @@ export default function ReferralClient({
             </div>
           </div>
         </div>
-        <p className="text-sm text-neutral-400">
-          Every friend who verifies their account and makes a purchase adds to
-          your earnings above. Individual referral activity isn&apos;t broken
-          down per-person yet — check your earnings breakdown for the totals.
-        </p>
+        {!referred ? (
+          /* The list call failed while the summary succeeded. Saying "no one
+             yet" here would contradict the count shown just above, so say
+             nothing about who — only that the breakdown is unavailable. */
+          <p className="text-sm text-neutral-400">
+            Your per-person breakdown couldn&apos;t be loaded right now. Your
+            referral count and earnings above are unaffected.
+          </p>
+        ) : referralList.length === 0 ? (
+          <p className="text-sm text-neutral-400">
+            No one has signed up with your code yet. Share your link above —
+            every friend who verifies their account and makes a purchase adds to
+            your earnings.
+          </p>
+        ) : (
+          <>
+            <p className="text-sm text-neutral-400">
+              Every friend who verifies their account and makes a purchase adds
+              to your earnings above.
+            </p>
+
+            <ul className="divide-y divide-white/5">
+              {referralList.map((person) => {
+                const label =
+                  person.name ||
+                  (person.username ? `@${person.username}` : "LYNCON member");
+                return (
+                  <li
+                    key={person.id}
+                    className="flex flex-wrap items-center justify-between gap-3 py-3"
+                  >
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="truncate text-sm font-medium text-white">
+                          {label}
+                        </span>
+                        {person.isVerified ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
+                            <CheckCircle2 className="size-3" />
+                            Verified
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-400">
+                            <Clock className="size-3" />
+                            Unverified
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-0.5 text-xs text-neutral-400">
+                        Joined {formatJoined(person.joinedAt)}
+                        {person.name && person.username
+                          ? ` · @${person.username}`
+                          : ""}
+                      </p>
+                    </div>
+
+                    <div className="text-right">
+                      <p className="text-[10px] uppercase tracking-wider text-neutral-500">
+                        Earned to date
+                      </p>
+                      <p className="text-sm font-semibold text-white">
+                        {formatNaira(person.earned)}
+                      </p>
+                      <p className="text-xs text-neutral-400">
+                        {person.purchaseCount === 0
+                          ? "No purchases yet"
+                          : `${person.purchaseCount} purchase${
+                              person.purchaseCount === 1 ? "" : "s"
+                            }`}
+                      </p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+
+            {referred?.hasMore ? (
+              <p className="text-xs text-neutral-500">
+                Showing the {referralList.length} most recent of{" "}
+                {referred.total}.
+              </p>
+            ) : null}
+          </>
+        )}
       </div>
 
       {/* Business Referrer Section */}

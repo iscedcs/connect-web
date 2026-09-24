@@ -75,6 +75,53 @@ export async function attachReferral(
 	}
 }
 
+export interface ReferredUser {
+	id: string;
+	username: string | null;
+	name: string | null;
+	joinedAt: string;
+	isVerified: boolean;
+	purchaseCount: number;
+	earned: number;
+}
+
+export interface ReferredUsersPage {
+	referrals: ReferredUser[];
+	total: number;
+	page: number;
+	limit: number;
+	hasMore: boolean;
+}
+
+/**
+ * The people this user referred, newest first, with what each has earned them.
+ *
+ * Returns null rather than throwing so the referral page keeps rendering its
+ * summary if this one call fails — the list is additive to the page, not the
+ * reason it exists.
+ */
+export async function getReferredUsers(
+	accessToken: string,
+	page = 1,
+	limit = 20,
+): Promise<ReferredUsersPage | null> {
+	if (!CONNECT_API_URL || !accessToken) return null;
+	try {
+		const res = await fetch(
+			`${CONNECT_API_URL}/referral/referred?page=${page}&limit=${limit}`,
+			{
+				headers: { Authorization: `Bearer ${accessToken}` },
+				cache: 'no-store',
+			},
+		);
+		if (!res.ok) return null;
+		const json = await res.json();
+		return json?.data ?? null;
+	} catch {
+		return null;
+	}
+}
+
 /** Fetch the authenticated user's referral code, earnings breakdown, and referral count. */
 export async function getReferralSummary(
 	accessToken: string,
