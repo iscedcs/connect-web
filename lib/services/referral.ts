@@ -3,8 +3,22 @@
  * connect-web never talks to ISCE Auth Service directly for referrals.
  */
 
-const CONNECT_API_URL =
-	process.env.CONNECT_API_URL || process.env.NEXT_PUBLIC_CONNECT_API_URL || '';
+/**
+ * connect-nest mounts every route under `setGlobalPrefix('api')`, but
+ * CONNECT_API_URL is set to the bare origin (e.g. `http://connect-nest:3000`).
+ * Every call in this file was therefore hitting `/referral/*` and getting
+ * `Cannot POST /referral/attach` back — which is why no user was ever bound to
+ * a referrer, and why the referral page always reported zero regardless.
+ *
+ * Normalised here rather than corrected per-environment, so it holds whichever
+ * way the variable happens to be set in each one.
+ */
+const CONNECT_API_URL = (() => {
+	const raw =
+		process.env.CONNECT_API_URL || process.env.NEXT_PUBLIC_CONNECT_API_URL || '';
+	if (!raw) return '';
+	return `${raw.replace(/\/+$/, '').replace(/\/api$/, '')}/api`;
+})();
 
 export interface ReferralSummary {
 	code: string | null;
