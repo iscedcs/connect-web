@@ -12,6 +12,55 @@ export interface ReferralSummary {
 	referralCount: number;
 }
 
+// The auth callback awaits attachReferral before redirecting, so this must not
+// hold sign-in hostage when connect-nest is slow. Bounded, and non-fatal.
+const ATTACH_TIMEOUT_MS = 3000;
+
+/**
+ * Bind the freshly-authenticated user to the referrer whose code they arrived
+ * with. connect-nest resolves the user id from the bearer token and injects the
+ * INTERNAL_API_KEY itself, so the key never reaches the browser.
+ *
+ * Safe to call on every sign-in: isce-auth no-ops when the referrer is already
+ * set, the code is unknown, or it's a self-referral. A leading '@' and any
+ * casing are normalised server-side by getUserByTag.
+ */
+export async function attachReferral(
+	accessToken: string,
+	referralUsername: string,
+): Promise<{ success: boolean; message: string }> {
+	const code = referralUsername.trim();
+	if (!CONNECT_API_URL || !accessToken || !code)
+		return { success: false, message: 'Service unavailable' };
+	try {
+		const res = await fetch(`${CONNECT_API_URL}/referral/attach`, {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ referralUsername: code }),
+			cache: 'no-store',
+			signal: AbortSignal.timeout(ATTACH_TIMEOUT_MS),
+		});
+		const json = await res.json().catch(() => null);
+		return {
+			success: res.ok && json?.success !== false,
+			message:
+				json?.message ??
+				(res.ok ? 'Referrer attached' : `Attach failed (${res.status})`),
+		};
+	} catch (err) {
+		return {
+			success: false,
+			message:
+				err instanceof Error && err.name === 'TimeoutError'
+					? `Attach timed out after ${ATTACH_TIMEOUT_MS}ms`
+					: 'Network error',
+		};
+	}
+}
+
 /** Fetch the authenticated user's referral code, earnings breakdown, and referral count. */
 export async function getReferralSummary(
 	accessToken: string,
