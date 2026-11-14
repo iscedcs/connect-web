@@ -1,259 +1,276 @@
 // proxy.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { protectedRoutes } from './routes';
-import { buildAuthLoginUrl } from './lib/auth-urls';
-import { verifyToken } from './lib/verify-jwt';
-import { setCsrfCookie, validateCsrf } from './lib/csrf';
-import { authLogger } from './lib/auth-logger';
+import { NextRequest, NextResponse } from "next/server";
+import { protectedRoutes } from "./routes";
+import { buildAuthLoginUrl } from "./lib/auth-urls";
+import { verifyToken } from "./lib/verify-jwt";
+import { setCsrfCookie, validateCsrf } from "./lib/csrf";
+import { authLogger } from "./lib/auth-logger";
 
 function isProtectedPath(pathname: string) {
-	return protectedRoutes.some((route) =>
-		route === '/' ?
-			pathname === '/'
-		:	pathname === route || pathname.startsWith(route + '/'),
-	);
+  return protectedRoutes.some((route) =>
+    route === "/"
+      ? pathname === "/"
+      : pathname === route || pathname.startsWith(route + "/"),
+  );
 }
 
 export async function proxy(req: NextRequest) {
-	const { pathname } = req.nextUrl;
+  const { pathname } = req.nextUrl;
 
-	// -- CSRF validation for state-changing API requests --
-	const csrfError = validateCsrf(req);
-	if (csrfError) return csrfError;
+  //   Auth by-pass: For Local UI-only changes
 
-	// Allow static/assets/callback/etc.
-	if (
-		pathname.startsWith('/_next/') ||
-		pathname.startsWith('/favicon') ||
-		pathname.startsWith('/robots.txt') ||
-		pathname.startsWith('/sitemap.xml') ||
-		pathname.startsWith('/auth/callback') ||
-		pathname.startsWith('/auth/logout') ||
-		pathname.startsWith('/auth/login') ||
-		pathname.startsWith('/api/auth') ||
-		pathname.startsWith('/cp/public/')  // Connect Plus public pages — no auth required
-	) {
-		const response = NextResponse.next();
-		setCsrfCookie(response, req.cookies.get('csrf_token')?.value);
-		return response;
-	}
+  if (
+    process.env.NODE_ENV === "development" &&
+    process.env.SKIP_AUTH_FOR_LOCAL === "true"
+  ) {
+    const response = NextResponse.next();
+    setCsrfCookie(response, req.cookies.get("csrf_token")?.value);
+    return response;
+  }
 
-	// Prevent logged-in users from accessing the /r folder (referral invites)
-	if (pathname === '/r' || pathname.startsWith('/r/')) {
-		const token = req.cookies.get('accessToken')?.value;
-		const refreshToken = req.cookies.get('refreshToken')?.value;
+  // -- CSRF validation for state-changing API requests --
+  const csrfError = validateCsrf(req);
+  if (csrfError) return csrfError;
 
-		if (token) {
-			const { valid, payload } = await verifyToken(token);
-			if (valid && payload) {
-				authLogger.log(
-					'PROXY',
-					`Logged-in user ${(payload as any)?.id || 'unknown'} accessing ${pathname} — redirecting to dashboard`,
-				);
-				const response = NextResponse.redirect(
-					new URL('/dashboard', req.nextUrl),
-				);
-				setCsrfCookie(response, req.cookies.get('csrf_token')?.value);
-				return response;
-			}
-		}
+  // Allow static/assets/callback/etc.
+  if (
+    pathname.startsWith("/_next/") ||
+    pathname.startsWith("/favicon") ||
+    pathname.startsWith("/robots.txt") ||
+    pathname.startsWith("/sitemap.xml") ||
+    pathname.startsWith("/auth/callback") ||
+    pathname.startsWith("/auth/logout") ||
+    pathname.startsWith("/auth/login") ||
+    pathname.startsWith("/api/auth") ||
+    pathname.startsWith("/cp/public/") // Connect Plus public pages — no auth required
+  ) {
+    const response = NextResponse.next();
+    setCsrfCookie(response, req.cookies.get("csrf_token")?.value);
+    return response;
+  }
 
-		if (refreshToken) {
-			try {
-				const authApiBase =
-					process.env.AUTH_API_URL ||
-					process.env.NEXT_PUBLIC_AUTH_API_URL;
-				const refreshRes = await fetch(`${authApiBase}/auth/refresh`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ refreshToken }),
-				});
+  // Prevent logged-in users from accessing the /r folder (referral invites)
+  if (pathname === "/r" || pathname.startsWith("/r/")) {
+    const token = req.cookies.get("accessToken")?.value;
+    const refreshToken = req.cookies.get("refreshToken")?.value;
 
-				if (refreshRes.ok) {
-					authLogger.log(
-						'PROXY',
-						`Token refresh successful on ${pathname} — redirecting to dashboard`,
-					);
-					const data = await refreshRes.json();
-					const isProduction = process.env.NODE_ENV === 'production';
+    if (token) {
+      const { valid, payload } = await verifyToken(token);
+      if (valid && payload) {
+        authLogger.log(
+          "PROXY",
+          `Logged-in user ${(payload as any)?.id || "unknown"} accessing ${pathname} — redirecting to dashboard`,
+        );
+        const response = NextResponse.redirect(
+          new URL("/dashboard", req.nextUrl),
+        );
+        setCsrfCookie(response, req.cookies.get("csrf_token")?.value);
+        return response;
+      }
+    }
 
-					let accessMaxAge = 60 * 60;
-					try {
-						const payload = JSON.parse(
-							atob(data.accessToken.split('.')[1]),
-						);
-						if (payload?.exp) {
-							const nowSec = Math.floor(Date.now() / 1000);
-							accessMaxAge = Math.max(payload.exp - nowSec, 0);
-						}
-					} catch {}
+    if (refreshToken) {
+      try {
+        const authApiBase =
+          process.env.AUTH_API_URL || process.env.NEXT_PUBLIC_AUTH_API_URL;
+        const refreshRes = await fetch(`${authApiBase}/auth/refresh`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refreshToken }),
+        });
 
-					const response = NextResponse.redirect(
-						new URL('/dashboard', req.nextUrl),
-					);
-					response.cookies.set('accessToken', data.accessToken, {
-						httpOnly: true,
-						secure: isProduction,
-						sameSite: 'lax',
-						path: '/',
-						maxAge: accessMaxAge,
-					});
-					response.cookies.set('refreshToken', data.refreshToken, {
-						httpOnly: true,
-						secure: isProduction,
-						sameSite: 'lax',
-						path: '/',
-						maxAge: 60 * 60 * 24 * 7,
-					});
-					setCsrfCookie(response, req.cookies.get('csrf_token')?.value);
-					return response;
-				}
-			} catch (error) {
-				authLogger.error(
-					'PROXY',
-					`Token refresh error on ${pathname}: ${error instanceof Error ? error.message : 'unknown'}`,
-				);
-			}
-		}
+        if (refreshRes.ok) {
+          authLogger.log(
+            "PROXY",
+            `Token refresh successful on ${pathname} — redirecting to dashboard`,
+          );
+          const data = await refreshRes.json();
+          const isProduction = process.env.NODE_ENV === "production";
 
-		const response = NextResponse.next();
-		setCsrfCookie(response, req.cookies.get('csrf_token')?.value);
-		return response;
-	}
+          let accessMaxAge = 60 * 60;
+          try {
+            const payload = JSON.parse(atob(data.accessToken.split(".")[1]));
+            if (payload?.exp) {
+              const nowSec = Math.floor(Date.now() / 1000);
+              accessMaxAge = Math.max(payload.exp - nowSec, 0);
+            }
+          } catch {}
 
-	// Only guard protected paths
-	if (!isProtectedPath(pathname)) {
-		const response = NextResponse.next();
-		setCsrfCookie(response, req.cookies.get('csrf_token')?.value);
-		return response;
-	}
-	if (pathname.startsWith('/api')) {
-		const response = NextResponse.next();
-		setCsrfCookie(response, req.cookies.get('csrf_token')?.value);
-		return response;
-	}
+          const response = NextResponse.redirect(
+            new URL("/dashboard", req.nextUrl),
+          );
+          response.cookies.set("accessToken", data.accessToken, {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: "lax",
+            path: "/",
+            maxAge: accessMaxAge,
+          });
+          response.cookies.set("refreshToken", data.refreshToken, {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: "lax",
+            path: "/",
+            maxAge: 60 * 60 * 24 * 7,
+          });
+          setCsrfCookie(response, req.cookies.get("csrf_token")?.value);
+          return response;
+        }
+      } catch (error) {
+        authLogger.error(
+          "PROXY",
+          `Token refresh error on ${pathname}: ${error instanceof Error ? error.message : "unknown"}`,
+        );
+      }
+    }
 
-	// Build a clean redirect URL (strip any stale "token" param so it
-	// never leaks into the auth redirect chain)
-	function getCleanRedirectUrl() {
-		const publicOrigin = process.env.NEXT_PUBLIC_URL || req.nextUrl.origin;
-		const url = new URL(req.nextUrl.toString());
-		url.searchParams.delete('token');
-		url.searchParams.delete('code');
-		return publicOrigin + url.pathname + (url.search || '');
-	}
+    const response = NextResponse.next();
+    setCsrfCookie(response, req.cookies.get("csrf_token")?.value);
+    return response;
+  }
 
-	const token = req.cookies.get('accessToken')?.value;
-	const refreshToken = req.cookies.get('refreshToken')?.value;
+  // Only guard protected paths
+  if (!isProtectedPath(pathname)) {
+    const response = NextResponse.next();
+    setCsrfCookie(response, req.cookies.get("csrf_token")?.value);
+    return response;
+  }
+  if (pathname.startsWith("/api")) {
+    const response = NextResponse.next();
+    setCsrfCookie(response, req.cookies.get("csrf_token")?.value);
+    return response;
+  }
 
-	authLogger.log('PROXY', `Auth check for ${pathname}`, {
-		hasAccessToken: !!token,
-		hasRefreshToken: !!refreshToken,
-	});
+  // Build a clean redirect URL (strip any stale "token" param so it
+  // never leaks into the auth redirect chain)
+  function getCleanRedirectUrl() {
+    const publicOrigin = process.env.NEXT_PUBLIC_URL || req.nextUrl.origin;
+    const url = new URL(req.nextUrl.toString());
+    url.searchParams.delete("token");
+    url.searchParams.delete("code");
+    return publicOrigin + url.pathname + (url.search || "");
+  }
 
-	if (!token && !refreshToken) {
-		authLogger.warn('PROXY', `No tokens — redirecting to auth login`);
-		return NextResponse.redirect(buildAuthLoginUrl(getCleanRedirectUrl()));
-	}
+  const token = req.cookies.get("accessToken")?.value;
+  const refreshToken = req.cookies.get("refreshToken")?.value;
 
-	if (token) {
-		const { valid, payload } = await verifyToken(token);
-		if (valid && payload) {
-			const userType = (payload as any)?.userType;
-			authLogger.log(
-				'PROXY',
-				`Access token valid for user ${(payload as any)?.id || 'unknown'} (type: ${userType || 'INDIVIDUAL'})`,
-			);
+  authLogger.log("PROXY", `Auth check for ${pathname}`, {
+    hasAccessToken: !!token,
+    hasRefreshToken: !!refreshToken,
+  });
 
-			// Route protection by account type:
-			// Business users are restricted to Connect Plus (/cp/*)
-			if (userType === 'BUSINESS_USER' && !pathname.startsWith('/cp')) {
-				authLogger.log('PROXY', `Business user accessing ${pathname} -> redirecting to /cp/org`);
-				const response = NextResponse.redirect(new URL('/cp/org', req.nextUrl));
-				setCsrfCookie(response, req.cookies.get('csrf_token')?.value);
-				return response;
-			}
+  if (!token && !refreshToken) {
+    authLogger.warn("PROXY", `No tokens — redirecting to auth login`);
+    return NextResponse.redirect(buildAuthLoginUrl(getCleanRedirectUrl()));
+  }
 
-			// Non-business users cannot access protected Connect Plus routes
-			if (userType !== 'BUSINESS_USER' && pathname.startsWith('/cp') && !pathname.startsWith('/cp/public')) {
-				authLogger.log('PROXY', `Non-business user accessing ${pathname} -> redirecting to /dashboard`);
-				const response = NextResponse.redirect(new URL('/dashboard', req.nextUrl));
-				setCsrfCookie(response, req.cookies.get('csrf_token')?.value);
-				return response;
-			}
+  if (token) {
+    const { valid, payload } = await verifyToken(token);
+    if (valid && payload) {
+      const userType = (payload as any)?.userType;
+      authLogger.log(
+        "PROXY",
+        `Access token valid for user ${(payload as any)?.id || "unknown"} (type: ${userType || "INDIVIDUAL"})`,
+      );
 
-			const response = NextResponse.next();
-			setCsrfCookie(response, req.cookies.get('csrf_token')?.value);
-			return response;
-		}
-		authLogger.warn('PROXY', `Access token invalid/expired`);
-	}
+      // Route protection by account type:
+      // Business users are restricted to Connect Plus (/cp/*)
+      if (userType === "BUSINESS_USER" && !pathname.startsWith("/cp")) {
+        authLogger.log(
+          "PROXY",
+          `Business user accessing ${pathname} -> redirecting to /cp/org`,
+        );
+        const response = NextResponse.redirect(new URL("/cp/org", req.nextUrl));
+        setCsrfCookie(response, req.cookies.get("csrf_token")?.value);
+        return response;
+      }
 
-	// Access token missing or invalid — try refreshing
-	if (refreshToken) {
-		authLogger.log('PROXY', `Attempting token refresh`);
-		try {
-			const authApiBase =
-				process.env.AUTH_API_URL ||
-				process.env.NEXT_PUBLIC_AUTH_API_URL;
-			const refreshRes = await fetch(`${authApiBase}/auth/refresh`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ refreshToken }),
-			});
+      // Non-business users cannot access protected Connect Plus routes
+      if (
+        userType !== "BUSINESS_USER" &&
+        pathname.startsWith("/cp") &&
+        !pathname.startsWith("/cp/public")
+      ) {
+        authLogger.log(
+          "PROXY",
+          `Non-business user accessing ${pathname} -> redirecting to /dashboard`,
+        );
+        const response = NextResponse.redirect(
+          new URL("/dashboard", req.nextUrl),
+        );
+        setCsrfCookie(response, req.cookies.get("csrf_token")?.value);
+        return response;
+      }
 
-			if (refreshRes.ok) {
-				authLogger.log('PROXY', `Token refresh successful`);
-				const data = await refreshRes.json();
-				const isProduction = process.env.NODE_ENV === 'production';
+      const response = NextResponse.next();
+      setCsrfCookie(response, req.cookies.get("csrf_token")?.value);
+      return response;
+    }
+    authLogger.warn("PROXY", `Access token invalid/expired`);
+  }
 
-				let accessMaxAge = 60 * 60;
-				try {
-					const payload = JSON.parse(
-						atob(data.accessToken.split('.')[1]),
-					);
-					if (payload?.exp) {
-						const nowSec = Math.floor(Date.now() / 1000);
-						accessMaxAge = Math.max(payload.exp - nowSec, 0);
-					}
-				} catch {}
+  // Access token missing or invalid — try refreshing
+  if (refreshToken) {
+    authLogger.log("PROXY", `Attempting token refresh`);
+    try {
+      const authApiBase =
+        process.env.AUTH_API_URL || process.env.NEXT_PUBLIC_AUTH_API_URL;
+      const refreshRes = await fetch(`${authApiBase}/auth/refresh`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refreshToken }),
+      });
 
-				const response = NextResponse.next();
-				response.cookies.set('accessToken', data.accessToken, {
-					httpOnly: true,
-					secure: isProduction,
-					sameSite: 'lax',
-					path: '/',
-					maxAge: accessMaxAge,
-				});
-				response.cookies.set('refreshToken', data.refreshToken, {
-					httpOnly: true,
-					secure: isProduction,
-					sameSite: 'lax',
-					path: '/',
-					maxAge: 60 * 60 * 24 * 7,
-				});
-				setCsrfCookie(response, req.cookies.get('csrf_token')?.value);
-				return response;
-			} else {
-				authLogger.error('PROXY', `Token refresh failed`, {
-					status: refreshRes.status,
-				});
-			}
-		} catch (error) {
-			authLogger.error(
-				'PROXY',
-				`Token refresh error: ${error instanceof Error ? error.message : 'unknown'}`,
-			);
-		}
-	}
+      if (refreshRes.ok) {
+        authLogger.log("PROXY", `Token refresh successful`);
+        const data = await refreshRes.json();
+        const isProduction = process.env.NODE_ENV === "production";
 
-	authLogger.warn('PROXY', `All auth attempts failed — redirecting to login`);
-	return NextResponse.redirect(buildAuthLoginUrl(getCleanRedirectUrl()));
+        let accessMaxAge = 60 * 60;
+        try {
+          const payload = JSON.parse(atob(data.accessToken.split(".")[1]));
+          if (payload?.exp) {
+            const nowSec = Math.floor(Date.now() / 1000);
+            accessMaxAge = Math.max(payload.exp - nowSec, 0);
+          }
+        } catch {}
+
+        const response = NextResponse.next();
+        response.cookies.set("accessToken", data.accessToken, {
+          httpOnly: true,
+          secure: isProduction,
+          sameSite: "lax",
+          path: "/",
+          maxAge: accessMaxAge,
+        });
+        response.cookies.set("refreshToken", data.refreshToken, {
+          httpOnly: true,
+          secure: isProduction,
+          sameSite: "lax",
+          path: "/",
+          maxAge: 60 * 60 * 24 * 7,
+        });
+        setCsrfCookie(response, req.cookies.get("csrf_token")?.value);
+        return response;
+      } else {
+        authLogger.error("PROXY", `Token refresh failed`, {
+          status: refreshRes.status,
+        });
+      }
+    } catch (error) {
+      authLogger.error(
+        "PROXY",
+        `Token refresh error: ${error instanceof Error ? error.message : "unknown"}`,
+      );
+    }
+  }
+
+  authLogger.warn("PROXY", `All auth attempts failed — redirecting to login`);
+  return NextResponse.redirect(buildAuthLoginUrl(getCleanRedirectUrl()));
 }
 
 export const config = {
-	matcher: [
-		'/((?!_next|[^?]*\\.(?:css|js|png|jpg|jpeg|svg|ico|webp|woff2?|ttf)).*)',
-	],
+  matcher: [
+    "/((?!_next|[^?]*\\.(?:css|js|png|jpg|jpeg|svg|ico|webp|woff2?|ttf)).*)",
+  ],
 };
