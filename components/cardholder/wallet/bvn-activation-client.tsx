@@ -5,9 +5,15 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import BvnScreen from './bvn-screen';
 import { csrfFetch } from '@/lib/csrf-client';
-import { Loader2, RefreshCw, XCircle } from 'lucide-react';
+import { compactPhone, NIGERIAN_MOBILE_PATTERN } from '@/schemas/bvn';
+import { Loader2, Phone, RefreshCw, XCircle } from 'lucide-react';
 
-type BvnFormData = { bvn: string; accountNumber: string; bankCode: string };
+type BvnFormData = {
+	bvn: string;
+	accountNumber: string;
+	bankCode: string;
+	phone: string;
+};
 
 /**
  * Client wrapper around BvnScreen that wires up the real API call.
@@ -21,6 +27,9 @@ export default function BvnActivationClient() {
 	const [showRetryForm, setShowRetryForm] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [rechecking, setRechecking] = useState(false);
+	const [phoneRequired, setPhoneRequired] = useState(false);
+	const [phone, setPhone] = useState('');
+	const [savingPhone, setSavingPhone] = useState(false);
 
 	// Fetch wallet status on mount
 	useEffect(() => {
@@ -33,6 +42,10 @@ export default function BvnActivationClient() {
 					setWalletStatus(status);
 					if (json?.data?.kycRejectionReason) {
 						setRejectionReason(json.data.kycRejectionReason);
+					}
+					if (json?.data?.phoneRequired) {
+						setPhoneRequired(true);
+						return;
 					}
 					if (status === 'BVN_VERIFIED') {
 						toast.success('Your wallet is already activated!');
@@ -62,6 +75,13 @@ export default function BvnActivationClient() {
 			setWalletStatus(status);
 
 			if (status === 'BVN_VERIFIED') {
+				if (json?.data?.phoneRequired) {
+					setPhoneRequired(true);
+					toast.info(
+						'Verified. Add your mobile number to get your virtual account.',
+					);
+					return;
+				}
 				toast.success(
 					'Wallet activated! Your virtual account is ready.',
 				);
@@ -90,6 +110,38 @@ export default function BvnActivationClient() {
 		}
 	};
 
+	const handleSavePhone = async () => {
+		const cleaned = compactPhone(phone);
+		if (!NIGERIAN_MOBILE_PATTERN.test(cleaned)) {
+			toast.error('Enter a Nigerian mobile number, e.g. 08031234567');
+			return;
+		}
+		setSavingPhone(true);
+		try {
+			const res = await csrfFetch('/api/wallet/kyc-phone', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ phone: cleaned }),
+			});
+			const json = await res.json();
+			if (!res.ok || !json.success) {
+				toast.error(json.message || 'Failed to save mobile number');
+				return;
+			}
+			if (json?.data?.phoneRequired) {
+				setPhoneRequired(true);
+				return;
+			}
+			setPhoneRequired(false);
+			toast.success('Wallet activated! Your virtual account is ready.');
+			router.push('/wallet');
+		} catch {
+			toast.error('Something went wrong. Please try again.');
+		} finally {
+			setSavingPhone(false);
+		}
+	};
+
 	const handleContinue = async (data: BvnFormData) => {
 		const isRetry =
 			showRetryForm ||
@@ -104,6 +156,7 @@ export default function BvnActivationClient() {
 					bvn: data.bvn,
 					accountNumber: data.accountNumber,
 					bankCode: data.bankCode,
+					phone: data.phone,
 				}),
 			});
 
@@ -137,6 +190,48 @@ export default function BvnActivationClient() {
 		return (
 			<div className='flex items-center justify-center min-h-screen'>
 				<Loader2 className='w-6 h-6 animate-spin text-white/50' />
+			</div>
+		);
+	}
+
+	if (phoneRequired) {
+		return (
+			<div className='flex flex-col items-center justify-center min-h-screen px-6 text-center gap-6 bg-black text-white'>
+				<div className='w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center'>
+					<Phone className='w-8 h-8 text-green-400' />
+				</div>
+				<div>
+					<h2 className='text-xl font-semibold text-white mb-2'>
+						Add Your Mobile Number
+					</h2>
+					<p className='text-white/60 text-sm max-w-xs'>
+						Verified. Add your mobile number to get your virtual
+						account.
+					</p>
+				</div>
+				<div className='w-full max-w-sm space-y-4'>
+					<input
+						type='tel'
+						inputMode='tel'
+						value={phone}
+						onChange={(e) =>
+							setPhone(
+								e.target.value.replace(/[^0-9+\s-]/g, ''),
+							)
+						}
+						placeholder='08031234567'
+						className='w-full bg-neutral-900 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-white/30'
+					/>
+					<button
+						onClick={handleSavePhone}
+						disabled={savingPhone}
+						className='w-full py-3 bg-white text-black rounded-full font-medium text-sm disabled:opacity-50 transition-opacity'
+					>
+						{savingPhone ?
+							<Loader2 className='w-4 h-4 animate-spin mx-auto' />
+						:	'Save number'}
+					</button>
+				</div>
 			</div>
 		);
 	}

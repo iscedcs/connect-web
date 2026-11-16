@@ -6,7 +6,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/verify-jwt';
-import { getMyWallets, retryBvnKyc } from '@/lib/services/wallet';
+import {
+	compactPhone,
+	getMyWallets,
+	NIGERIAN_MOBILE_PATTERN,
+	retryBvnKyc,
+} from '@/lib/services/wallet';
 
 export async function POST(req: NextRequest) {
 	const cookieStore = await cookies();
@@ -28,10 +33,11 @@ export async function POST(req: NextRequest) {
 	}
 
 	const body = await req.json().catch(() => ({}));
-	const { bvn, accountNumber, bankCode } = body as {
+	const { bvn, accountNumber, bankCode, phone: bodyPhone } = body as {
 		bvn?: string;
 		accountNumber?: string;
 		bankCode?: string;
+		phone?: string;
 	};
 
 	if (!bvn || !/^\d{11}$/.test(bvn)) {
@@ -56,7 +62,19 @@ export async function POST(req: NextRequest) {
 		);
 	}
 
+	const cleanedPhone = bodyPhone ? compactPhone(bodyPhone) : '';
+	if (cleanedPhone && !NIGERIAN_MOBILE_PATTERN.test(cleanedPhone)) {
+		return NextResponse.json(
+			{
+				success: false,
+				message: 'Enter a Nigerian mobile number, e.g. 08031234567',
+			},
+			{ status: 400 },
+		);
+	}
+
 	const user = payload as any;
+	const phone = cleanedPhone || user.phone || undefined;
 
 	// Find the user's NGN wallet
 	const wallets = await getMyWallets(accessToken);
@@ -75,6 +93,7 @@ export async function POST(req: NextRequest) {
 		bankCode,
 		firstName: user.firstName ?? undefined,
 		lastName: user.lastName ?? undefined,
+		phone,
 	});
 
 	return NextResponse.json(result, { status: result.success ? 200 : 500 });

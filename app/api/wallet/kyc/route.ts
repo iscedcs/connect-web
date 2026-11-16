@@ -13,6 +13,8 @@ import {
 	resolveAccountNumber,
 	addPaymentMethod,
 	listBanks,
+	compactPhone,
+	NIGERIAN_MOBILE_PATTERN,
 } from '@/lib/services/wallet';
 
 export async function POST(req: NextRequest) {
@@ -36,11 +38,12 @@ export async function POST(req: NextRequest) {
 	}
 
 	const body = await req.json().catch(() => ({}));
-	const { bvn, accountNumber, bankCode, dob } = body as {
+	const { bvn, accountNumber, bankCode, dob, phone: bodyPhone } = body as {
 		bvn?: string;
 		accountNumber?: string;
 		bankCode?: string;
 		dob?: string;
+		phone?: string;
 	};
 
 	if (!bvn || !/^\d{11}$/.test(bvn)) {
@@ -67,11 +70,22 @@ export async function POST(req: NextRequest) {
 		);
 	}
 
+	const cleanedPhone = bodyPhone ? compactPhone(bodyPhone) : '';
+	if (cleanedPhone && !NIGERIAN_MOBILE_PATTERN.test(cleanedPhone)) {
+		return NextResponse.json(
+			{
+				success: false,
+				message: 'Enter a Nigerian mobile number, e.g. 08031234567',
+			},
+			{ status: 400 },
+		);
+	}
+
 	const user = payload as any;
 	const firstName = user.firstName ?? '';
 	const lastName = user.lastName ?? '';
 	const email = user.email ?? '';
-	const phone = user.phone ?? undefined;
+	const phone = cleanedPhone || user.phone || undefined;
 
 	// Find or create the user's NGN wallet
 	let wallets = await getMyWallets(accessToken);

@@ -220,6 +220,12 @@ export async function submitBvnKyc(
 	}
 }
 
+export const NIGERIAN_MOBILE_PATTERN = /^(\+?234|0)[789][01]\d{8}$/;
+
+export function compactPhone(raw: string): string {
+	return raw.replace(/[\s-]/g, '');
+}
+
 /**
  * Retry KYC with corrected/new information.
  * Calls wallet-nest's POST /wallets/:id/kyc/retry.
@@ -234,6 +240,7 @@ export async function retryBvnKyc(
 		bankCode: string;
 		firstName?: string;
 		lastName?: string;
+		phone?: string;
 	},
 ): Promise<{ success: boolean; message: string; data?: any }> {
 	if (!WALLET_API_URL || !accessToken)
@@ -273,6 +280,8 @@ export async function recheckKycStatus(accessToken: string): Promise<{
 		kycLevel?: string;
 		virtualAccountNumber?: string | null;
 		virtualAccountBank?: string | null;
+		phoneRequired?: boolean;
+		message?: string;
 	};
 }> {
 	if (!WALLET_API_URL || !accessToken) return { success: false };
@@ -289,6 +298,46 @@ export async function recheckKycStatus(accessToken: string): Promise<{
 	}
 }
 
+/**
+ * Add a phone number to the customer's KYC record so Paystack can issue their virtual account.
+ */
+export async function addKycPhone(
+	accessToken: string,
+	phone: string,
+): Promise<{
+	success: boolean;
+	message?: string;
+	data?: {
+		kycStatus: string;
+		kycLevel?: string;
+		virtualAccountNumber?: string | null;
+		virtualAccountBank?: string | null;
+		phoneRequired?: boolean;
+	};
+}> {
+	if (!WALLET_API_URL || !accessToken)
+		return { success: false, message: 'Service unavailable' };
+	try {
+		const res = await fetch(`${WALLET_API_URL}/api/wallets/kyc/phone`, {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ phone }),
+			cache: 'no-store',
+		});
+		const json = await res.json();
+		return {
+			success: res.ok && json?.success !== false,
+			message: json?.message,
+			data: json?.data,
+		};
+	} catch {
+		return { success: false, message: 'Network error. Please try again.' };
+	}
+}
+
 /** Wallet status info returned by getWalletStatus */
 export interface WalletStatusInfo {
 	hasWallet: boolean;
@@ -302,6 +351,7 @@ export interface WalletStatusInfo {
 	kycRejectionReason: string | null;
 	virtualAccountNumber: string | null;
 	virtualAccountBank: string | null;
+	phoneRequired?: boolean;
 	balance: number | null;
 	currency: string | null;
 	hasPin: boolean;
@@ -331,13 +381,33 @@ export async function getWalletStatus(
 		};
 	}
 
+	let virtualAccountNumber: string | null =
+		ngnWallet.virtualAccountNumber ?? null;
+	let virtualAccountBank: string | null =
+		ngnWallet.virtualAccountBank ?? null;
+	let phoneRequired: boolean | undefined;
+
+	if (ngnWallet.kycStatus === 'BVN_VERIFIED' && !virtualAccountNumber) {
+		const recheck = await recheckKycStatus(accessToken);
+		if (recheck.success && recheck.data) {
+			virtualAccountNumber =
+				recheck.data.virtualAccountNumber ?? virtualAccountNumber;
+			virtualAccountBank =
+				recheck.data.virtualAccountBank ?? virtualAccountBank;
+			if (recheck.data.phoneRequired) {
+				phoneRequired = true;
+			}
+		}
+	}
+
 	return {
 		hasWallet: true,
 		walletId: ngnWallet.id ?? null,
 		kycStatus: ngnWallet.kycStatus ?? 'UNVERIFIED',
 		kycRejectionReason: ngnWallet.kycRejectionReason ?? null,
-		virtualAccountNumber: ngnWallet.virtualAccountNumber ?? null,
-		virtualAccountBank: ngnWallet.virtualAccountBank ?? null,
+		virtualAccountNumber,
+		virtualAccountBank,
+		...(phoneRequired ? { phoneRequired: true } : {}),
 		balance: ngnWallet.balance ? parseFloat(ngnWallet.balance) : 0,
 		currency: ngnWallet.currency ?? 'NGN',
 		hasPin: !!ngnWallet.hasPin,

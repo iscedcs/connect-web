@@ -4,8 +4,10 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { csrfFetch } from '@/lib/csrf-client';
+import { compactPhone, NIGERIAN_MOBILE_PATTERN } from '@/schemas/bvn';
 import {
 	Loader2,
+	Phone,
 	RefreshCw,
 	Tag,
 	Lock,
@@ -14,7 +16,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-type SetupStep = 'pending' | 'tag' | 'pin' | 'done';
+type SetupStep = 'pending' | 'phone' | 'tag' | 'pin' | 'done';
 
 interface WalletSetupClientProps {
 	/** The initial state to render */
@@ -24,18 +26,21 @@ interface WalletSetupClientProps {
 	hasTag: boolean;
 	/** Whether the user already has a PIN set */
 	hasPin: boolean;
+	/** Whether Paystack requires a phone number to issue the virtual account */
+	phoneRequired?: boolean;
 }
 
 /**
  * Client component handling:
  * 1. BVN_SUBMITTED — pending verification UI with "Check Status" button
- * 2. BVN_VERIFIED but missing tag/PIN — setup prompts
+ * 2. BVN_VERIFIED but missing phone/tag/PIN — setup prompts
  */
 export default function WalletSetupClient({
 	initialStep,
 	walletId,
 	hasTag: initialHasTag,
 	hasPin: initialHasPin,
+	phoneRequired: initialPhoneRequired = false,
 }: WalletSetupClientProps) {
 	const router = useRouter();
 	const [rechecking, setRechecking] = useState(false);
@@ -43,11 +48,13 @@ export default function WalletSetupClient({
 	// Setup flow state
 	const [step, setStep] = useState<SetupStep>(() => {
 		if (initialStep === 'pending') return 'pending';
+		if (initialPhoneRequired) return 'phone';
 		if (!initialHasTag) return 'tag';
 		if (!initialHasPin) return 'pin';
 		return 'done';
 	});
 
+	const [phone, setPhone] = useState('');
 	const [tag, setTag] = useState('');
 	const [pin, setPin] = useState('');
 	const [confirmPin, setConfirmPin] = useState('');
@@ -69,6 +76,13 @@ export default function WalletSetupClient({
 			const status = json?.data?.kycStatus;
 
 			if (status === 'BVN_VERIFIED') {
+				if (json?.data?.phoneRequired) {
+					toast.info(
+						'Verified. Add your mobile number to get your virtual account.',
+					);
+					setStep('phone');
+					return;
+				}
 				toast.success(
 					'Wallet activated! Let\u2019s finish setting up.',
 				);
@@ -101,6 +115,51 @@ export default function WalletSetupClient({
 			toast.error('Something went wrong. Please try again.');
 		} finally {
 			setRechecking(false);
+		}
+	};
+
+	// ─── Phone Setup ─────────────────────────────────────────────
+
+	const handleSavePhone = async () => {
+		const cleaned = compactPhone(phone);
+		if (!NIGERIAN_MOBILE_PATTERN.test(cleaned)) {
+			toast.error('Enter a Nigerian mobile number, e.g. 08031234567');
+			return;
+		}
+
+		setSubmitting(true);
+		try {
+			const res = await csrfFetch('/api/wallet/kyc-phone', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ phone: cleaned }),
+			});
+			const json = await res.json();
+
+			if (!res.ok || !json.success) {
+				toast.error(json.message || 'Failed to save mobile number');
+				return;
+			}
+
+			if (json?.data?.phoneRequired) {
+				toast.error('Please enter a valid Nigerian mobile number');
+				return;
+			}
+
+			toast.success('Virtual account issued!');
+
+			if (!hasTag) {
+				setStep('tag');
+			} else if (!hasPin) {
+				setStep('pin');
+			} else {
+				setStep('done');
+				router.refresh();
+			}
+		} catch {
+			toast.error('Something went wrong. Please try again.');
+		} finally {
+			setSubmitting(false);
 		}
 	};
 
@@ -221,6 +280,65 @@ export default function WalletSetupClient({
 						:	<RefreshCw className='w-4 h-4' />}
 						{rechecking ? 'Checking...' : 'Check KYC Status'}
 					</button>
+				</div>
+			</div>
+		);
+	}
+
+	// ─── Render: Phone Setup ─────────────────────────────────────
+
+	if (step === 'phone') {
+		return (
+			<div className='min-h-screen bg-black text-white'>
+				<div className='px-4 pt-4 pb-2'>
+					<Link
+						href='/'
+						className='text-white/90'
+					>
+						<ArrowLeft className='w-5 h-5' />
+					</Link>
+				</div>
+
+				<div className='flex flex-col items-center px-6 pt-16 gap-6'>
+					<div className='w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center'>
+						<Phone className='w-8 h-8 text-green-400' />
+					</div>
+					<div className='text-center'>
+						<h2 className='text-xl font-semibold text-white mb-2'>
+							Add Your Mobile Number
+						</h2>
+						<p className='text-white/60 text-sm max-w-xs'>
+							Verified. Add your mobile number to get your
+							virtual account.
+						</p>
+					</div>
+
+					<div className='w-full max-w-sm space-y-4'>
+						<input
+							type='tel'
+							inputMode='tel'
+							value={phone}
+							onChange={(e) =>
+								setPhone(
+									e.target.value.replace(/[^0-9+\s-]/g, ''),
+								)
+							}
+							placeholder='08031234567'
+							className='w-full bg-neutral-900 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-white/30'
+						/>
+						<p className='text-white/40 text-xs'>
+							Needed to issue your virtual account
+						</p>
+						<button
+							onClick={handleSavePhone}
+							disabled={submitting}
+							className='w-full py-3 bg-white text-black rounded-full font-medium text-sm disabled:opacity-50 transition-opacity'
+						>
+							{submitting ?
+								<Loader2 className='w-4 h-4 animate-spin mx-auto' />
+							:	'Save number'}
+						</button>
+					</div>
 				</div>
 			</div>
 		);

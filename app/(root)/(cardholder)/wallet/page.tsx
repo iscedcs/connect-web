@@ -85,14 +85,15 @@ export default async function WalletPage() {
 	const hasTag = !!userProfile?.username;
 	const hasPin = walletStatus.hasPin;
 
-	// If either tag or PIN is missing, show the setup flow
-	if (!hasTag || !hasPin) {
+	// If phone, tag, or PIN is missing, show the setup flow
+	if (!hasTag || !hasPin || walletStatus.phoneRequired) {
 		return (
 			<WalletSetupClient
 				initialStep='setup'
 				walletId={walletStatus.walletId!}
 				hasTag={hasTag}
 				hasPin={hasPin}
+				phoneRequired={Boolean(walletStatus.phoneRequired)}
 			/>
 		);
 	}

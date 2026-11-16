@@ -19,7 +19,12 @@ import {
 	FormMessage,
 	FormLabel,
 } from '@/components/ui/form';
-import { bvnSchema, type BvnInput } from '@/schemas/bvn';
+import {
+	bvnSchema,
+	compactPhone,
+	NIGERIAN_MOBILE_PATTERN,
+	type BvnInput,
+} from '@/schemas/bvn';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { csrfFetch } from '@/lib/csrf-client';
@@ -49,12 +54,13 @@ export default function BvnScreen({
 		bvn: string;
 		accountNumber: string;
 		bankCode: string;
+		phone: string;
 	}) => Promise<void> | void;
 	onScan?: () => void;
 }) {
 	const form = useForm<BvnInput>({
 		resolver: zodResolver(bvnSchema),
-		defaultValues: { bvn: '', accountNumber: '', bankCode: '' },
+		defaultValues: { bvn: '', accountNumber: '', bankCode: '', phone: '' },
 		mode: 'onChange',
 	});
 
@@ -177,11 +183,13 @@ export default function BvnScreen({
 
 	const accountNumber = form.watch('accountNumber');
 	const bankCode = form.watch('bankCode');
+	const phone = form.watch('phone');
 	const isValid =
 		form.formState.isValid &&
 		displayBVN.replace(/\D/g, '').length === 11 &&
 		accountNumber.length === 10 &&
-		bankCode.length > 0;
+		bankCode.length > 0 &&
+		NIGERIAN_MOBILE_PATTERN.test(compactPhone(phone ?? ''));
 
 	return (
 		<div className='min-h-screen bg-black text-white flex flex-col'>
@@ -223,6 +231,7 @@ export default function BvnScreen({
 								bvn: data.bvn,
 								accountNumber: data.accountNumber,
 								bankCode: data.bankCode,
+								phone: data.phone,
 							});
 						})}
 						className='space-y-6'
@@ -401,6 +410,46 @@ export default function BvnScreen({
 											<span>{resolvedName}</span>
 										</div>
 									)}
+								</FormItem>
+							)}
+						/>
+
+						{/* Mobile Number */}
+						<FormField
+							control={form.control}
+							name='phone'
+							render={() => (
+								<FormItem>
+									<FormLabel className='text-white/70 text-sm'>
+										Mobile Number
+									</FormLabel>
+									<FormControl>
+										<input
+											type='tel'
+											inputMode='tel'
+											value={phone}
+											onChange={(e) =>
+												form.setValue(
+													'phone',
+													e.target.value.replace(
+														/[^0-9+\s-]/g,
+														'',
+													),
+													{ shouldValidate: true },
+												)
+											}
+											placeholder='08031234567'
+											className={cn(
+												'w-full bg-transparent text-base outline-none',
+												'border-b border-white/20 focus:border-white transition-colors',
+												'pb-2 placeholder-white/40',
+											)}
+										/>
+									</FormControl>
+									<p className='text-xs text-white/40 mt-1'>
+										Needed to issue your virtual account
+									</p>
+									<FormMessage className='mt-1' />
 								</FormItem>
 							)}
 						/>
