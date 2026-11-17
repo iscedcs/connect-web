@@ -17,17 +17,6 @@ function isProtectedPath(pathname: string) {
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  //   Auth by-pass: For Local UI-only changes
-
-  if (
-    process.env.NODE_ENV === "development" &&
-    process.env.SKIP_AUTH_FOR_LOCAL === "true"
-  ) {
-    const response = NextResponse.next();
-    setCsrfCookie(response, req.cookies.get("csrf_token")?.value);
-    return response;
-  }
-
   // -- CSRF validation for state-changing API requests --
   const csrfError = validateCsrf(req);
   if (csrfError) return csrfError;
