@@ -32,7 +32,9 @@ export default async function ProfilesPage() {
 
   return (
     <main className="min-h-screen bg-black text-white">
-      <PageTitle title="Your Profile(s)" />
+      <div className="px-5 py-3">
+        <PageTitle title="Your Profile(s)" />
+      </div>
       <div className="p-4 space-y-6">
         <ProfileList profiles={profiles} accessToken={accessToken} />
       </div>
