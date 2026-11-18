@@ -11,6 +11,7 @@ import WalletHistoryList, {
 } from '@/components/cardholder/wallet/wallet-history-list';
 import WalletEmptyState from '@/components/cardholder/wallet/empty-wallet-state';
 import WalletSetupClient from '@/components/cardholder/wallet/wallet-setup-client';
+import AccountNumberNotice from '@/components/cardholder/wallet/account-number-notice';
 
 /** Format a Decimal string as ₦X,XXX.XX */
 function formatNaira(value: number | string | null): string {
@@ -114,25 +115,33 @@ export default async function WalletPage() {
 		.join(' - ');
 
 	const transactions = txData?.transactions ?? [];
+	const notice =
+		walletStatus.virtualAccountNumber ? null : <AccountNumberNotice />;
 
 	if (transactions.length === 0) {
 		return (
-			<WalletEmptyState
-				balance={balance}
-				accountNumber={accountNumber || 'No account'}
-				accountLabel='Wallet account details'
-			/>
+			<>
+				{notice}
+				<WalletEmptyState
+					balance={balance}
+					accountNumber={accountNumber || 'No account'}
+					accountLabel='Wallet account details'
+				/>
+			</>
 		);
 	}
 
 	const items: WalletTxn[] = transactions.map(toWalletTxn);
 
 	return (
-		<WalletHistoryList
-			balance={balance}
-			accountNumber={accountNumber || 'No account'}
-			accountLabel='Wallet account details'
-			items={items}
-		/>
+		<>
+			{notice}
+			<WalletHistoryList
+				balance={balance}
+				accountNumber={accountNumber || 'No account'}
+				accountLabel='Wallet account details'
+				items={items}
+			/>
+		</>
 	);
 }
