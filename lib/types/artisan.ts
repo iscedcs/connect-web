@@ -178,6 +178,8 @@ export interface ArtisanRequirements {
 	hasWallet: boolean;
 	categories: ArtisanCategory[];
 	minimumFields: string[];
+	/** false → new profiles wait for admin review; true → listed at once. Absent on older APIs. */
+	autoApproval?: boolean;
 }
 
 export interface EarningsData {
