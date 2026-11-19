@@ -436,9 +436,12 @@ export default function ArtisanSetupWizard({
 							className='mt-1 rounded border-white/20'
 						/>
 						<span className='text-xs text-white/60'>
-							I agree to the Artisan Terms of Service and
-							understand that my profile will be reviewed before
-							activation.
+							I agree to the Artisan Terms of Service
+							{requirements?.autoApproval === false ?
+								' and understand that my profile will be reviewed before activation.'
+							: requirements?.autoApproval === true ?
+								' and understand that my profile goes live as soon as I submit it.'
+							:	'.'}
 						</span>
 					</label>
 
