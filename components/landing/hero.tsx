@@ -60,7 +60,7 @@ export function Hero() {
         <motion.p
           variants={fadeInUp}
           className="mt-5 md:mt-8 text-base md:text-lg lg:text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed text-pretty">
-          Connect replaces paper business cards with a powerful digital profile.
+          LYNCON replaces paper business cards with a powerful digital profile.
           Share via NFC smart devices, QR codes, or a simple link — no app
           needed on their end.
         </motion.p>

@@ -7,7 +7,7 @@ import ManageAccountClient from '@/components/pages/cardholder/manage-account/ma
 export const metadata = generateMetadata({
 	title: 'Manage Account',
 	description:
-		'Manage your ISCE Connect account. Delete your account and all associated data.',
+		'Manage your LYNCON account. Delete your account and all associated data.',
 	keywords: ['account', 'delete', 'manage', 'data'],
 });
 

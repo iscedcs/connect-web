@@ -11,7 +11,7 @@ const screens = [
     id: "profile",
     label: "Profile",
     src: "/images/previews/portfolio.png",
-    alt: "Connect digital profile showing contact info, socials, and links",
+    alt: "LYNCON digital profile showing contact info, socials, and links",
   },
   {
     id: "qr-online",
@@ -52,7 +52,7 @@ export function ProfilePreview() {
               More Than a<span className="text-zinc-400"> Business Card</span>
             </h2>
             <p className="mt-5 text-base md:text-lg text-zinc-400 leading-relaxed">
-              Your Connect profile is a living, breathing representation of your
+              Your LYNCON profile is a living, breathing representation of your
               professional identity. Rich with modules for contacts, socials,
               links, files, and more. Share it via NFC devices, QR codes, or
               just a link.

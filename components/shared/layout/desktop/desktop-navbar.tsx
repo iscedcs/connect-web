@@ -25,7 +25,7 @@ import {
 
 const ROUTE_LABELS: Record<string, string> = {
   dashboard: "Dashboard",
-  connect: "Connect",
+  connect: "LYNCON",
   links: "Links",
   socials: "Social Profiles",
   videos: "Videos",
@@ -46,7 +46,7 @@ const ROUTE_LABELS: Record<string, string> = {
   withdraw: "Withdraw",
   settings: "Settings",
   account: "Account Settings",
-  "connect-config": "Connect Config",
+  "connect-config": "LYNCON Config",
   notifications: "Notifications",
   support: "Support",
   devices: "Devices",
@@ -207,7 +207,7 @@ export default function DesktopNavbar({ user }: DesktopNavbarProps) {
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link href="/settings/connect-config" className="cursor-pointer">
-                Connect Config
+                LYNCON Config
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />

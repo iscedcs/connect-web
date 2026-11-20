@@ -36,7 +36,7 @@ function BecomeArtisanCTA({
       </div>
       <div>
         <p className="text-[12px] text-white/60">
-          Offer your services on ISCE Connect
+          Offer your services on LYNCON
         </p>
         <div className="flex items-start justify-between mt-3">
           <h3 className="text-[22px] leading-[1.2] font-normal w-[75%]">

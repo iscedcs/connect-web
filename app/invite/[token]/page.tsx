@@ -108,7 +108,7 @@ export default function InvitePage() {
               <h1 className="text-2xl font-bold text-[var(--cp-text-1)]">You're invited!</h1>
               <p className="text-sm text-[var(--cp-text-2)] mt-2">
                 <strong className="text-[var(--cp-text-1)]">{info.inviterName}</strong> has invited you to join the{' '}
-                <strong className="text-[var(--cp-text-1)]">{info.workspaceName}</strong> Connect Plus workspace as a{' '}
+                <strong className="text-[var(--cp-text-1)]">{info.workspaceName}</strong> LYNCON Plus workspace as a{' '}
                 <span className="text-[var(--cp-primary)] font-semibold">{info.role}</span>.
               </p>
               <p className="text-xs text-[var(--cp-text-3)] mt-1">{info.email}</p>
@@ -183,10 +183,10 @@ export default function InvitePage() {
             <CheckCircle size={64} className="text-[var(--cp-primary)] mx-auto" />
             <div>
               <h1 className="text-2xl font-bold text-[var(--cp-text-1)]">You're all set!</h1>
-              <p className="text-sm text-[var(--cp-text-2)] mt-2">You're now part of the <strong className="text-[var(--cp-text-1)]">{info.workspaceName}</strong> Connect Plus workspace.</p>
+              <p className="text-sm text-[var(--cp-text-2)] mt-2">You're now part of the <strong className="text-[var(--cp-text-1)]">{info.workspaceName}</strong> LYNCON Plus workspace.</p>
             </div>
             <button onClick={() => router.push('/cp/org')} className="w-full py-3 rounded-xl bg-[var(--cp-primary)] text-white font-bold">
-              Open Connect Plus
+              Open LYNCON Plus
             </button>
           </div>
         )}

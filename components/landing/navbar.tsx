@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getSignInUrl, getSignUpUrl } from '@/lib/client-auth-urls';
 
 const navLinks = [
@@ -42,14 +43,22 @@ export function Navbar({
         }`}
       >
         <nav className="flex items-center justify-between px-5 md:px-10 lg:px-16 py-4 max-w-[1400px] mx-auto">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="relative w-8 h-8 rounded-lg bg-[#7B93FF]/20 flex items-center justify-center">
-              <div className="w-3 h-3 rounded-full bg-[#7B93FF]" />
-              <div className="absolute inset-0 rounded-lg bg-[#7B93FF]/10 group-hover:bg-[#7B93FF]/20 transition-colors" />
-            </div>
-            <span className="text-white font-semibold text-lg tracking-tight">
-              Connect
-            </span>
+          <Link
+            href="/"
+            className="flex items-center group"
+            aria-label="LYNCON home"
+          >
+            {/* Wordmark asset is 2068x488; height is fixed and width follows
+                so the ratio holds at every breakpoint. White variant because
+                the nav sits on black or a dark blur. */}
+            <Image
+              src="/assets/logo/white-transparent.png"
+              alt="LYNCON"
+              width={136}
+              height={32}
+              priority
+              className="h-7 w-auto md:h-8 transition-opacity group-hover:opacity-80"
+            />
           </Link>
 
           {/* Desktop Nav */}

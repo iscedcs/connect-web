@@ -11,18 +11,19 @@ export default function CategoriesGrid({ isAuthed }: { isAuthed: boolean }) {
   const router = useRouter();
   return (
     <>
-      <button
+      {/* <button
         type="button"
         className="cursor-pointer"
         onClick={() => router.back()}>
         <LeftIcon />
-      </button>
+      </button> */}
       <div className="grid gap-4 max-w-md mx-auto mt-2">
         {LINK_CATEGORIES.map((c) => (
           <Link
             key={c.key}
             href={disabled ? "#" : c.href}
-            aria-disabled={disabled}>
+            aria-disabled={disabled}
+          >
             <CategoryCard category={c} disabled={disabled} />
           </Link>
         ))}

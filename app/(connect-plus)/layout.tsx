@@ -1,8 +1,8 @@
 import React from 'react'
 
 export const metadata = {
-  title: 'ISCE Connect Plus',
-  description: 'Enterprise & Business Operations Layer for ISCE Connect',
+  title: 'LYNCON Plus',
+  description: 'Enterprise & Business Operations Layer for LYNCON',
 }
 
 export default function ConnectPlusRootLayout({

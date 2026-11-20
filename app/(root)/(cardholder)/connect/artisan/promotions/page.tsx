@@ -4,7 +4,7 @@ import { getMyArtisanProfile, getMyPromotions } from '@/lib/services/artisan';
 import ArtisanPromotionsClient from '@/components/cardholder/artisan/promotions/artisan-promotions-client';
 import { getConnectProfile } from '@/lib/services/profile';
 
-export const metadata = { title: 'Promotions — ISCE Connect' };
+export const metadata = { title: 'Promotions — LYNCON' };
 
 export default async function ArtisanPromotionsPage() {
 	const auth = await getAuthInfo();

@@ -9,9 +9,9 @@ import type { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-	title: 'Artisan Directory — ISCE Connect',
+	title: 'Artisan Directory — LYNCON',
 	description:
-		'Find skilled artisans and service providers near you on ISCE Connect.',
+		'Find skilled artisans and service providers near you on LYNCON.',
 };
 
 export default async function ArtisanDirectoryPage() {

@@ -45,7 +45,7 @@ export function CpSidebar() {
     { icon: Receipt,         label: 'Invoices & Billing',    href: `/cp/${slug}/invoices` },
     { icon: Calendar,        label: 'Appointments',          href: `/cp/${slug}/appointments` },
     { icon: UserCheck,       label: 'Leads & CRM',           href: `/cp/${slug}/leads` },
-    { icon: CreditCard,      label: 'Connect Cards',         href: `/cp/${slug}/cards` },
+    { icon: CreditCard,      label: 'LYNCON Cards',         href: `/cp/${slug}/cards` },
   ]
 
   // Account & Support Settings Navigation

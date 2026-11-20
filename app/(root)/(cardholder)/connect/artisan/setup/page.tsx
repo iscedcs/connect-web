@@ -12,7 +12,7 @@ import { generateMetadata } from "@/lib/metadata";
 export const metadata = generateMetadata({
   title: "Become an Artisan",
   description:
-    "Set up your artisan profile on ISCE Connect and start offering your services.",
+    "Set up your artisan profile on LYNCON and start offering your services.",
   keywords: ["artisan", "setup", "register", "services"],
 });
 
@@ -48,9 +48,9 @@ export default async function ArtisanSetupPage() {
               />
             </svg>
           </div>
-          <h2 className="text-lg font-semibold">Connect profile required</h2>
+          <h2 className="text-lg font-semibold">LYNCON profile required</h2>
           <p className="text-sm text-white/60">
-            You need to set up your Connect profile before becoming an Artisan.
+            You need to set up your LYNCON profile before becoming an Artisan.
             Go to your dashboard and set up your profile first.
           </p>
           <Link

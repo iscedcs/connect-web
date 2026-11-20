@@ -78,7 +78,7 @@ export default function DesktopProfileBanner({
   const name =
     connectProfile?.name ||
     [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
-    "Connect User";
+    "LYNCON User";
 
   const roleOrBio = connectProfile?.position || "";
   const initials = getAvatarInitials(name);

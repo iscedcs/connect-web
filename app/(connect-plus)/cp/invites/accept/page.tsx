@@ -33,7 +33,7 @@ export default function InviteAcceptancePage() {
         otp,
         fullName,
       })
-      alert('Workspace invite accepted! Welcome to Connect Plus.')
+      alert('Workspace invite accepted! Welcome to LYNCON Plus.')
       router.push('/cp/org')
     } catch {
       // Direct user after mock onboarding

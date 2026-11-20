@@ -66,16 +66,16 @@ export async function generateMetadata({
 
   if (!profileData) {
     return {
-      title: "Profile Not Found | Connect",
+      title: "Profile Not Found | LYNCON",
       robots: { index: false, follow: false },
     };
   }
 
   const { profile } = profileData;
-  const title = `${profile.name} | Connect`;
+  const title = `${profile.name} | LYNCON`;
   const description =
     profile.bio ||
-    `${profile.name}${profile.position ? ` - ${profile.position}` : ""}. Connect with me on ISCE Connect.`;
+    `${profile.name}${profile.position ? ` - ${profile.position}` : ""}. Connect with me on LYNCON.`;
   const fallbackCover = COVER_PHOTOS[hashCode(slug) % COVER_PHOTOS.length];
   const ogImage = profile.coverPhoto?.startsWith("http")
     ? profile.coverPhoto

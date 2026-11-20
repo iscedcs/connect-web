@@ -36,7 +36,7 @@ export default async function ContactManagementPage() {
 		return (
 			<main className='min-h-screen bg-black text-white flex items-center justify-center px-6'>
 				<p className='text-white/70 text-center max-w-sm leading-relaxed'>
-					No Connect profile found for this account. Please create a
+					No LYNCON profile found for this account. Please create a
 					profile to continue.
 				</p>
 			</main>

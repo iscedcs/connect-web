@@ -9,7 +9,7 @@ export default async function CreateProfilePage() {
     <main className="min-h-screen bg-black text-white p-4 pt-24">
       <h1 className="text-2xl font-bold">Create a new profile</h1>
       <p className="text-white/50 text-sm mt-1 mb-6">
-        Set up a new public contact profile for your ISCE Connect account.
+        Set up a new public contact profile for your LYNCON account.
       </p>
 
       <CreateProfileClient

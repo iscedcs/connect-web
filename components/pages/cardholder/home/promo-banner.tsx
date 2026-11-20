@@ -75,7 +75,7 @@ const allSlides: ContextualSlide[] = [
   {
     id: 5,
     icon: <UserCircle className="w-8 h-8 text-orange-500" />,
-    href: "/profile",
+    href: "/profiles",
     title: "Complete your profile",
     subtitle: "Add your details to stand out",
     showWhen: (ctx) => !ctx.profileComplete,

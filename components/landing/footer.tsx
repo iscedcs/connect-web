@@ -3,6 +3,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { fadeIn } from "@/lib/animations";
 import { Twitter, Linkedin, Instagram } from "lucide-react";
 
@@ -83,28 +84,17 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 md:gap-10">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2.5 mb-4">
-              <div
-                className="w-7 h-7 rounded-lg flex items-center justify-center"
-                style={{
-                  background:
-                    "linear-gradient(135deg, rgba(123,147,255,0.25), rgba(199,125,255,0.15))",
-                  border: "1px solid rgba(123,147,255,0.2)",
-                }}>
-                <div
-                  className="w-2.5 h-2.5 rounded-full"
-                  style={{
-                    background: "linear-gradient(135deg, #7B93FF, #A5B8FF)",
-                  }}
-                />
-              </div>
-              <span
-                className="text-white font-semibold text-base tracking-tight"
-                style={{
-                  fontFamily: "var(--font-syne), sans-serif",
-                }}>
-                Connect
-              </span>
+            <div className="flex items-center mb-4">
+              {/* Same 2068x488 wordmark as the nav, white variant for the
+                  dark footer. Height-fixed so the ratio holds; no priority
+                  here since the footer is never the LCP element. */}
+              <Image
+                src="/assets/logo/white-transparent.png"
+                alt="LYNCON"
+                width={119}
+                height={28}
+                className="h-6 w-auto md:h-7"
+              />
             </div>
             <p className="text-sm text-zinc-400 leading-relaxed max-w-[200px] mb-6">
               The future of professional networking, powered by ISCE Digital

@@ -32,8 +32,8 @@ export default function ReferralCard({
 		if (typeof navigator !== 'undefined' && navigator.share) {
 			try {
 				await navigator.share({
-					title: 'Join ISCE Connect',
-					text: `Join me on ISCE Connect using my referral code ${referralCode}!`,
+					title: 'Join LYNCON',
+					text: `Join me on LYNCON using my referral code ${referralCode}!`,
 					url: shareUrl,
 				});
 			} catch {

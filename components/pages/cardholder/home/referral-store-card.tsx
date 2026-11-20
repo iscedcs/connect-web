@@ -41,7 +41,14 @@ export default function ReferralStoreCard({
 		return null;
 	}
 
-	const storeUrl = 'https://store.isce.tech/';
+	// store.isce.tech serves the store's `main` branch, which has no database
+	// behind it — a referred user landing there can't actually buy a card. The
+	// test stack points this at the `dev` preview instead, which does.
+	//
+	// NEXT_PUBLIC_* is inlined at build time, not read at runtime, so this is
+	// fixed per image: changing it means rebuilding, not restarting.
+	const storeUrl =
+		process.env.NEXT_PUBLIC_STORE_URL || 'https://store.isce.tech/';
 
 	const handleCopy = async () => {
 		try {

@@ -10,7 +10,7 @@ const features = [
     icon: Nfc,
     title: "NFC Smart Devices",
     description:
-      "Tap your Connect card, wristband, badge, or any NFC-enabled device on a smartphone to instantly share your profile. No app needed.",
+      "Tap your LYNCON card, wristband, badge, or any NFC-enabled device on a smartphone to instantly share your profile. No app needed.",
   },
   {
     icon: QrCode,

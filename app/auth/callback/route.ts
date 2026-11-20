@@ -1,5 +1,59 @@
 import { NextResponse } from "next/server";
 import { authLogger } from "@/lib/auth-logger";
+import { attachReferral } from "@/lib/services/referral";
+
+/**
+ * Recover the referral code from a callback URL.
+ *
+ * getSignUpUrl/getSignInUrl nest it inside the `redirect` param
+ * (`?redirect=%2Fdashboard%3FreferralCode%3Dada`), so it is usually NOT a
+ * top-level param on this callback. Check both shapes.
+ */
+function extractReferralCode(
+  redirectTarget: string,
+  params: URLSearchParams,
+): string | null {
+  const direct =
+    params.get("referralCode") || params.get("referral") || params.get("ref");
+  if (direct) return direct;
+
+  const queryStart = redirectTarget.indexOf("?");
+  if (queryStart === -1) return null;
+  const nested = new URLSearchParams(redirectTarget.slice(queryStart + 1));
+  return (
+    nested.get("referralCode") || nested.get("referral") || nested.get("ref")
+  );
+}
+
+// Server-side only. Both values unset = legacy exchange (no client auth);
+// exactly one set is a misconfiguration and sends nothing rather than half.
+function getClientCredentials(): { clientId?: string; clientSecret?: string } {
+  const clientId = process.env.ISCE_AUTH_CLIENT_ID?.trim();
+  const clientSecret = process.env.ISCE_AUTH_CLIENT_SECRET?.trim();
+  if (clientId && clientSecret) return { clientId, clientSecret };
+  if (clientId || clientSecret) {
+    authLogger.error(
+      "CALLBACK",
+      "ISCE_AUTH_CLIENT_ID and ISCE_AUTH_CLIENT_SECRET must be set together; sending no client credentials",
+    );
+  }
+  return {};
+}
+
+// Relative paths, or absolute URLs whose origin is exactly one of ours.
+// "//evil.com" and "/\evil.com" start with "/" but resolve to another site, and a
+// prefix check would accept "https://app.example.com.evil.com".
+function isSafeRedirect(target: string, allowedBases: string[]): boolean {
+  if (target.startsWith("/")) {
+    return !target.startsWith("//") && !target.startsWith("/\\");
+  }
+  try {
+    const origin = new URL(target).origin;
+    return allowedBases.some((base) => new URL(base).origin === origin);
+  } catch {
+    return false;
+  }
+}
 
 function buildSignInRedirect(callbackUrl: URL): string {
   const base = (process.env.NEXT_PUBLIC_AUTH_WEB_URL || "").trim();
@@ -28,10 +82,7 @@ export async function GET(req: Request) {
   const authApiBase =
     process.env.AUTH_API_URL || process.env.NEXT_PUBLIC_AUTH_API_URL;
 
-  const safeRedirect =
-    redirectTo.startsWith("/") ||
-    redirectTo.startsWith(appBase) ||
-    redirectTo.startsWith(requestOrigin);
+  const safeRedirect = isSafeRedirect(redirectTo, [appBase, requestOrigin]);
   const safe = safeRedirect ? redirectTo : "/";
 
   const callbackUrl = new URL("/auth/callback", appBase);
@@ -54,7 +105,7 @@ export async function GET(req: Request) {
     const tokenRes = await fetch(`${authApiBase}/auth/token`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code }),
+      body: JSON.stringify({ code, ...getClientCredentials() }),
     });
 
     if (!tokenRes.ok) {
@@ -87,7 +138,7 @@ export async function GET(req: Request) {
       const remaining = Math.max(0, payload.exp - nowSec);
       maxAge = Math.min(remaining, 60 * 60 * 24 * 7);
     }
-    // Business users are routed to Connect Plus; the org page
+    // Business users are routed to LYNCON Plus; the org page
     // handles the workspace lookup after cookies are set.
     if (payload?.userType === "BUSINESS_USER") {
       finalRedirect = "/cp/org";
@@ -96,13 +147,33 @@ export async function GET(req: Request) {
   } catch {}
 
   const targetUrl = new URL(finalRedirect, appBase);
-  const callbackReferral =
-    searchParams.get("referralCode") ||
-    searchParams.get("referral") ||
-    searchParams.get("ref");
-  if (callbackReferral && !targetUrl.searchParams.has("referralCode")) {
-    targetUrl.searchParams.set("referralCode", callbackReferral);
+
+  // Read the code off `redirectTo`, not `finalRedirect` — business users are
+  // rewritten to /cp/org above, which would otherwise drop it.
+  const referralCode = extractReferralCode(redirectTo, searchParams);
+  if (referralCode && !targetUrl.searchParams.has("referralCode")) {
+    targetUrl.searchParams.set("referralCode", referralCode);
   }
+
+  // Bind the user to their referrer. Awaited, so it can't be lost to a frozen
+  // serverless instance; bounded, so it can't stall sign-in; non-fatal, so a
+  // referral problem never blocks login — but loudly logged either way, since
+  // silently dropping this is what left the referral ledger empty.
+  if (referralCode) {
+    const attach = await attachReferral(accessToken, referralCode);
+    if (attach.success) {
+      authLogger.log("CALLBACK", "Referral attached", {
+        referralCode,
+        message: attach.message,
+      });
+    } else {
+      authLogger.error("CALLBACK", "Referral attach FAILED", {
+        referralCode,
+        message: attach.message,
+      });
+    }
+  }
+
   const absoluteRedirect = targetUrl.toString();
 
   const isProduction = process.env.NODE_ENV === "production";

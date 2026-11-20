@@ -9,7 +9,7 @@ import Link from "next/link";
 
 const icons = [
   { src: "/assets/logos_youtube-icon.svg", alt: "YouTube" },
-  { src: "/assets/Ellipse9.svg", alt: "Connect" },
+  { src: "/assets/Ellipse9.svg", alt: "LYNCON" },
   { src: "/assets/336333cb08daaa72b8ac20c655e5f8de719c62f0.png", alt: "Links" },
   { src: "/assets/logos_bitcoin.svg", alt: "Bitcoin" },
   { src: "/assets/logos_spotify-icon.svg", alt: "Spotify" },
@@ -34,7 +34,7 @@ export default function ConnectManagement() {
 
   return (
     <div className="bg-neutral-900 rounded-2xl p-5 text-center">
-      <h3 className="text-lg font-medium">Connect management</h3>
+      <h3 className="text-lg font-medium">LYNCON management</h3>
       <p className="text-sm text-gray-400">
         Add links that will be accessible when your cards are scanned
       </p>

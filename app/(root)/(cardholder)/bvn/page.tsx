@@ -4,7 +4,7 @@ import { generateMetadata } from '@/lib/metadata';
 export const metadata = generateMetadata({
 	title: 'Activate Wallet Payments',
 	description:
-		'Verify your Bank Verification Number to activate payments on your Connect profile.',
+		'Verify your Bank Verification Number to activate payments on your LYNCON profile.',
 	keywords: ['BVN', 'verification', 'wallet', 'activate'],
 	noIndex: true,
 });

@@ -3,13 +3,123 @@
  * connect-web never talks to ISCE Auth Service directly for referrals.
  */
 
-const CONNECT_API_URL =
-	process.env.CONNECT_API_URL || process.env.NEXT_PUBLIC_CONNECT_API_URL || '';
+/**
+ * connect-nest mounts every route under `setGlobalPrefix('api')`, but
+ * CONNECT_API_URL is set to the bare origin (e.g. `http://connect-nest:3000`).
+ * Every call in this file was therefore hitting `/referral/*` and getting
+ * `Cannot POST /referral/attach` back — which is why no user was ever bound to
+ * a referrer, and why the referral page always reported zero regardless.
+ *
+ * Normalised here rather than corrected per-environment, so it holds whichever
+ * way the variable happens to be set in each one.
+ */
+const CONNECT_API_URL = (() => {
+	const raw =
+		process.env.CONNECT_API_URL || process.env.NEXT_PUBLIC_CONNECT_API_URL || '';
+	if (!raw) return '';
+	return `${raw.replace(/\/+$/, '').replace(/\/api$/, '')}/api`;
+})();
 
 export interface ReferralSummary {
 	code: string | null;
 	earnings: { pending: number; available: number; cashedOut: number };
 	referralCount: number;
+}
+
+// The auth callback awaits attachReferral before redirecting, so this must not
+// hold sign-in hostage when connect-nest is slow. Bounded, and non-fatal.
+const ATTACH_TIMEOUT_MS = 3000;
+
+/**
+ * Bind the freshly-authenticated user to the referrer whose code they arrived
+ * with. connect-nest resolves the user id from the bearer token and injects the
+ * INTERNAL_API_KEY itself, so the key never reaches the browser.
+ *
+ * Safe to call on every sign-in: isce-auth no-ops when the referrer is already
+ * set, the code is unknown, or it's a self-referral. A leading '@' and any
+ * casing are normalised server-side by getUserByTag.
+ */
+export async function attachReferral(
+	accessToken: string,
+	referralUsername: string,
+): Promise<{ success: boolean; message: string }> {
+	const code = referralUsername.trim();
+	if (!CONNECT_API_URL || !accessToken || !code)
+		return { success: false, message: 'Service unavailable' };
+	try {
+		const res = await fetch(`${CONNECT_API_URL}/referral/attach`, {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ referralUsername: code }),
+			cache: 'no-store',
+			signal: AbortSignal.timeout(ATTACH_TIMEOUT_MS),
+		});
+		const json = await res.json().catch(() => null);
+		return {
+			success: res.ok && json?.success !== false,
+			message:
+				json?.message ??
+				(res.ok ? 'Referrer attached' : `Attach failed (${res.status})`),
+		};
+	} catch (err) {
+		return {
+			success: false,
+			message:
+				err instanceof Error && err.name === 'TimeoutError'
+					? `Attach timed out after ${ATTACH_TIMEOUT_MS}ms`
+					: 'Network error',
+		};
+	}
+}
+
+export interface ReferredUser {
+	id: string;
+	username: string | null;
+	name: string | null;
+	joinedAt: string;
+	isVerified: boolean;
+	purchaseCount: number;
+	earned: number;
+}
+
+export interface ReferredUsersPage {
+	referrals: ReferredUser[];
+	total: number;
+	page: number;
+	limit: number;
+	hasMore: boolean;
+}
+
+/**
+ * The people this user referred, newest first, with what each has earned them.
+ *
+ * Returns null rather than throwing so the referral page keeps rendering its
+ * summary if this one call fails — the list is additive to the page, not the
+ * reason it exists.
+ */
+export async function getReferredUsers(
+	accessToken: string,
+	page = 1,
+	limit = 20,
+): Promise<ReferredUsersPage | null> {
+	if (!CONNECT_API_URL || !accessToken) return null;
+	try {
+		const res = await fetch(
+			`${CONNECT_API_URL}/referral/referred?page=${page}&limit=${limit}`,
+			{
+				headers: { Authorization: `Bearer ${accessToken}` },
+				cache: 'no-store',
+			},
+		);
+		if (!res.ok) return null;
+		const json = await res.json();
+		return json?.data ?? null;
+	} catch {
+		return null;
+	}
 }
 
 /** Fetch the authenticated user's referral code, earnings breakdown, and referral count. */

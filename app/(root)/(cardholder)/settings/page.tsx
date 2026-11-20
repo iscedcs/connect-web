@@ -1,5 +1,7 @@
 import { getAuthInfo } from '@/actions/auth';
 import { getConnectProfile } from '@/lib/services/profile';
+import { getMySubscription } from '@/lib/services/subscription';
+import { planSummary } from '@/lib/types/subscription';
 import { generateMetadata } from '@/lib/metadata';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -17,12 +19,13 @@ import {
   Wallet,
   AtSign,
   UserX,
+  Crown,
 } from "lucide-react";
 
 export const metadata = generateMetadata({
 	title: 'Settings',
 	description:
-		'Manage your Connect account settings, profile, and preferences.',
+		'Manage your LYNCON account settings, profile, and preferences.',
 	keywords: ['settings', 'account', 'preferences'],
 });
 
@@ -77,7 +80,7 @@ const SETTINGS_SECTIONS = [
 				href: '/bvn',
 				label: 'Activate Wallet Payments',
 				description:
-					'Verify your BVN to receive money on your Connect profile',
+					'Verify your BVN to receive money on your LYNCON profile',
 				Icon: Wallet,
 			},
 			{
@@ -86,6 +89,18 @@ const SETTINGS_SECTIONS = [
 				description:
 					'Set your unique @tag so others can find and pay you',
 				Icon: AtSign,
+			},
+		],
+	},
+	{
+		heading: 'Plan & Billing',
+		items: [
+			{
+				href: '/settings/subscription',
+				label: 'Subscription',
+				description:
+					'View your plan, compare upgrades, and manage billing',
+				Icon: Crown,
 			},
 		],
 	},
@@ -125,8 +140,14 @@ export default async function SettingsPage() {
 	const isAuthed = !('error' in authInfo) && !authInfo.isExpired;
 	if (!isAuthed) redirect('/');
 
-	const connectProfile = await getConnectProfile();
+	const [connectProfile, subscription] = await Promise.all([
+		getConnectProfile(),
+		getMySubscription(authInfo.accessToken),
+	]);
 	const hasProfile = Boolean(connectProfile?.id);
+	// The Subscription row names the plan the user is on, so it's visible
+	// without opening the plan page.
+	const planLine = subscription ? planSummary(subscription) : null;
 
 	return (
 		<main className='min-h-screen bg-black text-white'>
@@ -145,7 +166,7 @@ export default async function SettingsPage() {
 								Get started
 							</p>
 							<p className='text-xs text-white/50 mt-0.5'>
-								Create your first Connect profile
+								Create your first LYNCON profile
 							</p>
 						</div>
 						<ChevronRight className='h-4 w-4 text-sky-400' />
@@ -164,7 +185,7 @@ export default async function SettingsPage() {
 									href={item.href}
 									className='flex items-center gap-3 px-4 py-3.5 hover:bg-white/5 transition'
 								>
-									<div className='h-9 w-9 rounded-full bg-white/[0.06] flex items-center justify-center shrink-0'>
+									<div className='h-9 w-9 rounded-full bg-white/6 flex items-center justify-center shrink-0'>
 										<item.Icon className='h-4 w-4 text-white/60' />
 									</div>
 									<div className='flex-1 min-w-0'>
@@ -172,7 +193,9 @@ export default async function SettingsPage() {
 											{item.label}
 										</p>
 										<p className='text-xs text-white/40 truncate'>
-											{item.description}
+											{item.href === '/settings/subscription' && planLine
+												? planLine
+												: item.description}
 										</p>
 									</div>
 									<ChevronRight className='h-4 w-4 text-white/20 shrink-0' />

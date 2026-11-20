@@ -30,7 +30,7 @@ export const metadata: Metadata = generateMetadataUtil({
   description:
     "A dynamic digital lifestyle platform for seamless connectivity and modern lifestyle management.",
   keywords: [
-    "ISCE Connect",
+    "LYNCON",
     "digital lifestyle",
     "contact management",
     "NFC",
@@ -56,7 +56,7 @@ export default function RootLayout({
           name="apple-mobile-web-app-status-bar-style"
           content="black-translucent"
         />
-        <meta name="apple-mobile-web-app-title" content="Connect" />
+        <meta name="apple-mobile-web-app-title" content="LYNCON" />
       </head>
       <body
         className={`${interTight} ${syne.variable} antialiased min-h-svh bg-background text-foreground`}

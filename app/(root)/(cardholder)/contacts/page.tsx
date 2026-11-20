@@ -8,7 +8,7 @@ import SubpageHeader from '@/components/shared/subpage-header';
 export const metadata = generateMetadata({
 	title: 'Contacts',
 	description:
-		'View and manage contacts shared with you through your Connect profile.',
+		'View and manage contacts shared with you through your LYNCON profile.',
 	keywords: ['contacts', 'received contacts', 'shared contacts'],
 });
 

@@ -50,7 +50,7 @@ export default function PublicBusinessProfilePage() {
           phone: '+234 800 123 4567',
           email: 'contact@company.app',
           naicsCode: '541511 - Custom Systems',
-          aboutText: 'Welcome to our official ISCE Connect Plus business portal. Book an onsite or virtual consultation slot directly below.',
+          aboutText: 'Welcome to our official LYNCON Plus business portal. Book an onsite or virtual consultation slot directly below.',
         })
       })
       .finally(() => setLoading(false))

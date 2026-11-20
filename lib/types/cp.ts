@@ -1,4 +1,4 @@
-// ── Connect Plus shared types ──
+// ── LYNCON Plus shared types ──
 
 export type CpRole = 'CREATOR' | 'WORKSPACE_ADMIN' | 'STAFF' | 'CLIENT'
 
