@@ -18,6 +18,8 @@ import { getMyArtisanProfile } from "@/lib/services/artisan";
 import { getAuthUserProfile } from "@/lib/services/wallet";
 import { getReferralSummary } from "@/lib/services/referral";
 import { access } from "fs";
+import { getMySubscription } from "@/lib/services/subscription";
+import PlanBadge from "@/components/pages/cardholder/home/plan-badge";
 
 export const metadata = generateMetadata({
   title: "Analytics",
@@ -57,7 +59,7 @@ export default async function AnalyticsPage() {
   const userId = isAuthed ? authInfo.user.id : null;
   const accessToken = isAuthed ? authInfo.accessToken : null;
 
-  const [artisanProfile, userEvents, userProfile, referralData] =
+  const [artisanProfile, userEvents, userProfile, referralData, subscription] =
     await Promise.all([
       profileId ? getMyArtisanProfile(profileId) : Promise.resolve(null),
       userId ? fetchPublicUserEvent(userId) : Promise.resolve([]),
@@ -67,12 +69,23 @@ export default async function AnalyticsPage() {
       accessToken
         ? getReferralSummary(accessToken).catch(() => null)
         : Promise.resolve(null),
+      accessToken
+        ? getMySubscription(accessToken).catch(() => null)
+        : Promise.resolve(null),
     ]);
 
   return (
     <main className="min-h-screen bg-black text-white">
       <div className="px-5 py-3">
         <PageTitle title="Analytics & Settings" />
+      </div>
+      <div className="pb-4">
+        {/* The plan the user is on, and a way to change it */}
+        {subscription && (
+          <section className="md:block px-4 lg:p-0">
+            <PlanBadge subscription={subscription} />
+          </section>
+        )}
       </div>
       <div>
         <section className="px-4">
@@ -83,6 +96,7 @@ export default async function AnalyticsPage() {
           />
         </section>
       </div>
+
       <div className="p-6 space-y-4">
         <AnalyticsClient
           accessToken={authInfo.accessToken}

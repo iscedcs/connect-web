@@ -45,8 +45,6 @@ export async function getConnectProfile(): Promise<ConnectProfile | null> {
       Array.isArray(allJson?.data?.profiles) &&
       allJson.data.profiles.length === 0
     ) {
-      console.log("[ensure default profile] started");
-
       const ensured = await ensureDefaultProfile({});
       if (ensured.profile) {
         return ensured.profile;
