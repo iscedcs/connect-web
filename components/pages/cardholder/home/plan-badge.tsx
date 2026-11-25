@@ -18,14 +18,15 @@ export default function PlanBadge({
 }) {
   if (!subscription) return null;
 
-  const paid = subscription.plan.priceMonthly > 0 && hasPlanAccess(subscription);
+  const paid =
+    subscription.plan.priceMonthly > 0 && hasPlanAccess(subscription);
   const needsAttention =
     subscription.status === "PAST_DUE" ||
     (subscription.plan.priceMonthly > 0 && !hasPlanAccess(subscription));
   const action = needsAttention
     ? "Renew"
     : subscription.trialEligible && !paid
-      ? "Try free"
+      ? "Try Pro for Free"
       : paid
         ? "Manage"
         : "Upgrade";
@@ -37,7 +38,8 @@ export default function PlanBadge({
         needsAttention
           ? "border-amber-500/30 bg-amber-500/10"
           : "border-white/10 bg-white/3"
-      }`}>
+      }`}
+    >
       <div className="flex min-w-0 items-center gap-3">
         <Crown
           className={`h-4 w-4 shrink-0 ${paid ? "text-amber-400" : "text-white/40"}`}

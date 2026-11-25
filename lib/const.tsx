@@ -75,6 +75,7 @@ export const URLS = {
     stats: "/api/profile/stats",
     public: "/api/profile/public/{deviceId}",
     public_by_slug: "/api/profile/slug/{slug}",
+    ensure_default: "/api/profile/ensure-default",
   },
   social: {
     add: "/api/social/add",

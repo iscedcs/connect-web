@@ -211,7 +211,7 @@ export default async function DashboardPage({
             />
           </section>
           {/* DashboardAnalytics Overview */}
-          <section className="p-4 lg:hidden">
+          <section className="p-4 m-0 lg:hidden">
             <div>
               <DashboardAnalytics
                 accessToken={accessToken}
